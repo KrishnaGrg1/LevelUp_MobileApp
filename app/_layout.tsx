@@ -1,18 +1,14 @@
-import Providers from "@/components/providers/react-query";
+import "@/global.css";
+import QueryProviders from "@/providers/QueryProvider";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 import { Stack } from "expo-router";
-import "../global.css";
-
-import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
-import '@/global.css';
 
 export default function RootLayout() {
   return (
-    
-    <GluestackUIProvider mode="dark">
-      <Providers>
-      <Stack/>
-    </Providers>
-    </GluestackUIProvider>
-  
+    <ThemeProvider>
+      <QueryProviders>
+        <Stack />
+      </QueryProviders>
+    </ThemeProvider>
   );
 }

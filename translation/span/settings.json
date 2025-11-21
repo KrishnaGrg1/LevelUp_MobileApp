@@ -1,0 +1,8 @@
+ {
+    "title": "Configuración",
+    "theme": "Tema",
+    "language": "Idioma",
+    "themeAuto": "Auto",
+    "themeLight": "Claro",
+    "themeDark": "Oscuro"
+  }

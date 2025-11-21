@@ -1,0 +1,16 @@
+import axios, { AxiosInstance } from 'axios';
+
+const axiosInstance: AxiosInstance = axios.create({
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
+  withCredentials: true,
+  headers: {
+    'x-language': 'en', // Default language header
+  },
+});
+
+axiosInstance.interceptors.request.use(config => {
+  config.headers['X-Language'] = 'en'; // Default language
+  return config;
+});
+
+export default axiosInstance;
