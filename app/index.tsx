@@ -1,7 +1,7 @@
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ModeToggle } from "@/components/ModeToggle";
 import { Box } from "@/components/ui/box";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Icon } from "@/components/ui/icon";
@@ -43,7 +43,7 @@ export default function App() {
             router.replace("/(auth)/login");
           }}
         >
-          Go to Login
+          <ButtonText>Go to Login</ButtonText>
         </Button>
       </VStack>
     </Box>

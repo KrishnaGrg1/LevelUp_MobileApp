@@ -36,7 +36,7 @@ import {
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
-  const { mutate: register, isPending } = useRegister();
+  const { mutate: register, isPending, error } = useRegister();
   const [showPassword, setShowPassword] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<
     "google" | "github" | null
@@ -49,7 +49,11 @@ export default function RegisterScreen() {
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
   });
-
+  const errorMessage = error
+    ? error.message
+    : errors
+    ? errors.root?.message
+    : t("error.auth.registerFailed");
   const onSubmit = (data: RegisterInput) => {
     register(data);
   };
@@ -243,7 +247,11 @@ export default function RegisterScreen() {
               </FormControlError>
             )}
           </FormControl>
-
+          {errorMessage && (
+            <Text className="text-center text-sm text-red-600">
+              {errorMessage}
+            </Text>
+          )}
           {/* Submit Button */}
           <Button
             size="lg"
@@ -263,13 +271,13 @@ export default function RegisterScreen() {
 
           {/* Terms */}
           <Text className="text-center text-xs text-typography-400">
-            {t("auth.agreeToSignup")}{" "}
+            {String(t("auth.agreeToSignup"))}{" "}
             <Text className="text-typography-900 underline">
-              {t("auth.terms")}
+              {String(t("auth.terms"))}
             </Text>{" "}
-            {t("auth.and")}{" "}
+            {String(t("auth.and"))}{" "}
             <Text className="text-typography-900 underline">
-              {t("auth.privacyPolicy")}
+              {String(t("auth.privacyPolicy"))}
             </Text>
             .
           </Text>

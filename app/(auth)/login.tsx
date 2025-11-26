@@ -26,7 +26,7 @@ import { VStack } from "@/components/ui/vstack";
 import { useLogin } from "@/hooks/useAuth";
 import { LoginInput, loginSchema } from "@/schemas/auth/login";
 import { useTranslation } from "@/translation";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import {
   AlertCircle,
   Eye,
@@ -166,7 +166,7 @@ export default function LoginScreen() {
               <FormControlError>
                 <FormControlErrorIcon as={AlertCircle} />
                 <FormControlErrorText>
-                  {errors.email.message}
+                  {t(`${errors.email.message}`)}
                 </FormControlErrorText>
               </FormControlError>
             )}
@@ -248,17 +248,20 @@ export default function LoginScreen() {
 
           {/* Terms */}
           <Text className="text-center text-xs text-typography-400">
-            {t("auth.agreeTo")}{" "}
+            {String(t("auth.agreeTo"))}{" "}
             <Text className="text-typography-900 underline">
-              {t("auth.terms")}
+              {String(t("auth.terms"))}
             </Text>{" "}
-            {t("auth.and")}{" "}
+            {String(t("auth.and"))}{" "}
             <Text className="text-typography-900 underline">
-              {t("auth.privacyPolicy")}
+              {String(t("auth.privacyPolicy"))}
             </Text>
             .
           </Text>
         </VStack>
+        <Button onPress={() => router.push("/_sitemap")}>
+          <ButtonText>Go to indext</ButtonText>
+        </Button>
       </Box>
     </ScrollView>
   );

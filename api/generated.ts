@@ -174,10 +174,7 @@ export interface UserRegisterResponse {
   headers: Record<string, string>;
   body: {
     message: string;
-    data: {
-      isadmin: boolean;
-      expiredAt: string;
-    };
+    data: User
   };
 }
 

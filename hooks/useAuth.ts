@@ -19,14 +19,8 @@ export function useLogin() {
 
     onSuccess: (data) => {
       console.log("Login success:", data);
-      
-      // Get store actions
       const { setAuthenticated } = authStore.getState();
-      
-      // store tokens, navigate, etc.
       setAuthenticated(true);
-
-
       router.replace('/(main)/dashboard');
     },
 
@@ -45,8 +39,9 @@ export function useRegister() {
     },
 
     onSuccess: (data) => {
-      console.log("Register success:", data);
-
+      console.log("Register success:", data.body);
+   const { setUser } = authStore.getState(); 
+      setUser({ id: String(data.body.data.id) } as User);
       router.replace('/(auth)/verifyEmail');
     },
 
@@ -106,8 +101,10 @@ export function useVerifyEmail() {
     },
 
     onSuccess: (data) => {
+      const { setAuthenticated } = authStore.getState(); 
+      setAuthenticated(true); 
       console.log("Reset password success:", data);
-      router.push('/(auth)/login');
+      router.replace('/(main)/dashboard');
     },
 
     onError: (error: any) => {
