@@ -1,6 +1,7 @@
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ModeToggle } from "@/components/ModeToggle";
 import { Box } from "@/components/ui/box";
+import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Icon } from "@/components/ui/icon";
@@ -8,8 +9,8 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useTranslation } from "@/translation";
+import { router } from "expo-router";
 import { X } from "lucide-react-native";
-
 export default function App() {
   const { t } = useTranslation();
 
@@ -37,6 +38,13 @@ export default function App() {
 
         {/* Language Section */}
         <LanguageSwitcher />
+        <Button
+          onPress={() => {
+            router.replace("/(auth)/login");
+          }}
+        >
+          Go to Login
+        </Button>
       </VStack>
     </Box>
   );

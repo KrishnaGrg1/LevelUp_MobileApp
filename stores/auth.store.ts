@@ -1,5 +1,6 @@
 // stores/useAuth.ts
-import { User } from '@/services/generated';
+import { User } from '@/api/generated';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -37,7 +38,7 @@ const authStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => AsyncStorage),
       onRehydrateStorage: () => state => {
         state?.setHasHydrated(true);
       },

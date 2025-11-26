@@ -1,6 +1,7 @@
 import { Language } from '@/stores/language.store';
-import axiosInstance from './api';
+import axiosInstance from '../client';
 import type {
+  ForgetPasswordResponse,
   // LogoutRequest,
   LogoutResponse,
   OAuthRequest,
@@ -10,7 +11,7 @@ import type {
   UserRegisterResponse,
   UserVerifyInput,
   UserVerifyResponse,
-} from './generated';
+} from '../generated';
 
 export const login = async (data: UserLoginInput, lang: Language) => {
   try {
@@ -24,6 +25,7 @@ export const login = async (data: UserLoginInput, lang: Language) => {
     const err = error as {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
+    console.log("Login error response:", err);
     const errorMessage =
       err.response?.data?.body?.message || err.response?.data?.message || 'Login failed';
     throw new Error(errorMessage);
@@ -72,7 +74,7 @@ export const VerifyUser = async (data: UserVerifyInput, lang: Language) => {
 
 export const requestPasswordReset = async (email: string, lang: Language) => {
   try {
-    const response = await axiosInstance.post<{ message: string }>(
+    const response = await axiosInstance.post<ForgetPasswordResponse>(
       `/auth/forget-password`,
       { email },
       {

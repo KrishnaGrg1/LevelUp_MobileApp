@@ -348,3 +348,13 @@ export interface fullUserObjectResponse {
     data: User;
   };
 }
+
+export interface ForgetPasswordResponse {
+  statusCode: number;
+  body: {
+    data: {
+      userId: string;
+    };
+    message: string;
+  };
+}
