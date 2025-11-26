@@ -19,13 +19,27 @@ export function useLogin() {
 
     onSuccess: (data) => {
       console.log("Login success:", data);
-      const { setAuthenticated } = authStore.getState();
+      const { setAuthenticated, setAdminStatus, setUser } = authStore.getState();
+      
+      // Set authentication status
       setAuthenticated(true);
+      
+      // Set admin status from login response
+      const isAdmin = data?.body?.data?.isadmin || false;
+      setAdminStatus(isAdmin);
+      
+      // Set user data if available
+      if (data?.body?.data) {
+        setUser(data.body.data as unknown as User);
+      }
+      
+      // Navigate to main dashboard (can be customized based on requirements)
       router.replace('/(main)/dashboard');
     },
 
     onError: (error: any) => {
-      console.log("Login failed:", error.message);
+      console.error("Login failed:", error);
+      // Error is handled by the mutation error state
     },
   });
 }
@@ -40,13 +54,18 @@ export function useRegister() {
 
     onSuccess: (data) => {
       console.log("Register success:", data.body);
-   const { setUser } = authStore.getState(); 
+      const { setUser } = authStore.getState(); 
+      
+      // Set user data for verification flow
       setUser({ id: String(data.body.data.id) } as User);
+      
+      // Navigate to email verification
       router.replace('/(auth)/verifyEmail');
     },
 
     onError: (error: any) => {
-      console.log("Register failed:", error.message);
+      console.error("Register failed:", error);
+      // Error is handled by the mutation error state
     },
   });
 }
@@ -61,12 +80,17 @@ export function useForgetPassword() {
     onSuccess: (data) => {
       console.log("Forget password success:", data);
       const { setUser } = authStore.getState(); 
+      
+      // Store user ID for reset password flow
       setUser({ id: String(data.body.data.userId) } as User);
+      
+      // Navigate to reset password screen
       router.push('/(auth)/resetPassword');
     },
 
     onError: (error: any) => {
-      console.log("Forget password failed:", error.message);
+      console.error("Forget password failed:", error);
+      // Error is handled by the mutation error state
     },
   });
 }
@@ -80,14 +104,19 @@ export function useResetPassword() {
     },
 
     onSuccess: (data) => {
-       const { logout } = authStore.getState(); 
-       logout();
       console.log("Reset password success:", data);
+      const { logout } = authStore.getState(); 
+      
+      // Clear auth state
+      logout();
+      
+      // Navigate to login screen
       router.push('/(auth)/login');
     },
 
     onError: (error: any) => {
-      console.log("Reset password failed:", error.message);
+      console.error("Reset password failed:", error);
+      // Error is handled by the mutation error state
     },
   });
 }
@@ -101,14 +130,23 @@ export function useVerifyEmail() {
     },
 
     onSuccess: (data) => {
-      const { setAuthenticated } = authStore.getState(); 
-      setAuthenticated(true); 
-      console.log("Reset password success:", data);
+      console.log("Verify email success:", data);
+      const { setAuthenticated, setAdminStatus } = authStore.getState(); 
+      
+      // Set authentication status
+      setAuthenticated(true);
+      
+      // Set admin status if available in response
+      const isAdmin = data?.body?.data?.isadmin || false;
+      setAdminStatus(isAdmin);
+      
+      // Navigate to dashboard
       router.replace('/(main)/dashboard');
     },
 
     onError: (error: any) => {
-      console.log("Reset password failed:", error.message);
+      console.error("Verify email failed:", error);
+      // Error is handled by the mutation error state
     },
   });
 }
