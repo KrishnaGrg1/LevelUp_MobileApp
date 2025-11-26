@@ -259,9 +259,11 @@ export default function LoginScreen() {
             .
           </Text>
         </VStack>
-        <Button onPress={() => router.push("/_sitemap")}>
-          <ButtonText>Go to indext</ButtonText>
-        </Button>
+        {process.env.NODE_ENV === "development" && (
+          <Button onPress={() => router.push("/_sitemap")}>
+            <ButtonText>Go to main layout</ButtonText>
+          </Button>
+        )}
       </Box>
     </ScrollView>
   );
