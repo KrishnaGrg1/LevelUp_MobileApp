@@ -23,10 +23,14 @@ A modern mobile application built with Expo, React Native, and a powerful tech s
 - **Language**: TypeScript ~5.9.2
 - **UI Library**: [Gluestack UI v3](https://gluestack.io/ui) - Modern, accessible component library
 - **Styling**: [NativeWind v4](https://www.nativewind.dev/) (Tailwind CSS for React Native)
-- **State Management**: Zustand (Coming Soon) - Lightweight global state management
+- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/) - Lightweight global state management
 - **Data Fetching**: [TanStack Query v5](https://tanstack.com/query) - Powerful data synchronization
 - **Routing**: [Expo Router v6](https://docs.expo.dev/router) - File-based routing
 - **Animations**: React Native Reanimated ~4.1.0
+- **Form Validation**: Zod + React Hook Form
+- **HTTP Client**: Axios
+- **Real-time**: Socket.io Client
+- **Internationalization**: Custom i18n with 7 languages (EN, AR, CN, FR, JP, NP, ES)
 
 ## ✨ Features
 
@@ -38,6 +42,11 @@ A modern mobile application built with Expo, React Native, and a powerful tech s
 - 🎭 Smooth animations with Reanimated
 - 📐 Tailwind CSS styling via NativeWind
 - 🧭 File-based navigation with Expo Router
+- 🔐 Complete authentication system (Login, Register, Email Verification, Password Reset)
+- 🌍 Multi-language support (English, Arabic, Chinese, French, Japanese, Nepali, Spanish)
+- 🎮 AI-powered quest system with time tracking
+- 🌓 Dark/Light theme support
+- ✅ Form validation with Zod schemas
 
 ## 📦 Prerequisites
 
@@ -97,18 +106,102 @@ Before you begin, ensure you have the following installed:
 ```
 LevelUpMobileApp/
 ├── app/                    # App screens and navigation (Expo Router)
-│   ├── (tabs)/            # Tab-based navigation
+│   ├── (auth)/            # Authentication screens
+│   │   ├── login.tsx
+│   │   ├── register.tsx
+│   │   ├── verifyEmail.tsx
+│   │   ├── forgetPassword.tsx
+│   │   └── resetPassword.tsx
+│   ├── (main)/            # Main app screens (after auth)
+│   │   ├── dashboard.tsx
+│   │   ├── learn.tsx
+│   │   ├── challenges.tsx
+│   │   └── profile.tsx
 │   ├── _layout.tsx        # Root layout with providers
-│   └── global.css         # Global Tailwind styles
+│   └── index.tsx          # Entry point
+├── api/                   # API configuration and endpoints
+│   ├── client.ts          # Axios instance
+│   ├── generated.ts       # Generated API types
+│   ├── endPoints/         # API endpoint modules
+│   └── types/             # API type definitions
 ├── components/            # Reusable components
-│   ├── providers/         # Context providers
-│   │   └── react-query.tsx # TanStack Query configuration
-│   └── ui/                # UI components (Gluestack UI)
-├── constants/             # App constants and theme
+│   ├── auth/              # Auth-related components
+│   ├── ui/                # UI components (Gluestack UI)
+│   ├── LanguageSwitcher.tsx
+│   └── ModeToggle.tsx
+├── providers/             # Context providers
+│   ├── QueryProvider.tsx  # TanStack Query setup
+│   └── ThemeProvider.tsx  # Theme management
 ├── hooks/                 # Custom React hooks
-├── assets/                # Images, fonts, and other assets
-└── scripts/               # Build and utility scripts
+│   └── useAuth.ts
+├── stores/                # Zustand stores
+│   ├── auth.store.ts
+│   ├── language.store.ts
+│   ├── theme.store.ts
+│   └── pagination.store.ts
+├── translation/           # Internationalization
+│   ├── index.ts           # Translation utilities with t() function
+│   ├── eng/               # English translations
+│   ├── arab/              # Arabic translations
+│   ├── chin/              # Chinese translations
+│   ├── fr/                # French translations
+│   ├── jap/               # Japanese translations
+│   ├── nep/               # Nepali translations
+│   └── span/              # Spanish translations
+├── schemas/               # Zod validation schemas
+│   ├── auth/              # Auth form schemas
+│   └── quest/             # Quest schemas
+├── styles/                # Theme configuration
+└── assets/                # Images, fonts, and other assets
 ```
+
+## 🌍 Internationalization (i18n)
+
+The app supports 7 languages with a custom translation system:
+
+- 🇬🇧 English (eng)
+- 🇸🇦 Arabic (arab) - RTL support
+- 🇨🇳 Chinese (chin)
+- 🇫🇷 French (fr)
+- 🇯🇵 Japanese (jap)
+- 🇳🇵 Nepali (nep)
+- 🇪🇸 Spanish (span)
+
+### Translation System
+
+The `t()` function supports:
+
+- **Dot notation**: `t('auth.login.title')`
+- **Namespace format**: `t('auth:login.title')`
+- **Parameter replacement**: `t('quests.landing.minRequired', { minutes: 30 })` → "30 min required"
+- **Fallback values**: `t('missing.key', 'Default text')`
+
+### Usage Examples
+
+```typescript
+import { t } from "@/translation";
+
+// Simple translation
+const title = t("auth.login.title"); // "Login"
+
+// With parameters
+const message = t("quests.landing.minRemaining", { minutes: 15 }); // "15 min remaining"
+
+// In React components (reactive)
+import { useTranslation } from "@/translation";
+
+function MyComponent() {
+  const { t, language } = useTranslation();
+  return <Text>{t("common.welcome")}</Text>;
+}
+```
+
+### Adding Translations
+
+1. Create/edit JSON file in language folder: `translation/eng/feature.json`
+2. Add translations with placeholders: `{"message": "Hello {name}"}`
+3. Import in language index: `import feature from './feature.json'`
+4. Export in language object: `const eng = { ..., feature }`
 
 ## 💾 State Management
 
@@ -116,48 +209,70 @@ This project uses **Zustand** for global state management:
 
 - **Lightweight**: Minimal boilerplate
 - **TypeScript-friendly**: Full type safety
-- **DevTools**: Redux DevTools integration
-- **Middleware**: Persist, immer support
+- **Persist**: localStorage/AsyncStorage integration
 
-Example usage:
+### Implemented Stores
 
 ```typescript
-// stores/useUserStore.ts
+// stores/auth.store.ts - Authentication state
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
-interface UserState {
+interface AuthState {
+  token: string | null;
   user: User | null;
-  setUser: (user: User) => void;
+  setAuth: (token: string, user: User) => void;
+  clearAuth: () => void;
 }
 
-export const useUserStore = create<UserState>((set) => ({
-  user: null,
-  setUser: (user) => set({ user }),
-}));
+export const useAuthStore = create<AuthState>()(persist(...));
+
+// stores/language.store.ts - Language preference
+// stores/theme.store.ts - Dark/Light theme
+// stores/pagination.store.ts - Pagination state
 ```
 
 ## 🔄 Data Fetching
 
 **TanStack Query** is configured for efficient data fetching:
 
-- **Location**: `components/providers/react-query.tsx`
+- **Location**: `providers/QueryProvider.tsx`
 - **Configuration**:
-  - Stale time: 60 seconds
-  - Retry: 1 attempt
-  - SSR-compatible setup
+  - Stale time: 5 minutes
+  - Cache time: 10 minutes
+  - Automatic refetching on window focus
+  - Retry on failure
 
-Example usage:
+### API Integration
 
 ```typescript
-import { useQuery } from '@tanstack/react-query';
+// api/client.ts - Axios instance with interceptors
+import axiosInstance from "@/api/client";
 
-function UserProfile() {
-  const { data, isLoading } = useQuery({
-    queryKey: ['user'],
-    queryFn: fetchUser,
+// api/endPoints/auth.service.ts - Authentication endpoints
+export const authService = {
+  login: (data: LoginData) => axiosInstance.post("/auth/login", data),
+  register: (data: RegisterData) => axiosInstance.post("/auth/register", data),
+  // ... more endpoints
+};
+
+// Usage in components with React Query
+import { useMutation } from "@tanstack/react-query";
+import { authService } from "@/api/endPoints/auth.service";
+
+function LoginForm() {
+  const loginMutation = useMutation({
+    mutationFn: authService.login,
+    onSuccess: (data) => {
+      // Handle success
+    },
   });
 
-  // Component logic
+  return (
+    <Button onPress={() => loginMutation.mutate({ email, password })}>
+      <ButtonText>Login</ButtonText>
+    </Button>
+  );
 }
 ```
 
@@ -180,14 +295,14 @@ function UserProfile() {
 - **Usage**:
 
   ```tsx
-  import { Box, Button, Text } from '@/components/ui';
+  import { Box, Button, Text } from "@/components/ui";
 
   <Box className="p-4">
     <Text>Hello World</Text>
     <Button onPress={() => {}}>
       <ButtonText>Click me</ButtonText>
     </Button>
-  </Box>
+  </Box>;
   ```
 
 ## 📜 Scripts
@@ -198,23 +313,79 @@ pnpm android        # Run on Android emulator
 pnpm ios            # Run on iOS simulator
 pnpm web            # Run in web browser
 pnpm lint           # Run ESLint
-pnpm reset-project  # Reset to clean project structure
+pnpm install        # Install dependencies
 ```
 
 ## 🔧 Development
 
+### Authentication Flow
+
+The app includes a complete authentication system:
+
+1. **Login** → JWT token stored in Zustand + AsyncStorage
+2. **Register** → Auto-navigate to email verification
+3. **Email Verification** → OTP code validation
+4. **Password Reset** → Email → OTP → New password
+5. **Auto-logout** on token expiration
+
 ### File-Based Routing
 
-This project uses Expo Router for navigation. Create new screens by adding files to the `app/` directory:
+This project uses Expo Router for navigation:
 
 ```
 app/
-├── index.tsx              # Home screen (/)
-├── profile.tsx            # Profile screen (/profile)
-└── (tabs)/
-    ├── _layout.tsx        # Tab layout
-    ├── index.tsx          # First tab
-    └── explore.tsx        # Second tab
+├── index.tsx              # Entry screen (/)
+├── (auth)/                # Auth group (no layout)
+│   ├── login.tsx         # /login
+│   ├── register.tsx      # /registerdark:bg-gray-900 p-4">
+  <Text className="text-2xl font-bold text-gray-900 dark:text-white">
+    Hello World
+  </Text>
+</View>
+```
+
+### Form Validation
+
+Use Zod schemas with React Hook Form:
+
+```typescript
+// schemas/auth/login.ts
+import { z } from 'zod';
+
+export const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+// In component
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const { control, handleSubmit } = useForm({
+  resolver: zodResolver(loginSchema),
+});in)/               # Protected routes (requires auth)
+    ├── _layout.tsx       # Tab navigation layout
+    ├── dashboard.tsx     # /dashboard
+    └── ...
+```
+
+### Protected Routes
+
+Use `useAuth` hook to protect routes:
+
+```typescript
+import { useAuth } from "@/hooks/useAuth";
+import { Redirect } from "expo-router";
+
+export default function ProtectedScreen() {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Redirect href="/login" />;
+  }
+
+  return <View>...</View>;
+}
 ```
 
 ### Styling with NativeWind

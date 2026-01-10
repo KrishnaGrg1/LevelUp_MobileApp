@@ -1,0 +1,7 @@
+{
+  "landing": {
+    "minRequired": "需要 {minutes} 分钟",
+    "minRemaining": "剩余 {minutes} 分钟",
+    "readyToComplete": "准备完成"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "landing": {
+    "minRequired": "{minutes} मिनेट आवश्यक",
+    "minRemaining": "{minutes} मिनेट बाँकी",
+    "readyToComplete": "पूरा गर्न तयार"
+  }
+}

@@ -1,21 +1,21 @@
 // === Enums ===
 export enum MemberStatus {
-  Beginner = 'Beginner',
-  Intermediate = 'Intermediate',
-  Advanced = 'Advanced',
+  Beginner = "Beginner",
+  Intermediate = "Intermediate",
+  Advanced = "Advanced",
 }
 
 export enum QuestType {
-  Daily = 'Daily',
-  Weekly = 'Weekly',
-  Monthly = 'Monthly',
-  OneTime = 'OneTime',
+  Daily = "Daily",
+  Weekly = "Weekly",
+  Monthly = "Monthly",
+  OneTime = "OneTime",
 }
 
 export enum QuestSource {
-  AI = 'AI',
-  TEMPLATE = 'TEMPLATE',
-  MANUAL = 'MANUAL',
+  AI = "AI",
+  TEMPLATE = "TEMPLATE",
+  MANUAL = "MANUAL",
 }
 
 // === Interfaces ===
@@ -26,6 +26,8 @@ export interface User {
   password: string;
   xp: number;
   level: number;
+  // Current token balance for AI interactions (optional until /auth/me fetched)
+  tokens?: number;
   createdAt: Date;
   updatedAt: Date;
   categoryId?: string;
@@ -37,9 +39,14 @@ export interface User {
   CommunityMember?: CommunityMember[];
   otps?: Otp[];
   Quest?: Quest[];
-  category?: Category;
+  category?: Category[];
   sessions?: Session[];
   keys?: Key[];
+  timezone: string;
+  isBanned: boolean;
+  bandUntil: Date;
+  hasOnboarded: boolean;
+  message: Message[];
 }
 
 export interface Session {
@@ -153,6 +160,7 @@ export interface UserLoginResponse {
   body: {
     data: {
       isadmin: boolean;
+      hasOnboarded: boolean;
       expiredAt: string;
     };
     message: string;
@@ -174,7 +182,7 @@ export interface UserRegisterResponse {
   headers: Record<string, string>;
   body: {
     message: string;
-    data: User
+    data: User;
   };
 }
 
@@ -196,7 +204,7 @@ export interface UserVerifyInput {
 }
 
 export interface OAuthRequest {
-  provider: 'google' | 'github';
+  provider: "google" | "github";
   code: string; // Authorization code from OAuth callback
   redirectUri?: string; // Optional, default handled in env
 }
@@ -286,9 +294,12 @@ export interface CommunityDTO {
   description?: string;
   currentMembers: number; // number of members
   maxMembers: number; // member limit
-  visibility: 'private' | 'public';
-  userRole: 'ADMIN' | 'MEMBER';
+  isPrivate: boolean;
+  userRole: "ADMIN" | "MEMBER";
   isPinned?: boolean;
+  totalXP?: number;
+  level?: number;
+  updatedAt?: Date;
 }
 
 export interface GetMyCommunities {
@@ -313,7 +324,9 @@ export interface CreateCommunityResponse {
   statusCode: number;
   body: {
     message: string;
-    data: CommunityDTO; // changed from 'any' to CommunityDTO
+    data: {
+      id: string;
+    };
   };
 }
 export interface TogglePinDTO {
@@ -336,7 +349,9 @@ export interface searchCommunitiesResponse {
   };
 }
 
-export type UpdateUserPayload = Partial<Pick<User, 'UserName' | 'email' | 'level' | 'isVerified'>>;
+export type UpdateUserPayload = Partial<
+  Pick<User, "UserName" | "email" | "level" | "isVerified">
+>;
 
 export interface fullUserObjectResponse {
   statusCode: number;
@@ -346,12 +361,191 @@ export interface fullUserObjectResponse {
   };
 }
 
-export interface ForgetPasswordResponse {
+interface communityDetailById {
+  id: string;
+  name: string;
+  description: string;
+  memberLimit: number;
+  photo?: string;
+  _count: {
+    members: number;
+    clans: number;
+  };
+}
+export interface communityDetailByIdResponse {
   statusCode: number;
   body: {
-    data: {
-      userId: string;
-    };
     message: string;
+    data: communityDetailById;
+  };
+}
+
+export interface CommunityMemberProfile {
+  totalXP: number;
+  level: number;
+  userRole: "ADMIN" | "MEMBER";
+  communityId: string;
+  communityName: string;
+}
+
+export interface CommunityMemberProfileResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: CommunityMemberProfile;
+  };
+}
+
+export interface Sender {
+  id: string;
+  UserName: string;
+  profilePicture: string | null;
+  level: number;
+}
+
+export interface Message {
+  id: string;
+  content: string;
+  createdAt: string;
+  senderId: string;
+  UserName: string;
+  sender: Sender;
+  communityId?: string;
+  clanId?: string;
+}
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  hasMore: boolean;
+}
+
+export interface SendMessagePayload {
+  content: string;
+  type?: "text" | "image" | "file";
+  attachments?: File[];
+}
+
+export interface MessageResponse {
+  success: boolean;
+  data: Message;
+  error?: string;
+}
+
+export interface GetCommunityMessagesResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: {
+      messages: Message[];
+      pagination: Pagination;
+    };
+  };
+}
+
+export interface OnboardingResponse {
+  body: {
+    message: string;
+    data?: {
+      success: boolean;
+    };
+  };
+}
+
+export interface getCategoriesResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: {
+      count: number;
+      categories: string[];
+    };
+  };
+}
+
+export interface GetAllCommunitesAdminResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: {
+      communities: Community[];
+      pagination: PaginationMetadata;
+    };
+  };
+}
+
+export type MemberData = Partial<
+  Pick<User, "id" | "UserName" | "email" | "isAdmin">
+>;
+export interface GetCommunityMembersResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: {
+      members: MemberData[];
+    };
+  };
+}
+
+export interface DeleteCommunityResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: {
+      communityId: string;
+      deleted: boolean;
+    };
+  };
+}
+export interface UpdateCommunityPrivacyResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: { updated: boolean };
+  };
+}
+export interface UpdateCommunityCategoryResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: { updated: boolean };
+  };
+}
+
+export interface AddCategoryResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: { category: Category };
+  };
+}
+
+export interface DeleteCategoryResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: { deleted: boolean };
+  };
+}
+
+export interface GetCategoryStatsResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: { categoryUsage: Record<string, number> };
+  };
+}
+
+export interface CommunityStats {
+  totalCommunities: number;
+  privateCommunities: number;
+  publicCommunities: number;
+}
+export interface GetCommunityStatsResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: CommunityStats;
   };
 }

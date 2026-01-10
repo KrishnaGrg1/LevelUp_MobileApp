@@ -1,0 +1,7 @@
+{
+  "landing": {
+    "minRequired": "{minutes} min required",
+    "minRemaining": "{minutes} min remaining",
+    "readyToComplete": "Ready to complete"
+  }
+}

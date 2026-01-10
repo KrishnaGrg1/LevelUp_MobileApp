@@ -1,0 +1,7 @@
+{
+  "landing": {
+    "minRequired": "{minutes} دقيقة مطلوبة",
+    "minRemaining": "{minutes} دقيقة متبقية",
+    "readyToComplete": "جاهز للإكمال"
+  }
+}
