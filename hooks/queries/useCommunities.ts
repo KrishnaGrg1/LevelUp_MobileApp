@@ -1,4 +1,8 @@
-import { createCommunity, getMyCommunities } from "@/api/endPoints/communities";
+import {
+  createCommunity,
+  getMyCommunities,
+  joinPrivateCommunity,
+} from "@/api/endPoints/communities";
 import { communitiesService } from "@/api/endPoints/communities.service";
 
 import { CreateCommunityDto } from "@/api/generated";
@@ -60,50 +64,21 @@ export const useCreateCommunity = () => {
 };
 
 /**
- * Join community mutation
+ * Join Private community mutation
  */
-// export const useJoinCommunity = () => {
-//   const queryClient = useQueryClient();
+export const useJoinPrivateCommunity = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
 
-//   return useMutation({
-//     mutationFn: (id: string) => communitiesService.join(id),
-//     onMutate: async (id) => {
-//       // Cancel outgoing refetches
-//       await queryClient.cancelQueries({ queryKey: ["communities", id] });
-
-//       // Snapshot previous value
-//       const previousCommunity = queryClient.getQueryData<Community>([
-//         "communities",
-//         id,
-//       ]);
-
-//       // Optimistically update
-//       if (previousCommunity) {
-//         queryClient.setQueryData<Community>(["communities", id], {
-//           ...previousCommunity,
-//           currentMembers: previousCommunity.currentMembers + 1,
-//         });
-//       }
-
-//       return { previousCommunity };
-//     },
-//     onError: (err, id, context) => {
-//       // Rollback on error
-//       if (context?.previousCommunity) {
-//         queryClient.setQueryData(
-//           ["communities", id],
-//           context.previousCommunity
-//         );
-//       }
-//     },
-//     onSettled: (data, error, id) => {
-//       // Refetch to ensure consistency
-//       queryClient.invalidateQueries({ queryKey: ["communities", id] });
-//       queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
-//       queryClient.invalidateQueries({ queryKey: ["userStats"] });
-//     },
-//   });
-// };
+  return useMutation({
+    mutationFn: (joinCode: string) => joinPrivateCommunity(language, joinCode),
+    onSuccess: () => {
+      // Refresh the user's community list so the new one shows up
+      queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+      queryClient.invalidateQueries({ queryKey: ["communities"] });
+    },
+  });
+};
 
 /**
  * Leave community mutation

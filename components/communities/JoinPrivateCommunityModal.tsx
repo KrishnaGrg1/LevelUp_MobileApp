@@ -1,10 +1,11 @@
 import { Box } from "@/components/ui/box";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button"; // Added Spinner
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { useJoinPrivateCommunity } from "@/hooks/queries/useCommunities"; // Import the hook
 import { AlertCircle, X } from "lucide-react-native";
 import React from "react";
 import { KeyboardAvoidingView, Modal, Platform, Pressable } from "react-native";
@@ -19,6 +20,28 @@ export function JoinPrivateCommunityModal({
   onClose,
 }: JoinPrivateCommunityModalProps) {
   const [inviteCode, setInviteCode] = React.useState("");
+
+  // Initialize the mutation hook
+  const { mutate: joinCommunity, isPending } = useJoinPrivateCommunity();
+
+  const handleJoin = () => {
+    if (inviteCode.length < 8) {
+      console.log("Code too short");
+      return;
+    }
+
+    joinCommunity(inviteCode.toUpperCase(), {
+      onSuccess: () => {
+        setInviteCode(""); // Clear input
+        onClose(); // Close modal
+        // You could add a success toast here
+      },
+      onError: (error: any) => {
+        console.error("Failed to join:", error);
+        // You could show an error message to the user here
+      },
+    });
+  };
 
   return (
     <Modal
@@ -45,7 +68,6 @@ export function JoinPrivateCommunityModal({
 
             {/* Content */}
             <VStack className="flex-1 px-6 mt-8" space="lg">
-              {/* Info Banner */}
               <HStack
                 space="sm"
                 className="p-4 bg-blue-50 rounded-lg border border-blue-200"
@@ -62,7 +84,6 @@ export function JoinPrivateCommunityModal({
                 </VStack>
               </HStack>
 
-              {/* Invite Code Input */}
               <VStack space="xs">
                 <Text className="text-sm font-medium text-typography-700">
                   Invite Code <Text className="text-error-500">*</Text>
@@ -73,16 +94,18 @@ export function JoinPrivateCommunityModal({
                   className="border-outline-300"
                 >
                   <InputField
-                    placeholder="Enter 6-digit code"
+                    placeholder="Enter 8-digit code"
                     value={inviteCode}
                     onChangeText={setInviteCode}
                     placeholderTextColor="#9ca3af"
-                    maxLength={6}
+                    maxLength={8}
                     autoCapitalize="characters"
+                    // Disable input while loading
+                    editable={!isPending}
                   />
                 </Input>
                 <Text className="text-xs text-typography-500">
-                  Example: ABC123
+                  Example: ABCD1234
                 </Text>
               </VStack>
             </VStack>
@@ -97,17 +120,18 @@ export function JoinPrivateCommunityModal({
                 variant="outline"
                 onPress={onClose}
                 className="flex-1 border-outline-300"
+                isDisabled={isPending}
               >
                 <ButtonText className="text-typography-700">Cancel</ButtonText>
               </Button>
+
               <Button
                 size="lg"
                 className="flex-1 bg-primary-500"
-                onPress={() => {
-                  // Handle join with code
-                  console.log("Join with code:", inviteCode);
-                }}
+                onPress={handleJoin}
+                isDisabled={isPending || inviteCode.length < 8}
               >
+                {isPending && <ButtonSpinner className="mr-2" />}
                 <ButtonText>Join Community</ButtonText>
               </Button>
             </HStack>
