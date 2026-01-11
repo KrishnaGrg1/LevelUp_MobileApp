@@ -311,7 +311,7 @@ export interface GetMyCommunities {
 }
 
 export interface CreateCommunityInput {
-  name: string;
+  communityName: string;
   description?: string;
   memberLimit?: number;
   isPrivate?: boolean;
@@ -548,4 +548,12 @@ export interface GetCommunityStatsResponse {
     message: string;
     data: CommunityStats;
   };
+}
+
+export interface CreateCommunityDto {
+  communityName: string;
+  description?: string;
+  photo?: string;
+  memberLimit?: number;
+  isPrivate: boolean;
 }
