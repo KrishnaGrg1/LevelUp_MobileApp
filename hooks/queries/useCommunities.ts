@@ -1,7 +1,9 @@
 import {
   createCommunity,
   getMyCommunities,
+  joinCommunity,
   joinPrivateCommunity,
+  searchCommunities,
 } from "@/api/endPoints/communities";
 import { communitiesService } from "@/api/endPoints/communities.service";
 
@@ -19,6 +21,19 @@ export const useMyCommunities = () => {
 
     queryFn: () => getMyCommunities(language),
     staleTime: 3 * 60 * 1000, // 3 minutes
+  });
+};
+
+/**
+ * Search communities
+ */
+export const useSearchCommunities = (searchQuery: string) => {
+  const language = LanguageStore.getState().language;
+  return useQuery({
+    queryKey: ["search-communities", searchQuery],
+    queryFn: () => searchCommunities(language, searchQuery),
+    enabled: searchQuery.length > 0,
+    staleTime: 1 * 60 * 1000, // 1 minute
   });
 };
 
@@ -76,6 +91,24 @@ export const useJoinPrivateCommunity = () => {
       // Refresh the user's community list so the new one shows up
       queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
       queryClient.invalidateQueries({ queryKey: ["communities"] });
+    },
+  });
+};
+
+/**
+ * Join Public community mutation
+ */
+export const useJoinCommunity = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+
+  return useMutation({
+    mutationFn: (communityId: string) => joinCommunity(language, communityId),
+    onSuccess: () => {
+      // Refresh the user's community list
+      queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+      queryClient.invalidateQueries({ queryKey: ["communities"] });
+      queryClient.invalidateQueries({ queryKey: ["search-communities"] });
     },
   });
 };

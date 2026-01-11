@@ -24,7 +24,7 @@ import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { Textarea, TextareaInput } from "@/components/ui/textarea";
 import { VStack } from "@/components/ui/vstack";
-import { Globe, Upload, X } from "lucide-react-native";
+import { Globe, Lock, Upload, X } from "lucide-react-native";
 
 interface CreateCommunityModalProps {
   visible: boolean;
@@ -41,6 +41,7 @@ export function CreateCommunityModal({
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<CreateCommunityInput>({
     resolver: zodResolver(createCommunitySchema),
@@ -51,6 +52,8 @@ export function CreateCommunityModal({
       isPrivate: false,
     },
   });
+
+  const isPrivate = watch("isPrivate");
 
   const onSubmit = (data: CreateCommunityInput) => {
     const formData = new FormData();
@@ -223,11 +226,24 @@ export function CreateCommunityModal({
                     Privacy Settings
                   </Text>
                   <HStack className="bg-[#334155]/50 px-4 py-3 rounded-xl items-center justify-between border border-slate-600">
-                    <HStack space="xs" className="items-center">
-                      <Globe size={16} color="#10b981" />
-                      <Text className="text-white text-xs font-bold">
-                        Public Community
-                      </Text>
+                    <HStack space="md" className="items-center flex-1">
+                      <HStack space="xs" className="items-center">
+                        {isPrivate ? (
+                          <Lock size={16} color="#f97316" />
+                        ) : (
+                          <Globe size={16} color="#10b981" />
+                        )}
+                        <Text className="text-white text-xs font-bold">
+                          {isPrivate ? "Private" : "Public"}
+                        </Text>
+                      </HStack>
+                      {isPrivate && (
+                        <Box className="bg-orange-500/20 px-2 py-1 rounded">
+                          <Text className="text-orange-400 text-[9px] font-semibold">
+                            Only invited members can join
+                          </Text>
+                        </Box>
+                      )}
                     </HStack>
                     <Controller
                       control={control}
