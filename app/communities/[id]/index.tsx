@@ -213,12 +213,37 @@ export default function CommunityDetailScreen() {
                       item.UserName &&
                       currentUser.UserName === item.UserName;
 
+                    // Format time in 12-hour format
+                    const formatTime = (dateString: string) => {
+                      const date = new Date(dateString);
+                      return date.toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                      });
+                    };
+
+                    // Get first letter of username for avatar
+                    const getInitial = (name?: string) => {
+                      return name ? name.charAt(0).toUpperCase() : "?";
+                    };
+
                     return (
-                      <Box
+                      <HStack
                         className={`px-4 py-2 ${
-                          isMyMessage ? "items-end" : "items-start"
+                          isMyMessage ? "justify-end" : "justify-start"
                         }`}
+                        space="xs"
                       >
+                        {/* Avatar for other users only */}
+                        {!isMyMessage && (
+                          <Box className="w-8 h-8 rounded-full bg-primary-500 items-center justify-center mt-1">
+                            <Text className="text-white text-xs font-semibold">
+                              {getInitial(item.UserName)}
+                            </Text>
+                          </Box>
+                        )}
+
                         <Box
                           className={`max-w-[75%] px-4 py-2 rounded-2xl ${
                             isMyMessage
@@ -228,13 +253,7 @@ export default function CommunityDetailScreen() {
                         >
                           <VStack space="xs">
                             {!isMyMessage && (
-                              <Text
-                                className={`text-xs font-semibold ${
-                                  isMyMessage
-                                    ? "text-white"
-                                    : "text-typography-700"
-                                }`}
-                              >
+                              <Text className="text-xs font-semibold text-typography-700">
                                 {item.UserName || "Anonymous"}
                               </Text>
                             )}
@@ -254,11 +273,11 @@ export default function CommunityDetailScreen() {
                                   : "text-typography-400"
                               }`}
                             >
-                              {new Date(item.createdAt).toLocaleTimeString()}
+                              {formatTime(item.createdAt)}
                             </Text>
                           </VStack>
                         </Box>
-                      </Box>
+                      </HStack>
                     );
                   }}
                   onEndReached={hasMore ? loadMore : undefined}
