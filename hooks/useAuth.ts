@@ -1,14 +1,20 @@
-import { login, registerUser, requestPasswordReset, resetPasswordWithOtp, VerifyUser } from '@/api/endPoints/auth.service';
-import { User } from '@/api/generated';
-import { ForgetPasswordInput } from '@/schemas/auth/forgetPassword';
-import { LoginInput } from '@/schemas/auth/login';
-import { RegisterInput } from '@/schemas/auth/register';
-import { ResetPasswordAPIInput } from '@/schemas/auth/resetPassword';
-import { VerifyInput } from '@/schemas/auth/verifyEmail';
-import authStore from '@/stores/auth.store';
-import LanguageStore from '@/stores/language.store';
-import { useMutation } from '@tanstack/react-query';
-import { router } from 'expo-router';
+import {
+  login,
+  registerUser,
+  requestPasswordReset,
+  resetPasswordWithOtp,
+  VerifyUser,
+} from "@/api/endPoints/auth.service";
+import { User } from "@/api/generated";
+import { ForgetPasswordInput } from "@/schemas/auth/forgetPassword";
+import { LoginInput } from "@/schemas/auth/login";
+import { RegisterInput } from "@/schemas/auth/register";
+import { ResetPasswordAPIInput } from "@/schemas/auth/resetPassword";
+import { VerifyInput } from "@/schemas/auth/verifyEmail";
+import authStore from "@/stores/auth.store";
+import LanguageStore from "@/stores/language.store";
+import { useMutation } from "@tanstack/react-query";
+import { router } from "expo-router";
 
 export function useLogin() {
   return useMutation({
@@ -19,31 +25,37 @@ export function useLogin() {
 
     onSuccess: (data) => {
       console.log("Login success:", data);
-      const { setAuthenticated, setAdminStatus, setUser } = authStore.getState();
-      
-      // Set authentication status
-      setAuthenticated(true);
-      
-      // Set admin status from login response
-      const isAdmin = data?.body?.data?.isadmin || false;
-      setAdminStatus(isAdmin);
-      
-      // Set user data if available
-      if (data?.body?.data) {
-        setUser(data.body.data as unknown as User);
-      }
-      
-      // Navigate to main dashboard (can be customized based on requirements)
-      router.replace('/(main)/dashboard');
-    },
+      const loginData = data?.body?.data;
 
+      if (loginData) {
+        const { setAuthenticated, setAdminStatus, setUser } =
+          authStore.getState();
+
+        // Set authentication status
+        setAuthenticated(true);
+
+        // Set admin status from login response
+        setAdminStatus(loginData.isadmin);
+
+        // Set user data if available
+        if (data?.body?.data) {
+          setUser({
+            id: loginData.id,
+            UserName: loginData.UserName, // This will now be saved in Zustand
+            isAdmin: loginData.isadmin,
+          } as User);
+        }
+
+        // Navigate to main dashboard (can be customized based on requirements)
+        router.replace("/(main)/dashboard");
+      }
+    },
     onError: (error: any) => {
       console.error("Login failed:", error);
       // Error is handled by the mutation error state
     },
   });
 }
-
 
 export function useRegister() {
   return useMutation({
@@ -54,13 +66,13 @@ export function useRegister() {
 
     onSuccess: (data) => {
       console.log("Register success:", data.body);
-      const { setUser } = authStore.getState(); 
-      
+      const { setUser } = authStore.getState();
+
       // Set user data for verification flow
       setUser({ id: String(data.body.data.id) } as User);
-      
+
       // Navigate to email verification
-      router.replace('/(auth)/verifyEmail');
+      router.replace("/(auth)/verifyEmail");
     },
 
     onError: (error: any) => {
@@ -79,13 +91,13 @@ export function useForgetPassword() {
 
     onSuccess: (data) => {
       console.log("Forget password success:", data);
-      const { setUser } = authStore.getState(); 
-      
+      const { setUser } = authStore.getState();
+
       // Store user ID for reset password flow
       setUser({ id: String(data.body.data.userId) } as User);
-      
+
       // Navigate to reset password screen
-      router.push('/(auth)/resetPassword');
+      router.push("/(auth)/resetPassword");
     },
 
     onError: (error: any) => {
@@ -94,7 +106,6 @@ export function useForgetPassword() {
     },
   });
 }
-
 
 export function useResetPassword() {
   return useMutation({
@@ -105,13 +116,13 @@ export function useResetPassword() {
 
     onSuccess: (data) => {
       console.log("Reset password success:", data);
-      const { logout } = authStore.getState(); 
-      
+      const { logout } = authStore.getState();
+
       // Clear auth state
       logout();
-      
+
       // Navigate to login screen
-      router.push('/(auth)/login');
+      router.push("/(auth)/login");
     },
 
     onError: (error: any) => {
@@ -120,7 +131,6 @@ export function useResetPassword() {
     },
   });
 }
-
 
 export function useVerifyEmail() {
   return useMutation({
@@ -131,17 +141,17 @@ export function useVerifyEmail() {
 
     onSuccess: (data) => {
       console.log("Verify email success:", data);
-      const { setAuthenticated, setAdminStatus } = authStore.getState(); 
-      
+      const { setAuthenticated, setAdminStatus } = authStore.getState();
+
       // Set authentication status
       setAuthenticated(true);
-      
+
       // Set admin status if available in response
       const isAdmin = data?.body?.data?.isadmin || false;
       setAdminStatus(isAdmin);
-      
+
       // Navigate to dashboard
-      router.replace('/(main)/dashboard');
+      router.replace("/(main)/dashboard");
     },
 
     onError: (error: any) => {
