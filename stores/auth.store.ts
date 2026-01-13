@@ -1,8 +1,8 @@
 // stores/auth.store.ts
-import { User } from "@/api/generated";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { User } from '@/api/generated';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -20,7 +20,7 @@ interface AuthState {
 
 const authStore = create<AuthState>()(
   persist(
-    (set) => ({
+    set => ({
       isAuthenticated: false,
       setAuthenticated: (value: boolean) => set({ isAuthenticated: value }),
       authSession: undefined,
@@ -48,13 +48,13 @@ const authStore = create<AuthState>()(
       setHasHydrated: (state: boolean) => set({ _hasHydrated: state }),
     }),
     {
-      name: "auth-storage",
+      name: 'auth-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => state => {
         state?.setHasHydrated(true);
       },
-    }
-  )
+    },
+  ),
 );
 
 export default authStore;

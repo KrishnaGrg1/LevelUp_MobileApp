@@ -1,7 +1,7 @@
-import { AuthProvider } from "@/providers/AuthProvider";
-import { SocketProvider } from "@/providers/SocketProvider";
-import authStore from "@/stores/auth.store";
-import { Redirect, Slot } from "expo-router";
+import { AuthProvider } from '@/providers/AuthProvider';
+import { SocketProvider } from '@/providers/SocketProvider';
+import authStore from '@/stores/auth.store';
+import { Redirect, Slot } from 'expo-router';
 
 /**
  * MainLayout - Protected routes layout
@@ -9,7 +9,7 @@ import { Redirect, Slot } from "expo-router";
  * Wraps with AuthProvider → SocketProvider for proper initialization
  */
 export default function MainLayout() {
-  const isAuthenticated = authStore((state) => state.isAuthenticated);
+  const isAuthenticated = authStore(state => state.isAuthenticated);
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {

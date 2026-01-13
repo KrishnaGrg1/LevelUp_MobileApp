@@ -20,8 +20,8 @@
 **Example**:
 
 ```tsx
-import { useAuthUser } from "@/hooks/useAuthUser";
-import { ActivityIndicator, View } from "react-native";
+import { useAuthUser } from '@/hooks/useAuthUser';
+import { ActivityIndicator, View } from 'react-native';
 
 export default function ProfileScreen() {
   const { user, isLoading, error } = useAuthUser();
@@ -75,15 +75,15 @@ export default function ProfileScreen() {
 2. **Access cached user data from store** when fresh data isn't needed
 
    ```tsx
-   import authStore from "@/stores/auth.store";
+   import authStore from '@/stores/auth.store';
 
-   const user = authStore((state) => state.user);
+   const user = authStore(state => state.user);
    ```
 
 3. **Keep layouts simple** - only handle authentication checks
    ```tsx
    export default function MainLayout() {
-     const isAuthenticated = authStore((state) => state.isAuthenticated);
+     const isAuthenticated = authStore(state => state.isAuthenticated);
      // Just check auth, don't fetch data
    }
    ```

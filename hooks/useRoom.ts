@@ -1,18 +1,12 @@
-import { checkClanMembership } from "@/api/endPoints/message.service";
-import {
-  getSocket,
-  joinClan,
-  joinCommunity,
-  leaveClan,
-  leaveCommunity,
-} from "@/lib/socket";
-import useAuthStore from "@/stores/auth.store";
-import { useEffect, useRef, useState } from "react";
-import { useSocket } from "./useSocket";
+import { checkClanMembership } from '@/api/endPoints/message.service';
+import { getSocket, joinClan, joinCommunity, leaveClan, leaveCommunity } from '@/lib/socket';
+import useAuthStore from '@/stores/auth.store';
+import { useEffect, useRef, useState } from 'react';
+import { useSocket } from './useSocket';
 
 interface UseRoomProps {
   roomId?: string;
-  type: "community" | "clan";
+  type: 'community' | 'clan';
 }
 
 interface RoomState {
@@ -27,7 +21,7 @@ interface RoomState {
  */
 export const useRoom = ({ roomId, type }: UseRoomProps) => {
   const { isConnected } = useSocket();
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(state => state.user);
   const [roomState, setRoomState] = useState<RoomState>({
     isJoined: false,
     isMember: true,
@@ -42,7 +36,7 @@ export const useRoom = ({ roomId, type }: UseRoomProps) => {
     hasJoinedRef.current = true;
 
     const handleAccessDenied = (data: { code: string; message: string }) => {
-      console.error("❌ Room access denied:", data);
+      console.error('❌ Room access denied:', data);
       setRoomState({
         isJoined: false,
         isMember: false,
@@ -52,16 +46,16 @@ export const useRoom = ({ roomId, type }: UseRoomProps) => {
     };
 
     // Subscribe to access denied events (for clans)
-    if (type === "clan") {
-      socket.on("clan-access-denied", handleAccessDenied);
+    if (type === 'clan') {
+      socket.on('clan-access-denied', handleAccessDenied);
     }
 
     // Join room
     const joinRoom = async () => {
-      if (type === "community") {
+      if (type === 'community') {
         // Communities are open - join directly
         joinCommunity(roomId);
-        setRoomState((prev) => ({ ...prev, isJoined: true }));
+        setRoomState(prev => ({ ...prev, isJoined: true }));
       } else {
         // Clans require membership check
         if (!user?.id) {
@@ -69,7 +63,7 @@ export const useRoom = ({ roomId, type }: UseRoomProps) => {
             isJoined: false,
             isMember: false,
             accessDenied: true,
-            accessDeniedCode: "NOT_AUTHENTICATED",
+            accessDeniedCode: 'NOT_AUTHENTICATED',
           });
           return;
         }
@@ -82,25 +76,25 @@ export const useRoom = ({ roomId, type }: UseRoomProps) => {
               isJoined: false,
               isMember: false,
               accessDenied: true,
-              accessDeniedCode: "NOT_MEMBER",
+              accessDeniedCode: 'NOT_MEMBER',
             });
             return;
           }
 
           // User is member - join clan
           joinClan(roomId);
-          setRoomState((prev) => ({
+          setRoomState(prev => ({
             ...prev,
             isJoined: true,
             isMember: true,
           }));
         } catch (error) {
-          console.error("Failed to check clan membership:", error);
+          console.error('Failed to check clan membership:', error);
           setRoomState({
             isJoined: false,
             isMember: false,
             accessDenied: true,
-            accessDeniedCode: "MEMBERSHIP_CHECK_FAILED",
+            accessDeniedCode: 'MEMBERSHIP_CHECK_FAILED',
           });
         }
       }
@@ -110,8 +104,8 @@ export const useRoom = ({ roomId, type }: UseRoomProps) => {
 
     // Cleanup on unmount
     return () => {
-      if (type === "clan") {
-        socket.off("clan-access-denied", handleAccessDenied);
+      if (type === 'clan') {
+        socket.off('clan-access-denied', handleAccessDenied);
         leaveClan(roomId);
       } else {
         leaveCommunity(roomId);

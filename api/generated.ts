@@ -1,21 +1,21 @@
 // === Enums ===
 export enum MemberStatus {
-  Beginner = "Beginner",
-  Intermediate = "Intermediate",
-  Advanced = "Advanced",
+  Beginner = 'Beginner',
+  Intermediate = 'Intermediate',
+  Advanced = 'Advanced',
 }
 
 export enum QuestType {
-  Daily = "Daily",
-  Weekly = "Weekly",
-  Monthly = "Monthly",
-  OneTime = "OneTime",
+  Daily = 'Daily',
+  Weekly = 'Weekly',
+  Monthly = 'Monthly',
+  OneTime = 'OneTime',
 }
 
 export enum QuestSource {
-  AI = "AI",
-  TEMPLATE = "TEMPLATE",
-  MANUAL = "MANUAL",
+  AI = 'AI',
+  TEMPLATE = 'TEMPLATE',
+  MANUAL = 'MANUAL',
 }
 
 // === Interfaces ===
@@ -205,7 +205,7 @@ export interface UserVerifyInput {
 }
 
 export interface OAuthRequest {
-  provider: "google" | "github";
+  provider: 'google' | 'github';
   code: string; // Authorization code from OAuth callback
   redirectUri?: string; // Optional, default handled in env
 }
@@ -296,7 +296,7 @@ export interface CommunityDTO {
   currentMembers: number; // number of members
   maxMembers: number; // member limit
   isPrivate: boolean;
-  userRole: "ADMIN" | "MEMBER";
+  userRole: 'ADMIN' | 'MEMBER';
   isPinned?: boolean;
   totalXP?: number;
   level?: number;
@@ -350,9 +350,7 @@ export interface searchCommunitiesResponse {
   };
 }
 
-export type UpdateUserPayload = Partial<
-  Pick<User, "UserName" | "email" | "level" | "isVerified">
->;
+export type UpdateUserPayload = Partial<Pick<User, 'UserName' | 'email' | 'level' | 'isVerified'>>;
 
 export interface fullUserObjectResponse {
   statusCode: number;
@@ -384,7 +382,7 @@ export interface communityDetailByIdResponse {
 export interface CommunityMemberProfile {
   totalXP: number;
   level: number;
-  userRole: "ADMIN" | "MEMBER";
+  userRole: 'ADMIN' | 'MEMBER';
   communityId: string;
   communityName: string;
 }
@@ -424,7 +422,7 @@ export interface Pagination {
 
 export interface SendMessagePayload {
   content: string;
-  type?: "text" | "image" | "file";
+  type?: 'text' | 'image' | 'file';
   attachments?: File[];
 }
 
@@ -476,9 +474,7 @@ export interface GetAllCommunitesAdminResponse {
   };
 }
 
-export type MemberData = Partial<
-  Pick<User, "id" | "UserName" | "email" | "isAdmin">
->;
+export type MemberData = Partial<Pick<User, 'id' | 'UserName' | 'email' | 'isAdmin'>>;
 export interface GetCommunityMembersResponse {
   statusCode: number;
   body: {

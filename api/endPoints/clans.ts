@@ -1,5 +1,5 @@
-import { Language } from "@/stores/language.store";
-import axiosInstance from "../client";
+import { Language } from '@/stores/language.store';
+import axiosInstance from '../client';
 
 // Clan interface matching backend response
 export interface ClanOwner {
@@ -101,46 +101,12 @@ export interface UpdateClanPayload {
 }
 
 // Get all clans for a community
-export const getClansByCommunity = async (
-  communityId: string,
-  lang: Language
-) => {
+export const getClansByCommunity = async (communityId: string, lang: Language) => {
   try {
-    const response = await axiosInstance.get<GetClansResponse>(
-      `/clan/${communityId}`,
-      {
-        withCredentials: true,
-        headers: {
-          "X-Language": lang,
-        },
-      }
-    );
-    return response.data;
-  } catch (error: unknown) {
-    const err = error as {
-      response?: { data?: { body?: { message?: string }; message?: string } };
-    };
-    const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Failed to fetch clans";
-    throw new Error(errorMessage);
-  }
-};
-
-// Create a new clan
-export const createClan = async (
-  payload: CreateClanPayload,
-  lang: Language
-) => {
-  try {
-    const response = await axiosInstance.post<{
-      statusCode: number;
-      body: { message: string; data: Clan };
-    }>("/clan/create", payload, {
+    const response = await axiosInstance.get<GetClansResponse>(`/clan/${communityId}`, {
       withCredentials: true,
       headers: {
-        "X-Language": lang,
+        'X-Language': lang,
       },
     });
     return response.data;
@@ -149,9 +115,30 @@ export const createClan = async (
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Failed to create clan";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to fetch clans';
+    throw new Error(errorMessage);
+  }
+};
+
+// Create a new clan
+export const createClan = async (payload: CreateClanPayload, lang: Language) => {
+  try {
+    const response = await axiosInstance.post<{
+      statusCode: number;
+      body: { message: string; data: Clan };
+    }>('/clan/create', payload, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to create clan';
     throw new Error(errorMessage);
   }
 };
@@ -160,14 +147,14 @@ export const createClan = async (
 export const joinClan = async (lang: Language, clanId: string) => {
   try {
     const response = await axiosInstance.post(
-      "/clan/join",
+      '/clan/join',
       { clanId },
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -175,9 +162,7 @@ export const joinClan = async (lang: Language, clanId: string) => {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Failed to join clan";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to join clan';
     throw new Error(errorMessage);
   }
 };
@@ -186,14 +171,14 @@ export const joinClan = async (lang: Language, clanId: string) => {
 export const leaveClan = async (clanId: string, lang: Language) => {
   try {
     const response = await axiosInstance.post(
-      "/clan/leave",
+      '/clan/leave',
       { clanId },
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -201,9 +186,7 @@ export const leaveClan = async (clanId: string, lang: Language) => {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Failed to leave clan";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to leave clan';
     throw new Error(errorMessage);
   }
 };
@@ -214,7 +197,7 @@ export const deleteClan = async (clanId: string, lang: Language) => {
     const response = await axiosInstance.delete(`/clan/${clanId}`, {
       withCredentials: true,
       headers: {
-        "X-Language": lang,
+        'X-Language': lang,
       },
     });
     return response.data;
@@ -223,9 +206,7 @@ export const deleteClan = async (clanId: string, lang: Language) => {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Failed to delete clan";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to delete clan';
     throw new Error(errorMessage);
   }
 };
@@ -233,67 +214,10 @@ export const deleteClan = async (clanId: string, lang: Language) => {
 // Get clan members
 export const getClanMembers = async (clanId: string, lang: Language) => {
   try {
-    const response = await axiosInstance.get<GetClanMembersResponse>(
-      `/clan/members/${clanId}`,
-      {
-        withCredentials: true,
-        headers: {
-          "X-Language": lang,
-        },
-      }
-    );
-    return response.data;
-  } catch (error: unknown) {
-    const err = error as {
-      response?: { data?: { body?: { message?: string }; message?: string } };
-    };
-    const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Failed to fetch clan members";
-    throw new Error(errorMessage);
-  }
-};
-
-// Get clan info
-export const getClanInfo = async (clanId: string, lang: Language) => {
-  try {
-    const response = await axiosInstance.get<GetClanInfoResponse>(
-      `/clan/info/${clanId}`,
-      {
-        withCredentials: true,
-        headers: {
-          "X-Language": lang,
-        },
-      }
-    );
-    return response.data;
-  } catch (error: unknown) {
-    const err = error as {
-      response?: { data?: { body?: { message?: string }; message?: string } };
-    };
-    const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Failed to fetch clan info";
-    throw new Error(errorMessage);
-  }
-};
-
-// Update clan
-export const updateClan = async (
-  clanId: string,
-  payload: UpdateClanPayload,
-  lang: Language
-) => {
-  try {
-    const response = await axiosInstance.put<{
-      statusCode: number;
-      body: { message: string; data: Clan };
-    }>(`/clan/${clanId}`, payload, {
+    const response = await axiosInstance.get<GetClanMembersResponse>(`/clan/members/${clanId}`, {
       withCredentials: true,
       headers: {
-        "X-Language": lang,
+        'X-Language': lang,
       },
     });
     return response.data;
@@ -304,7 +228,52 @@ export const updateClan = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to update clan";
+      'Failed to fetch clan members';
+    throw new Error(errorMessage);
+  }
+};
+
+// Get clan info
+export const getClanInfo = async (clanId: string, lang: Language) => {
+  try {
+    const response = await axiosInstance.get<GetClanInfoResponse>(`/clan/info/${clanId}`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to fetch clan info';
+    throw new Error(errorMessage);
+  }
+};
+
+// Update clan
+export const updateClan = async (clanId: string, payload: UpdateClanPayload, lang: Language) => {
+  try {
+    const response = await axiosInstance.put<{
+      statusCode: number;
+      body: { message: string; data: Clan };
+    }>(`/clan/${clanId}`, payload, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to update clan';
     throw new Error(errorMessage);
   }
 };
@@ -315,7 +284,7 @@ export const getUserClans = async (userId: string, lang: Language) => {
     const response = await axiosInstance.get(`/clan/user/${userId}`, {
       withCredentials: true,
       headers: {
-        "X-Language": lang,
+        'X-Language': lang,
       },
     });
     return response.data;
@@ -326,21 +295,18 @@ export const getUserClans = async (userId: string, lang: Language) => {
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to fetch user clans";
+      'Failed to fetch user clans';
     throw new Error(errorMessage);
   }
 };
 
 export const checkClanMembership = async (userId: string, clanId: string) => {
   try {
-    const response = await axiosInstance.get(
-      `/clan/checkMembership/${clanId}`,
-      {
-        withCredentials: true,
-        params: { userId },
-      }
-    );
-    console.log("Check Clan Membership Response:", response.data);
+    const response = await axiosInstance.get(`/clan/checkMembership/${clanId}`, {
+      withCredentials: true,
+      params: { userId },
+    });
+    console.log('Check Clan Membership Response:', response.data);
     return response.data.body.data;
   } catch (error: unknown) {
     const err = error as {
@@ -349,7 +315,7 @@ export const checkClanMembership = async (userId: string, clanId: string) => {
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to check clan membership";
+      'Failed to check clan membership';
     throw new Error(errorMessage);
   }
 };

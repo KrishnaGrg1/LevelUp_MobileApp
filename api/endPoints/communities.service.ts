@@ -1,5 +1,5 @@
-import axiosInstance from "../client";
-import { CreateCommunityDto } from "../generated";
+import axiosInstance from '../client';
+import { CreateCommunityDto } from '../generated';
 
 export interface Community {
   id: string;
@@ -9,7 +9,7 @@ export interface Community {
   currentMembers: number;
   maxMembers: number;
   isPrivate: boolean;
-  userRole: "ADMIN" | "MEMBER";
+  userRole: 'ADMIN' | 'MEMBER';
   isPinned: boolean;
 }
 
@@ -63,14 +63,8 @@ export const communitiesService = {
   /**
    * Update community settings (admin only)
    */
-  updateSettings: async (
-    id: string,
-    payload: Partial<CreateCommunityDto>
-  ): Promise<Community> => {
-    const { data } = await axiosInstance.patch<Community>(
-      `/communities/${id}`,
-      payload
-    );
+  updateSettings: async (id: string, payload: Partial<CreateCommunityDto>): Promise<Community> => {
+    const { data } = await axiosInstance.patch<Community>(`/communities/${id}`, payload);
     return data;
   },
 

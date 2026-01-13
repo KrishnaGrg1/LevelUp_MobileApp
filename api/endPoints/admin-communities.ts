@@ -1,5 +1,5 @@
-import { Language } from "@/stores/language.store";
-import axiosInstance from "../client";
+import { Language } from '@/stores/language.store';
+import axiosInstance from '../client';
 import type {
   AddCategoryResponse,
   DeleteCategoryResponse,
@@ -10,22 +10,19 @@ import type {
   GetCommunityStatsResponse,
   UpdateCommunityCategoryResponse,
   UpdateCommunityPrivacyResponse,
-} from "../generated";
+} from '../generated';
 
 // Get all communities for admin with pagination and filters
-export const getAllCommunitiesAdmin = async (
-  lang: Language,
-  params: URLSearchParams
-) => {
+export const getAllCommunitiesAdmin = async (lang: Language, params: URLSearchParams) => {
   try {
     const response = await axiosInstance.get<GetAllCommunitesAdminResponse>(
       `/admin/communities/all?${params.toString()}`,
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -35,18 +32,15 @@ export const getAllCommunitiesAdmin = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to fetch communities";
+      'Failed to fetch communities';
     throw new Error(errorMessage);
   }
 };
 
 // Get Community Members by Community ID
-export const getCommunityMembers = async (
-  communityId: string,
-  lang: Language
-) => {
+export const getCommunityMembers = async (communityId: string, lang: Language) => {
   try {
-    console.log("Payload for the getCommunityMembers request:", {
+    console.log('Payload for the getCommunityMembers request:', {
       communityId,
       lang,
     });
@@ -55,9 +49,9 @@ export const getCommunityMembers = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -67,7 +61,7 @@ export const getCommunityMembers = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to fetch community members";
+      'Failed to fetch community members';
     throw new Error(errorMessage);
   }
 };
@@ -76,7 +70,7 @@ export const getCommunityMembers = async (
 export const removeCommunityMember = async (
   communityId: string,
   memberId: string,
-  lang: Language
+  lang: Language,
 ) => {
   try {
     const response = await axiosInstance.delete(
@@ -84,9 +78,9 @@ export const removeCommunityMember = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -94,9 +88,7 @@ export const removeCommunityMember = async (
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Failed to remove member";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to remove member';
     throw new Error(errorMessage);
   }
 };
@@ -109,9 +101,9 @@ export const deleteCommunity = async (communityId: string, lang: Language) => {
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -121,7 +113,7 @@ export const deleteCommunity = async (communityId: string, lang: Language) => {
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to delete community";
+      'Failed to delete community';
     throw new Error(errorMessage);
   }
 };
@@ -130,7 +122,7 @@ export const deleteCommunity = async (communityId: string, lang: Language) => {
 export const updateCommunityPrivacy = async (
   communityId: string,
   isPrivate: boolean,
-  lang: Language
+  lang: Language,
 ) => {
   try {
     const response = await axiosInstance.patch<UpdateCommunityPrivacyResponse>(
@@ -139,9 +131,9 @@ export const updateCommunityPrivacy = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -151,7 +143,7 @@ export const updateCommunityPrivacy = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to update privacy";
+      'Failed to update privacy';
     throw new Error(errorMessage);
   }
 };
@@ -159,7 +151,7 @@ export const updateCommunityPrivacy = async (
 export const updateCommunityCategory = async (
   communityId: string,
   category: string,
-  lang: Language
+  lang: Language,
 ) => {
   try {
     const response = await axiosInstance.patch<UpdateCommunityCategoryResponse>(
@@ -168,9 +160,9 @@ export const updateCommunityCategory = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -180,7 +172,7 @@ export const updateCommunityCategory = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to update category";
+      'Failed to update category';
     throw new Error(errorMessage);
   }
 };
@@ -199,9 +191,9 @@ export const addCategory = async (categoryName: string, lang: Language) => {
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -209,19 +201,13 @@ export const addCategory = async (categoryName: string, lang: Language) => {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Failed to add category";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to add category';
     throw new Error(errorMessage);
   }
 };
 
 // Update Category
-export const updateCategory = async (
-  oldName: string,
-  newName: string,
-  lang: Language
-) => {
+export const updateCategory = async (oldName: string, newName: string, lang: Language) => {
   try {
     const response = await axiosInstance.put(
       `/admin/categories/${encodeURIComponent(oldName)}`,
@@ -229,9 +215,9 @@ export const updateCategory = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -241,7 +227,7 @@ export const updateCategory = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to update category";
+      'Failed to update category';
     throw new Error(errorMessage);
   }
 };
@@ -254,9 +240,9 @@ export const deleteCategory = async (categoryName: string, lang: Language) => {
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -266,7 +252,7 @@ export const deleteCategory = async (categoryName: string, lang: Language) => {
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to delete category";
+      'Failed to delete category';
     throw new Error(errorMessage);
   }
 };
@@ -274,15 +260,12 @@ export const deleteCategory = async (categoryName: string, lang: Language) => {
 // Get Category Stats
 export const getCategoryStats = async (lang: Language) => {
   try {
-    const response = await axiosInstance.get<GetCategoryStatsResponse>(
-      `/admin/categories/stats`,
-      {
-        withCredentials: true,
-        headers: {
-          "X-Language": lang,
-        },
-      }
-    );
+    const response = await axiosInstance.get<GetCategoryStatsResponse>(`/admin/categories/stats`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+      },
+    });
     return response.data;
   } catch (error: unknown) {
     const err = error as {
@@ -291,7 +274,7 @@ export const getCategoryStats = async (lang: Language) => {
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to fetch category stats";
+      'Failed to fetch category stats';
     throw new Error(errorMessage);
   }
 };
@@ -304,9 +287,9 @@ export const getCommunityStats = async (lang: Language) => {
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -316,7 +299,7 @@ export const getCommunityStats = async (lang: Language) => {
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to fetch community stats";
+      'Failed to fetch community stats';
     throw new Error(errorMessage);
   }
 };

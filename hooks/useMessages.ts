@@ -1,38 +1,31 @@
-import {
-  getClanMessages,
-  getCommunityMessages,
-} from "@/api/endPoints/message.service";
+import { getClanMessages, getCommunityMessages } from '@/api/endPoints/message.service';
 import {
   getSocket,
   onClanMessage,
   onCommunityMessage,
   sendClanMessage,
   sendCommunityMessage,
-} from "@/lib/socket";
-import authStore from "@/stores/auth.store";
-import LanguageStore from "@/stores/language.store";
-import { Message } from "@/types/message.types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert } from "react-native";
-import { useRoom } from "./useRoom";
+} from '@/lib/socket';
+import authStore from '@/stores/auth.store';
+import LanguageStore from '@/stores/language.store';
+import { Message } from '@/types/message.types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Alert } from 'react-native';
+import { useRoom } from './useRoom';
 
 interface UseMessagesProps {
   communityId?: string;
   clanId?: string;
-  type: "community" | "clan";
+  type: 'community' | 'clan';
 }
 
 /**
  * Hook for managing messages (CRUD + real-time)
  */
-export const useMessages = ({
-  communityId,
-  clanId,
-  type,
-}: UseMessagesProps) => {
+export const useMessages = ({ communityId, clanId, type }: UseMessagesProps) => {
   const language = LanguageStore.getState().language;
-  const targetId = type === "community" ? communityId : clanId;
+  const targetId = type === 'community' ? communityId : clanId;
 
   // Room management
   const { isJoined, isMember, accessDenied, accessDeniedCode } = useRoom({
@@ -52,12 +45,12 @@ export const useMessages = ({
 
   const queryKey = useMemo(
     () => [
-      type === "community" ? "community-messages" : "clan-messages",
+      type === 'community' ? 'community-messages' : 'clan-messages',
       targetId,
       currentPage,
       language,
     ],
-    [type, targetId, currentPage, language]
+    [type, targetId, currentPage, language],
   );
 
   // Fetch initial messages
@@ -66,7 +59,7 @@ export const useMessages = ({
     queryFn: async () => {
       if (!targetId) return { messages: [], pagination: { hasMore: false } };
 
-      return type === "community"
+      return type === 'community'
         ? await getCommunityMessages(targetId, currentPage, 20, language)
         : await getClanMessages(targetId, currentPage, 20, language);
     },
@@ -78,9 +71,7 @@ export const useMessages = ({
   // Reset state when switching rooms
   useEffect(() => {
     if (previousRoomKeyRef.current !== roomKey) {
-      console.log(
-        `🔄 Room changed: ${previousRoomKeyRef.current} → ${roomKey}`
-      );
+      console.log(`🔄 Room changed: ${previousRoomKeyRef.current} → ${roomKey}`);
       hasInitializedRef.current = false;
       setMessages([]);
       setCurrentPage(1);
@@ -96,7 +87,7 @@ export const useMessages = ({
     // Enrich messages with UserName if missing
     const enrichedMessages = initialMessages.messages.map((msg: any) => ({
       ...msg,
-      UserName: msg.UserName || msg.sender?.UserName || "Unknown User",
+      UserName: msg.UserName || msg.sender?.UserName || 'Unknown User',
       userId: msg.userId || msg.senderId,
     }));
 
@@ -112,19 +103,19 @@ export const useMessages = ({
 
     try {
       const more =
-        type === "community"
+        type === 'community'
           ? await getCommunityMessages(targetId, nextPage, 20, language)
           : await getClanMessages(targetId, nextPage, 20, language);
 
-      setMessages((prev) => {
-        const existingIds = new Set(prev.map((m) => m.id));
+      setMessages(prev => {
+        const existingIds = new Set(prev.map(m => m.id));
 
         // Enrich new messages with UserName if missing
         const enrichedNewMessages = more.messages
-          .filter((m) => !existingIds.has(m.id))
+          .filter(m => !existingIds.has(m.id))
           .map((msg: any) => ({
             ...msg,
-            UserName: msg.UserName || msg.sender?.UserName || "Unknown User",
+            UserName: msg.UserName || msg.sender?.UserName || 'Unknown User',
             userId: msg.userId || msg.senderId,
           }));
 
@@ -132,8 +123,8 @@ export const useMessages = ({
       });
       setCurrentPage(nextPage);
     } catch (error) {
-      console.error("Failed to load more messages:", error);
-      Alert.alert("Error", "Failed to load more messages");
+      console.error('Failed to load more messages:', error);
+      Alert.alert('Error', 'Failed to load more messages');
     }
   }, [targetId, initialMessages, currentPage, type, language]);
 
@@ -145,9 +136,7 @@ export const useMessages = ({
 
     const handleMessage = (message: any) => {
       const belongs =
-        type === "community"
-          ? message.communityId === targetId
-          : message.clanId === targetId;
+        type === 'community' ? message.communityId === targetId : message.clanId === targetId;
 
       if (!belongs) return;
 
@@ -156,41 +145,36 @@ export const useMessages = ({
       const enrichedMessage = {
         ...message,
         UserName:
-          message.UserName ||
-          message.sender?.UserName ||
-          currentUser?.UserName ||
-          "Unknown User",
+          message.UserName || message.sender?.UserName || currentUser?.UserName || 'Unknown User',
         userId: message.userId || message.senderId,
       };
 
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === enrichedMessage.id)) return prev;
-        console.log("🔌 New message received via socket:", enrichedMessage);
+      setMessages(prev => {
+        if (prev.some(m => m.id === enrichedMessage.id)) return prev;
+        console.log('🔌 New message received via socket:', enrichedMessage);
         return [...prev, enrichedMessage]; // Append new message
       });
     };
 
-    if (type === "community") {
+    if (type === 'community') {
       onCommunityMessage(handleMessage);
     } else {
       onClanMessage(handleMessage);
     }
 
     return () => {
-      socket.off(
-        type === "community" ? "community:new-message" : "clan:new-message"
-      );
+      socket.off(type === 'community' ? 'community:new-message' : 'clan:new-message');
     };
   }, [targetId, type, isJoined, roomKey]);
 
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: async (content: string) => {
-      if (!targetId) throw new Error("No target ID");
+      if (!targetId) throw new Error('No target ID');
 
-      console.log("📤 Sending message");
+      console.log('📤 Sending message');
 
-      if (type === "community") {
+      if (type === 'community') {
         sendCommunityMessage(targetId, content);
       } else {
         sendClanMessage(targetId, content);
@@ -201,30 +185,30 @@ export const useMessages = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
     },
-    onError: (error) => {
-      console.error("❌ Failed to send message:", error);
-      Alert.alert("Error", "Failed to send message");
+    onError: error => {
+      console.error('❌ Failed to send message:', error);
+      Alert.alert('Error', 'Failed to send message');
     },
   });
 
   const sendMessage = useCallback(
     (content: string) => {
       if (!content.trim()) {
-        Alert.alert("Error", "Message cannot be empty");
+        Alert.alert('Error', 'Message cannot be empty');
         return;
       }
       if (!isJoined) {
-        Alert.alert("Error", "Not connected to room");
+        Alert.alert('Error', 'Not connected to room');
         return;
       }
       if (!isMember) {
-        Alert.alert("Error", "You are not a member");
+        Alert.alert('Error', 'You are not a member');
         return;
       }
 
       sendMessageMutation.mutate(content);
     },
-    [sendMessageMutation, isJoined, isMember]
+    [sendMessageMutation, isJoined, isMember],
   );
 
   return {

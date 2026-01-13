@@ -1,15 +1,15 @@
-import LanguageStore, { Language } from "@/stores/language.store";
-import { DEFAULT_LANGUAGE } from "@/translation/language";
+import LanguageStore, { Language } from '@/stores/language.store';
+import { DEFAULT_LANGUAGE } from '@/translation/language';
 
 // language imports
-import arab from "./arab";
-import chin from "./chin";
-import en from "./eng";
-import fr from "./fr";
-import jap from "./jap";
-import lang from "./lang";
-import nep from "./nep";
-import span from "./span";
+import arab from './arab';
+import chin from './chin';
+import en from './eng';
+import fr from './fr';
+import jap from './jap';
+import lang from './lang';
+import nep from './nep';
+import span from './span';
 
 // Types
 type TranslationValue = string | Record<string, unknown>;
@@ -35,11 +35,7 @@ function getCurrentLanguage(): Language {
 }
 
 // Shared translation logic
-function getTranslation(
-  language: Language,
-  key: string,
-  fallback?: string
-): string {
+function getTranslation(language: Language, key: string, fallback?: string): string {
   const langPack = translations[language];
 
   if (!langPack) return fallback || key;
@@ -47,13 +43,13 @@ function getTranslation(
   let value: unknown;
 
   // Case 1: namespace:key
-  if (key.includes(":")) {
-    const [namespace, rest] = key.split(":");
+  if (key.includes(':')) {
+    const [namespace, rest] = key.split(':');
 
     const nsObject = langPack[namespace];
-    if (!nsObject || typeof nsObject !== "object") return fallback || key;
+    if (!nsObject || typeof nsObject !== 'object') return fallback || key;
 
-    const nestedKeys = rest.split(".");
+    const nestedKeys = rest.split('.');
     value = nsObject;
 
     for (const k of nestedKeys) {
@@ -63,7 +59,7 @@ function getTranslation(
   }
   // Case 2: dot path
   else {
-    const keys = key.split(".");
+    const keys = key.split('.');
     value = langPack;
 
     for (const part of keys) {
@@ -72,30 +68,27 @@ function getTranslation(
     }
   }
 
-  return typeof value === "string" ? value : fallback || key;
+  return typeof value === 'string' ? value : fallback || key;
 }
 
 // Enhanced translation function with parameter replacement
-export function t(
-  key: string,
-  params?: Record<string, string | number> | string
-): string {
+export function t(key: string, params?: Record<string, string | number> | string): string {
   const currentLang = getCurrentLanguage();
-  const keys = key.split(".");
-  const fallback = typeof params === "string" ? params : undefined;
-  const replacements = typeof params === "object" ? params : undefined;
+  const keys = key.split('.');
+  const fallback = typeof params === 'string' ? params : undefined;
+  const replacements = typeof params === 'object' ? params : undefined;
 
   let value: unknown = translations[currentLang];
 
   // Handle namespace:key format (e.g., "success:login")
-  if (key.includes(":")) {
-    const [namespace, ...restKeys] = key.split(":");
-    const actualKey = restKeys.join(":");
+  if (key.includes(':')) {
+    const [namespace, ...restKeys] = key.split(':');
+    const actualKey = restKeys.join(':');
     const langTranslations = translations[currentLang] as TranslationContent;
     value = langTranslations?.[namespace];
 
     if (value && actualKey) {
-      const nestedKeys = actualKey.split(".");
+      const nestedKeys = actualKey.split('.');
       for (const nestedKey of nestedKeys) {
         value = (value as Record<string, unknown>)?.[nestedKey];
         if (value === undefined) break;
@@ -109,15 +102,12 @@ export function t(
     }
   }
 
-  let result = typeof value === "string" ? value : fallback || key;
+  let result = typeof value === 'string' ? value : fallback || key;
 
   // Replace parameters in the string (e.g., {minutes} -> 30)
   if (replacements) {
     Object.entries(replacements).forEach(([param, paramValue]) => {
-      result = result.replace(
-        new RegExp(`\\{${param}\\}`, "g"),
-        String(paramValue)
-      );
+      result = result.replace(new RegExp(`\\{${param}\\}`, 'g'), String(paramValue));
     });
   }
 
@@ -126,7 +116,7 @@ export function t(
 
 // Hook to subscribe to language changes
 export function useLanguage(): Language {
-  const language = LanguageStore((state) => state.language);
+  const language = LanguageStore(state => state.language);
   return language || defaultLocale;
 }
 
@@ -149,4 +139,4 @@ export {
   isValidLanguage,
   VALID_LANGUAGES,
   validateLanguage,
-} from "@/translation/language";
+} from '@/translation/language';

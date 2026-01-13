@@ -11,15 +11,15 @@ interface LanguageState {
 
 const LanguageStore = create<LanguageState>()(
   persist(
-    (set) => ({
+    set => ({
       language: 'eng',
       setLanguage: (lang: Language) => set({ language: lang }),
     }),
     {
       name: 'levelup-language',
       storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+    },
+  ),
 );
 
 export default LanguageStore;

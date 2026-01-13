@@ -1,21 +1,21 @@
-import { Language } from "@/stores/language.store";
+import { Language } from '@/stores/language.store';
 
-import { t } from "@/translation";
-import axiosInstance from "../client";
+import { t } from '@/translation';
+import axiosInstance from '../client';
 export interface Quest {
   id: string;
   userId: string;
   communityId: string;
   description: string;
   xpValue: number;
-  type: "Daily" | "Weekly";
+  type: 'Daily' | 'Weekly';
   periodStatus:
-    | "TODAY"
-    | "YESTERDAY"
-    | "DAY_BEFORE_YESTERDAY"
-    | "THIS_WEEK"
-    | "LAST_WEEK"
-    | "TWO_WEEKS_AGO";
+    | 'TODAY'
+    | 'YESTERDAY'
+    | 'DAY_BEFORE_YESTERDAY'
+    | 'THIS_WEEK'
+    | 'LAST_WEEK'
+    | 'TWO_WEEKS_AGO';
   periodKey: string; // YYYY-MM-DD
   periodSeq: number; // 1–5
   // additional fields returned by API
@@ -29,7 +29,7 @@ export interface Quest {
   source?: string;
 }
 
-export type QuestStatus = "not-started" | "in-progress" | "ready" | "completed";
+export type QuestStatus = 'not-started' | 'in-progress' | 'ready' | 'completed';
 
 export interface TimeRemaining {
   isReady: boolean;
@@ -39,12 +39,12 @@ export interface TimeRemaining {
 }
 
 export function getQuestStatus(quest: Quest): QuestStatus {
-  if (quest.isCompleted || quest.completedAt) return "completed";
+  if (quest.isCompleted || quest.completedAt) return 'completed';
   if (quest.startedAt) {
     const timeRemaining = getTimeRemaining(quest);
-    return timeRemaining.isReady ? "ready" : "in-progress";
+    return timeRemaining.isReady ? 'ready' : 'in-progress';
   }
-  return "not-started";
+  return 'not-started';
 }
 
 export function getTimeRemaining(quest: Quest): TimeRemaining {
@@ -53,7 +53,7 @@ export function getTimeRemaining(quest: Quest): TimeRemaining {
     return {
       isReady: false,
       remainingMinutes: required,
-      remainingText: t("quests.landing.minRequired", { minutes: required }),
+      remainingText: t('quests.landing.minRequired', { minutes: required }),
       progressPercent: 0,
     };
   }
@@ -63,18 +63,15 @@ export function getTimeRemaining(quest: Quest): TimeRemaining {
   const now = Date.now();
   const elapsedMinutes = Math.floor((now - startTime) / (1000 * 60));
   const remainingMinutes = Math.max(0, requiredMinutes - elapsedMinutes);
-  const progressPercent = Math.min(
-    100,
-    (elapsedMinutes / requiredMinutes) * 100
-  );
+  const progressPercent = Math.min(100, (elapsedMinutes / requiredMinutes) * 100);
 
   return {
     isReady: remainingMinutes === 0,
     remainingMinutes,
     remainingText:
       remainingMinutes > 0
-        ? t("quests.landing.minRemaining", { minutes: remainingMinutes })
-        : t("quests.landing.readyToComplete"),
+        ? t('quests.landing.minRemaining', { minutes: remainingMinutes })
+        : t('quests.landing.readyToComplete'),
     progressPercent,
   };
 }
@@ -100,25 +97,19 @@ export interface ApiResponse<T> {
 }
 
 export const fetchDailyQuests = async (lang: Language) => {
-  const res = await axiosInstance.get<ApiResponse<DailyQuestsData>>(
-    `/ai/quests/daily`,
-    {
-      headers: { "X-Language": lang },
-      withCredentials: true,
-    }
-  );
-  console.log("fetchDailyQuests response:", res.data);
+  const res = await axiosInstance.get<ApiResponse<DailyQuestsData>>(`/ai/quests/daily`, {
+    headers: { 'X-Language': lang },
+    withCredentials: true,
+  });
+  console.log('fetchDailyQuests response:', res.data);
   return res.data;
 };
 
 export const fetchWeeklyQuests = async (lang: Language) => {
-  const res = await axiosInstance.get<ApiResponse<WeeklyQuestsData>>(
-    `/ai/quests/weekly`,
-    {
-      headers: { "X-Language": lang },
-      withCredentials: true,
-    }
-  );
+  const res = await axiosInstance.get<ApiResponse<WeeklyQuestsData>>(`/ai/quests/weekly`, {
+    headers: { 'X-Language': lang },
+    withCredentials: true,
+  });
   return res.data;
 };
 
@@ -127,9 +118,9 @@ export const generateDailyQuests = async (lang: Language) => {
     `/ai/generate/daily`,
     undefined,
     {
-      headers: { "X-Language": lang },
+      headers: { 'X-Language': lang },
       withCredentials: true,
-    }
+    },
   );
   return res.data;
 };
@@ -139,9 +130,9 @@ export const generateWeeklyQuests = async (lang: Language) => {
     `/ai/generate/weekly`,
     undefined,
     {
-      headers: { "X-Language": lang },
+      headers: { 'X-Language': lang },
       withCredentials: true,
-    }
+    },
   );
   return res.data;
 };
@@ -167,9 +158,9 @@ export const startQuest = async (questId: string, lang: Language) => {
     `/ai/quests/start`,
     { questId },
     {
-      headers: { "X-Language": lang },
+      headers: { 'X-Language': lang },
       withCredentials: true,
-    }
+    },
   );
   return res.data;
 };
@@ -179,9 +170,9 @@ export const completeQuest = async (questId: string, lang: Language) => {
     `/ai/quests/complete`,
     { questId },
     {
-      headers: { "X-Language": lang },
+      headers: { 'X-Language': lang },
       withCredentials: true,
-    }
+    },
   );
   return res.data;
 };
@@ -202,20 +193,20 @@ export const fetchCompletedQuests = async (
   lang: Language,
   page: number = 1,
   limit: number = 20,
-  type?: "Daily" | "Weekly"
+  type?: 'Daily' | 'Weekly',
 ) => {
   const params = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
   });
-  if (type) params.append("type", type);
+  if (type) params.append('type', type);
 
   const res = await axiosInstance.get<ApiResponse<CompletedQuestsResponse>>(
     `/ai/quests/completed?${params.toString()}`,
     {
-      headers: { "X-Language": lang },
+      headers: { 'X-Language': lang },
       withCredentials: true,
-    }
+    },
   );
   return res.data;
 };
@@ -229,12 +220,13 @@ export interface QuestWithCommunity extends Quest {
 }
 
 export const fetchSingleQuest = async (questId: string, lang: Language) => {
-  const res = await axiosInstance.get<
-    ApiResponse<{ quest: QuestWithCommunity }>
-  >(`/ai/quests/${questId}`, {
-    headers: { "X-Language": lang },
-    withCredentials: true,
-  });
+  const res = await axiosInstance.get<ApiResponse<{ quest: QuestWithCommunity }>>(
+    `/ai/quests/${questId}`,
+    {
+      headers: { 'X-Language': lang },
+      withCredentials: true,
+    },
+  );
   return res.data;
 };
 
@@ -247,9 +239,9 @@ export const sendAIChat = async (prompt: string, lang: Language) => {
     `/ai/chat`,
     { prompt },
     {
-      headers: { "X-Language": lang },
+      headers: { 'X-Language': lang },
       withCredentials: true,
-    }
+    },
   );
   return res.data;
 };
@@ -298,18 +290,15 @@ export interface AIConfigResponse {
 }
 
 export const fetchAIConfig = async (lang: Language) => {
-  const res = await axiosInstance.get<ApiResponse<AIConfigResponse>>(
-    `/ai/config`,
-    {
-      headers: { "X-Language": lang },
-      withCredentials: true,
-    }
-  );
+  const res = await axiosInstance.get<ApiResponse<AIConfigResponse>>(`/ai/config`, {
+    headers: { 'X-Language': lang },
+    withCredentials: true,
+  });
   return res.data;
 };
 
 export interface AIHealthResponse {
-  status: "healthy" | "degraded";
+  status: 'healthy' | 'degraded';
   timestamp: string;
   uptime: number;
   responseTime: number;
@@ -338,13 +327,10 @@ export interface AIHealthResponse {
 }
 
 export const fetchAIHealth = async (lang: Language) => {
-  const res = await axiosInstance.get<ApiResponse<AIHealthResponse>>(
-    `/ai/health`,
-    {
-      headers: { "X-Language": lang },
-      withCredentials: true,
-    }
-  );
+  const res = await axiosInstance.get<ApiResponse<AIHealthResponse>>(`/ai/health`, {
+    headers: { 'X-Language': lang },
+    withCredentials: true,
+  });
   return res.data;
 };
 
@@ -353,7 +339,7 @@ export const forceGenerateDailyQuests = async (lang: Language) => {
   const res = await axiosInstance.post<
     ApiResponse<{ today: QuestWithCommunity[]; count: number; forced: boolean }>
   >(`/ai/generate/daily/force`, undefined, {
-    headers: { "X-Language": lang },
+    headers: { 'X-Language': lang },
     withCredentials: true,
   });
   return res.data;
@@ -367,7 +353,7 @@ export const forceGenerateWeeklyQuests = async (lang: Language) => {
       forced: boolean;
     }>
   >(`/ai/generate/weekly/force`, undefined, {
-    headers: { "X-Language": lang },
+    headers: { 'X-Language': lang },
     withCredentials: true,
   });
   return res.data;
@@ -375,12 +361,13 @@ export const forceGenerateWeeklyQuests = async (lang: Language) => {
 
 // Admin only - delete quest
 export const deleteQuest = async (questId: string, lang: Language) => {
-  const res = await axiosInstance.delete<
-    ApiResponse<{ deletedQuestId: string; userId: string }>
-  >(`/ai/quests/${questId}`, {
-    headers: { "X-Language": lang },
-    withCredentials: true,
-  });
+  const res = await axiosInstance.delete<ApiResponse<{ deletedQuestId: string; userId: string }>>(
+    `/ai/quests/${questId}`,
+    {
+      headers: { 'X-Language': lang },
+      withCredentials: true,
+    },
+  );
   return res.data;
 };
 
@@ -404,12 +391,13 @@ export interface CommunityMembershipsResponse {
 }
 
 export const getCommunityMemberships = async (lang: Language) => {
-  const res = await axiosInstance.get<
-    ApiResponse<CommunityMembershipsResponse>
-  >(`/ai/community/memberships`, {
-    headers: { "X-Language": lang },
-    withCredentials: true,
-  });
+  const res = await axiosInstance.get<ApiResponse<CommunityMembershipsResponse>>(
+    `/ai/community/memberships`,
+    {
+      headers: { 'X-Language': lang },
+      withCredentials: true,
+    },
+  );
   return res.data;
 };
 
@@ -454,7 +442,7 @@ export interface QuestStatsResponse {
 export interface BulkDeleteFilter {
   userId?: string;
   communityId?: string;
-  type?: "Daily" | "Weekly";
+  type?: 'Daily' | 'Weekly';
   periodStatus?: string;
   startDate?: string;
   endDate?: string;
@@ -472,25 +460,22 @@ export const adminGenerateDailyAll = async (lang: Language) => {
     `/ai/admin/generate/daily/all`,
     undefined,
     {
-      headers: { "X-Language": lang },
+      headers: { 'X-Language': lang },
       withCredentials: true,
-    }
+    },
   );
   return res.data;
 };
 
 // Admin: Generate daily quests for specific user
-export const adminGenerateDailyUser = async (
-  userId: string,
-  lang: Language
-) => {
+export const adminGenerateDailyUser = async (userId: string, lang: Language) => {
   const res = await axiosInstance.post<ApiResponse<AdminGenerateUserResponse>>(
     `/ai/admin/generate/daily/${userId}`,
     undefined,
     {
-      headers: { "X-Language": lang },
+      headers: { 'X-Language': lang },
       withCredentials: true,
-    }
+    },
   );
   return res.data;
 };
@@ -501,53 +486,41 @@ export const adminGenerateWeeklyAll = async (lang: Language) => {
     `/ai/admin/generate/weekly/all`,
     undefined,
     {
-      headers: { "X-Language": lang },
+      headers: { 'X-Language': lang },
       withCredentials: true,
-    }
+    },
   );
   return res.data;
 };
 
 // Admin: Generate weekly quests for specific user
-export const adminGenerateWeeklyUser = async (
-  userId: string,
-  lang: Language
-) => {
+export const adminGenerateWeeklyUser = async (userId: string, lang: Language) => {
   const res = await axiosInstance.post<ApiResponse<AdminGenerateUserResponse>>(
     `/ai/admin/generate/weekly/${userId}`,
     undefined,
     {
-      headers: { "X-Language": lang },
+      headers: { 'X-Language': lang },
       withCredentials: true,
-    }
+    },
   );
   return res.data;
 };
 
 // Admin: Get quest statistics
 export const adminGetQuestStats = async (lang: Language) => {
-  const res = await axiosInstance.get<ApiResponse<QuestStatsResponse>>(
-    `/ai/admin/quests/stats`,
-    {
-      headers: { "X-Language": lang },
-      withCredentials: true,
-    }
-  );
+  const res = await axiosInstance.get<ApiResponse<QuestStatsResponse>>(`/ai/admin/quests/stats`, {
+    headers: { 'X-Language': lang },
+    withCredentials: true,
+  });
   return res.data;
 };
 
 // Admin: Bulk delete quests
-export const adminBulkDeleteQuests = async (
-  filters: BulkDeleteFilter,
-  lang: Language
-) => {
-  const res = await axiosInstance.delete<ApiResponse<BulkDeleteResponse>>(
-    `/ai/admin/quests`,
-    {
-      headers: { "X-Language": lang },
-      data: filters,
-      withCredentials: true,
-    }
-  );
+export const adminBulkDeleteQuests = async (filters: BulkDeleteFilter, lang: Language) => {
+  const res = await axiosInstance.delete<ApiResponse<BulkDeleteResponse>>(`/ai/admin/quests`, {
+    headers: { 'X-Language': lang },
+    data: filters,
+    withCredentials: true,
+  });
   return res.data;
 };

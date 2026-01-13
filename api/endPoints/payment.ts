@@ -1,22 +1,23 @@
-import { Language } from "@/stores/language.store";
-import axiosInstance from "../client";
+import { Language } from '@/stores/language.store';
+import axiosInstance from '../client';
 import type {
   ApiResponse,
   KhaltiInitializeResponse,
   SubscriptionPlansResponse,
-} from "../types/payment";
+} from '../types/payment';
 
 // Get all subscription plans
 export const getSubscriptionPlans = async (lang: Language) => {
   try {
-    const response = await axiosInstance.get<
-      ApiResponse<SubscriptionPlansResponse>
-    >(`/subscription/subscriptionPlans`, {
-      withCredentials: true,
-      headers: {
-        "X-Language": lang,
+    const response = await axiosInstance.get<ApiResponse<SubscriptionPlansResponse>>(
+      `/subscription/subscriptionPlans`,
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+        },
       },
-    });
+    );
 
     response.data.body.data.subscriptionPlans;
     return;
@@ -27,7 +28,7 @@ export const getSubscriptionPlans = async (lang: Language) => {
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to load subscription plans";
+      'Failed to load subscription plans';
     throw new Error(errorMessage);
   }
 };
@@ -36,7 +37,7 @@ export const getSubscriptionPlans = async (lang: Language) => {
 export const initializeKhaltiPayment = async (
   planId: string,
   totalPrice: number,
-  lang: Language
+  lang: Language,
 ) => {
   try {
     const response = await axiosInstance.post<KhaltiInitializeResponse>(
@@ -49,10 +50,10 @@ export const initializeKhaltiPayment = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
-          "Content-Type": "application/json",
+          'X-Language': lang,
+          'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     response.data.payment.payment_url;
@@ -64,7 +65,7 @@ export const initializeKhaltiPayment = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to initialize payment. Please try again.";
+      'Failed to initialize payment. Please try again.';
     throw new Error(errorMessage);
   }
 };

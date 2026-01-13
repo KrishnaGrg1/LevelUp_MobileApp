@@ -4,20 +4,20 @@ import {
   joinCommunity,
   joinPrivateCommunity,
   searchCommunities,
-} from "@/api/endPoints/communities";
-import { communitiesService } from "@/api/endPoints/communities.service";
+} from '@/api/endPoints/communities';
+import { communitiesService } from '@/api/endPoints/communities.service';
 
-import { CreateCommunityDto } from "@/api/generated";
+import { CreateCommunityDto } from '@/api/generated';
 
-import LanguageStore from "@/stores/language.store";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import LanguageStore from '@/stores/language.store';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 /**
  * Get user's joined communities
  */
 export const useMyCommunities = () => {
   const language = LanguageStore.getState().language;
   return useQuery({
-    queryKey: ["userCommunities"],
+    queryKey: ['userCommunities'],
 
     queryFn: () => getMyCommunities(language),
     staleTime: 3 * 60 * 1000, // 3 minutes
@@ -30,7 +30,7 @@ export const useMyCommunities = () => {
 export const useSearchCommunities = (searchQuery: string) => {
   const language = LanguageStore.getState().language;
   return useQuery({
-    queryKey: ["search-communities", searchQuery],
+    queryKey: ['search-communities', searchQuery],
     queryFn: () => searchCommunities(language, searchQuery),
     enabled: searchQuery.length > 0,
     staleTime: 1 * 60 * 1000, // 1 minute
@@ -42,7 +42,7 @@ export const useSearchCommunities = (searchQuery: string) => {
  */
 export const useCommunity = (id: string) => {
   return useQuery({
-    queryKey: ["communities", id],
+    queryKey: ['communities', id],
     queryFn: () => communitiesService.getById(id),
     enabled: !!id,
     staleTime: 3 * 60 * 1000,
@@ -54,7 +54,7 @@ export const useCommunity = (id: string) => {
  */
 export const useCommunityMembers = (id: string) => {
   return useQuery({
-    queryKey: ["communities", id, "members"],
+    queryKey: ['communities', id, 'members'],
     queryFn: () => communitiesService.getMembers(id),
     enabled: !!id,
     staleTime: 2 * 60 * 1000,
@@ -72,8 +72,8 @@ export const useCreateCommunity = () => {
     mutationFn: (payload: FormData) => createCommunity(language, payload),
     onSuccess: () => {
       // Invalidate communities list
-      queryClient.invalidateQueries({ queryKey: ["communities"] });
-      queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
     },
   });
 };
@@ -89,8 +89,8 @@ export const useJoinPrivateCommunity = () => {
     mutationFn: (joinCode: string) => joinPrivateCommunity(language, joinCode),
     onSuccess: () => {
       // Refresh the user's community list so the new one shows up
-      queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
-      queryClient.invalidateQueries({ queryKey: ["communities"] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
     },
   });
 };
@@ -106,9 +106,9 @@ export const useJoinCommunity = () => {
     mutationFn: (communityId: string) => joinCommunity(language, communityId),
     onSuccess: () => {
       // Refresh the user's community list
-      queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
-      queryClient.invalidateQueries({ queryKey: ["communities"] });
-      queryClient.invalidateQueries({ queryKey: ["search-communities"] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['search-communities'] });
     },
   });
 };
@@ -161,16 +161,11 @@ export const useUpdateCommunity = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: string;
-      payload: Partial<CreateCommunityDto>;
-    }) => communitiesService.updateSettings(id, payload),
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<CreateCommunityDto> }) =>
+      communitiesService.updateSettings(id, payload),
     onSuccess: (data, { id }) => {
-      queryClient.setQueryData(["communities", id], data);
-      queryClient.invalidateQueries({ queryKey: ["communities"] });
+      queryClient.setQueryData(['communities', id], data);
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
     },
   });
 };
@@ -184,8 +179,8 @@ export const useDeleteCommunity = () => {
   return useMutation({
     mutationFn: (id: string) => communitiesService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["communities"] });
-      queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
     },
   });
 };

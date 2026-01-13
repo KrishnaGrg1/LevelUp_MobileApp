@@ -1,5 +1,5 @@
-import { Language } from "@/stores/language.store";
-import axiosInstance from "../client";
+import { Language } from '@/stores/language.store';
+import axiosInstance from '../client';
 import {
   communityDetailByIdResponse,
   CreateCommunityResponse,
@@ -7,40 +7,15 @@ import {
   GetMyCommunities,
   searchCommunitiesResponse,
   TogglePinResponse,
-} from "../generated";
+} from '../generated';
 
 // Get user's communities
 export const getMyCommunities = async (lang: Language) => {
   try {
-    const response = await axiosInstance.get<GetMyCommunities>(
-      `/community/my`,
-      {
-        withCredentials: true,
-        headers: {
-          "X-Language": lang,
-        },
-      }
-    );
-    return response.data;
-  } catch (error: unknown) {
-    const err = error as {
-      response?: { data?: { body?: { message?: string }; message?: string } };
-    };
-    const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Get My Communities failed";
-    throw new Error(errorMessage);
-  }
-};
-
-// Get all communities
-export const getAllCommunities = async (lang: Language) => {
-  try {
-    const response = await axiosInstance.get<GetMyCommunities>(`/community`, {
+    const response = await axiosInstance.get<GetMyCommunities>(`/community/my`, {
       withCredentials: true,
       headers: {
-        "X-Language": lang,
+        'X-Language': lang,
       },
     });
     return response.data;
@@ -51,7 +26,29 @@ export const getAllCommunities = async (lang: Language) => {
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Get All Communities failed";
+      'Get My Communities failed';
+    throw new Error(errorMessage);
+  }
+};
+
+// Get all communities
+export const getAllCommunities = async (lang: Language) => {
+  try {
+    const response = await axiosInstance.get<GetMyCommunities>(`/community`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Get All Communities failed';
     throw new Error(errorMessage);
   }
 };
@@ -65,21 +62,19 @@ export const togglePin = async (lang: Language, communityIds: string[]) => {
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
-          "Content-Type": "application/json",
+          'X-Language': lang,
+          'Content-Type': 'application/json',
         },
-      }
+      },
     );
-    console.log("Id are", communityIds);
+    console.log('Id are', communityIds);
     return response.data;
   } catch (error: unknown) {
     const err = error as {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "To Community failed";
+      err.response?.data?.body?.message || err.response?.data?.message || 'To Community failed';
     throw new Error(errorMessage);
   }
 };
@@ -92,10 +87,10 @@ export const createCommunity = async (lang: Language, formData: FormData) => {
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
-          "Content-Type": "multipart/form-data",
+          'X-Language': lang,
+          'Content-Type': 'multipart/form-data',
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -103,9 +98,7 @@ export const createCommunity = async (lang: Language, formData: FormData) => {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Create Community failed";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Create Community failed';
     throw new Error(errorMessage);
   }
 };
@@ -113,16 +106,13 @@ export const createCommunity = async (lang: Language, formData: FormData) => {
 // Search  communities
 export const searchCommunities = async (lang: Language, query: string) => {
   try {
-    const response = await axiosInstance.get<searchCommunitiesResponse>(
-      `/community/search`,
-      {
-        params: { q: query },
-        withCredentials: true,
-        headers: {
-          "X-Language": lang,
-        },
-      }
-    );
+    const response = await axiosInstance.get<searchCommunitiesResponse>(`/community/search`, {
+      params: { q: query },
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+      },
+    });
     return response.data;
   } catch (error: unknown) {
     const err = error as {
@@ -131,7 +121,7 @@ export const searchCommunities = async (lang: Language, query: string) => {
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to search community";
+      'Failed to search community';
     throw new Error(errorMessage);
   }
 };
@@ -148,9 +138,9 @@ export const joinCommunity = async (lang: Language, communityId: string) => {
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -160,16 +150,13 @@ export const joinCommunity = async (lang: Language, communityId: string) => {
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to join community";
+      'Failed to join community';
     throw new Error(errorMessage);
   }
 };
 
 // Join a community
-export const joinPrivateCommunity = async (
-  lang: Language,
-  joinCode: string
-) => {
+export const joinPrivateCommunity = async (lang: Language, joinCode: string) => {
   try {
     const response = await axiosInstance.post<{
       success: boolean;
@@ -180,9 +167,9 @@ export const joinPrivateCommunity = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -192,25 +179,22 @@ export const joinPrivateCommunity = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to join community";
+      'Failed to join community';
     throw new Error(errorMessage);
   }
 };
 
 // Specific   Community Detail
-export const communityDetailById = async (
-  lang: Language,
-  communityId: string
-) => {
+export const communityDetailById = async (lang: Language, communityId: string) => {
   try {
     const response = await axiosInstance.get<communityDetailByIdResponse>(
       `/community/${communityId}`,
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -220,7 +204,7 @@ export const communityDetailById = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to search community";
+      'Failed to search community';
     throw new Error(errorMessage);
   }
 };
@@ -229,15 +213,12 @@ export const communityDetailById = async (
 
 export const getCategories = async (lang: Language) => {
   try {
-    const response = await axiosInstance.get<getCategoriesResponse>(
-      `/auth/categories`,
-      {
-        withCredentials: true,
-        headers: {
-          "X-Language": lang,
-        },
-      }
-    );
+    const response = await axiosInstance.get<getCategoriesResponse>(`/auth/categories`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+      },
+    });
     return response.data;
   } catch (error: unknown) {
     const err = error as {
@@ -246,7 +227,7 @@ export const getCategories = async (lang: Language) => {
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to get categories";
+      'Failed to get categories';
     throw new Error(errorMessage);
   }
 };

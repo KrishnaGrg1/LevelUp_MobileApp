@@ -1,16 +1,12 @@
-import { Language } from "@/stores/language.store";
-import axiosInstance from "../client";
-import {
-  GetCommunityMessagesResponse,
-  Message,
-  SendMessagePayload,
-} from "../generated";
+import { Language } from '@/stores/language.store';
+import axiosInstance from '../client';
+import { GetCommunityMessagesResponse, Message, SendMessagePayload } from '../generated';
 
 export const getCommunityMessages = async (
   lang: Language,
   communityId: string,
   page: number,
-  limit = 10
+  limit = 10,
 ) => {
   try {
     const res = await axiosInstance.get<GetCommunityMessagesResponse>(
@@ -18,9 +14,9 @@ export const getCommunityMessages = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     // Return the full data object with messages and pagination
     return res.data.body.data;
@@ -31,7 +27,7 @@ export const getCommunityMessages = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to fetch community messages";
+      'Failed to fetch community messages';
     throw new Error(errorMessage);
   }
 };
@@ -39,7 +35,7 @@ export const getCommunityMessages = async (
 export const sendCommunityMessageAPI = async (
   lang: Language,
   communityId: string,
-  payload: SendMessagePayload
+  payload: SendMessagePayload,
 ): Promise<Message> => {
   try {
     const response = await axiosInstance.post<{ data: Message }>(
@@ -48,9 +44,9 @@ export const sendCommunityMessageAPI = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data.data;
   } catch (error: unknown) {
@@ -60,27 +56,22 @@ export const sendCommunityMessageAPI = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to send community message";
+      'Failed to send community message';
     throw new Error(errorMessage);
   }
 };
 
 // Clan Messages
-export const getClanMessages = async (
-  lang: Language,
-  clanId: string,
-  page = 1,
-  limit = 10
-) => {
+export const getClanMessages = async (lang: Language, clanId: string, page = 1, limit = 10) => {
   try {
     const response = await axiosInstance.get<GetCommunityMessagesResponse>(
       `/community/clan/${clanId}/messages?page=${page}&limit=${limit}`,
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     // Return the full data object with messages and pagination
     return response.data.body.data;
@@ -91,7 +82,7 @@ export const getClanMessages = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to fetch clan messages";
+      'Failed to fetch clan messages';
     throw new Error(errorMessage);
   }
 };
@@ -99,7 +90,7 @@ export const getClanMessages = async (
 export const sendClanMessageAPI = async (
   lang: Language,
   clanId: string,
-  payload: SendMessagePayload
+  payload: SendMessagePayload,
 ): Promise<Message> => {
   try {
     const response = await axiosInstance.post<{ data: Message }>(
@@ -108,9 +99,9 @@ export const sendClanMessageAPI = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data.data;
   } catch (error: unknown) {
@@ -120,7 +111,7 @@ export const sendClanMessageAPI = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      "Failed to send clan message";
+      'Failed to send clan message';
     throw new Error(errorMessage);
   }
 };
