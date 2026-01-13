@@ -1,4 +1,5 @@
 import { communityDetailById } from "@/api/endPoints/communities";
+import { CreateClanModal } from "@/components/communities/CreateClanModal";
 import { Box } from "@/components/ui/box";
 import { Center } from "@/components/ui/center";
 import { Heading } from "@/components/ui/heading";
@@ -6,6 +7,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { useClansByCommunity } from "@/hooks/queries/useClan";
 import { useMessages } from "@/hooks/useMessages";
 import authStore from "@/stores/auth.store";
 import LanguageStore from "@/stores/language.store";
@@ -15,7 +17,10 @@ import {
   MessageCircle,
   MoreVertical,
   Paperclip,
+  Plus,
+  Search,
   Send,
+  Shield,
   Users,
 } from "lucide-react-native";
 import React, { useRef, useState } from "react";
@@ -36,6 +41,9 @@ export default function CommunityDetailScreen() {
   const [activeTab, setActiveTab] = useState<
     "chat" | "quests" | "profile" | "clans" | "leaderboard"
   >("chat");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedClan, setSelectedClan] = useState<string | null>(null);
+  const [showCreateClanModal, setShowCreateClanModal] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
   const { data, isLoading, error } = useQuery({
@@ -58,6 +66,21 @@ export default function CommunityDetailScreen() {
   });
 
   const community = data?.body?.data;
+
+  // Fetch clans from API
+  const {
+    data: clansData,
+    isLoading: clansLoading,
+    error: clansError,
+  } = useClansByCommunity(id as string);
+
+  const clans = clansData?.body?.data || [];
+  const myClans = clans.filter((clan) => clan.isMember);
+  const availableClans = clans.filter((clan) => !clan.isMember);
+
+  const filteredClans = clans.filter((clan) =>
+    clan.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const tabs = [
     { id: "chat", label: "Chat", icon: MessageCircle },
@@ -328,7 +351,157 @@ export default function CommunityDetailScreen() {
             </>
           )}
 
-          {activeTab !== "chat" && (
+          {activeTab === "clans" && (
+            <VStack className="flex-1">
+              {/* Header with Create Clan Button */}
+              <HStack className="px-4 py-3 bg-background-50 items-center justify-between border-b border-outline-200">
+                <VStack>
+                  <Heading size="sm" className="text-typography-900">
+                    {community.name}
+                  </Heading>
+                  <HStack space="xs" className="items-center">
+                    <Users size={12} color="#6b7280" />
+                    <Text className="text-xs text-typography-500">
+                      {community._count?.members || 0} members
+                    </Text>
+                    <Text className="text-xs text-typography-400">•</Text>
+                    <Shield size={12} color="#6b7280" />
+                    <Text className="text-xs text-typography-500">
+                      {community._count?.clans || 0} clans
+                    </Text>
+                  </HStack>
+                </VStack>
+                <Pressable
+                  className="bg-primary-600 px-4 py-2 rounded-lg flex-row items-center gap-2"
+                  onPress={() => setShowCreateClanModal(true)}
+                >
+                  <Plus size={16} color="#ffffff" />
+                  <Text className="text-white text-sm font-semibold">
+                    Create Clan
+                  </Text>
+                </Pressable>
+              </HStack>
+
+              {/* Search Bar */}
+              <Box className="px-4 py-3 bg-background-0 border-b border-outline-200">
+                <HStack
+                  space="md"
+                  className="bg-background-50 rounded-lg px-3 py-2 items-center border border-outline-200"
+                >
+                  <Search size={18} color="#9ca3af" />
+                  <TextInput
+                    placeholder="Search clans..."
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    placeholderTextColor="#9ca3af"
+                    className="flex-1 text-typography-900 text-sm"
+                  />
+                </HStack>
+              </Box>
+
+              {/* Loading State */}
+              {clansLoading ? (
+                <Center className="flex-1">
+                  <Spinner size="large" />
+                  <Text className="mt-4 text-sm text-typography-500">
+                    Loading clans...
+                  </Text>
+                </Center>
+              ) : clansError ? (
+                <Center className="flex-1 px-4">
+                  <Text className="text-error-500 text-center">
+                    Failed to load clans
+                  </Text>
+                </Center>
+              ) : (
+                /* Clans List */
+                <FlatList
+                  data={filteredClans}
+                  keyExtractor={(item) => item.id}
+                  contentContainerStyle={{ paddingBottom: 20 }}
+                  ListHeaderComponent={
+                    <>
+                      {/* My Clans Section */}
+                      {myClans.length > 0 && (
+                        <VStack className="px-4 py-3">
+                          <Text className="text-xs font-semibold text-typography-500 uppercase mb-2">
+                            My Clans
+                          </Text>
+                        </VStack>
+                      )}
+                    </>
+                  }
+                  renderItem={({ item, index }) => {
+                    const isMyClans = item.isMember;
+                    const isSelected = selectedClan === item.id;
+                    const showAvailableHeader =
+                      index === myClans.length && availableClans.length > 0;
+
+                    return (
+                      <>
+                        {showAvailableHeader && (
+                          <VStack className="px-4 py-3 pt-4">
+                            <Text className="text-xs font-semibold text-typography-500 uppercase mb-2">
+                              Available Clans
+                            </Text>
+                          </VStack>
+                        )}
+                        <Pressable
+                          onPress={() => setSelectedClan(item.id)}
+                          className={`mx-4 mb-2 rounded-lg border ${
+                            isSelected
+                              ? "bg-primary-50 border-primary-500"
+                              : "bg-background-0 border-outline-200"
+                          }`}
+                        >
+                          <HStack space="md" className="px-4 py-3 items-center">
+                            <Box
+                              className={`w-12 h-12 rounded-lg items-center justify-center ${
+                                isSelected ? "bg-primary-500" : "bg-primary-100"
+                              }`}
+                            >
+                              <Text className="text-2xl">
+                                {item.isPrivate ? "🔒" : "⚔️"}
+                              </Text>
+                            </Box>
+                            <VStack className="flex-1">
+                              <Text className="text-sm font-semibold text-typography-900">
+                                {item.name}
+                              </Text>
+                              <HStack space="xs" className="items-center mt-1">
+                                <Users size={12} color="#6b7280" />
+                                <Text className="text-xs text-typography-500">
+                                  {item.stats?.memberCount || 0} / {item.limit}{" "}
+                                  members
+                                </Text>
+                              </HStack>
+                            </VStack>
+                            {isMyClans && (
+                              <Box className="bg-primary-100 px-2 py-1 rounded">
+                                <Text className="text-xs text-primary-700 font-medium">
+                                  Joined
+                                </Text>
+                              </Box>
+                            )}
+                          </HStack>
+                        </Pressable>
+                      </>
+                    );
+                  }}
+                  ListEmptyComponent={
+                    <Center className="py-20">
+                      <Shield size={48} color="#d1d5db" />
+                      <Text className="mt-4 text-typography-500">
+                        No clans found
+                      </Text>
+                    </Center>
+                  }
+                />
+              )}
+            </VStack>
+          )}
+
+          {activeTab !== "chat" && activeTab !== "clans" && (
             <Center className="flex-1">
               <Text className="text-typography-500 capitalize">
                 {activeTab} for {community.name} coming soon
@@ -337,6 +510,13 @@ export default function CommunityDetailScreen() {
           )}
         </VStack>
       </KeyboardAvoidingView>
+
+      {/* Create Clan Modal */}
+      <CreateClanModal
+        visible={showCreateClanModal}
+        onClose={() => setShowCreateClanModal(false)}
+        communityId={id as string}
+      />
     </SafeAreaView>
   );
 }
