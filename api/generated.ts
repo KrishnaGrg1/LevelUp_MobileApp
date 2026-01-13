@@ -159,6 +159,8 @@ export interface UserLoginResponse {
   statusCode: number;
   body: {
     data: {
+      id: string;
+      UserName: string;
       isadmin: boolean;
       hasOnboarded: boolean;
       expiredAt: string;

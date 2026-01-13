@@ -131,7 +131,7 @@ export function CommunitiesSection() {
   }, [communities, isLoading, isError, error]);
 
   const handleCommunityPress = (communityId: string) => {
-    router.push(`/(main)/communities/${communityId}` as any);
+    router.push(`/communities/${communityId}` as any);
   };
 
   const handleViewAllPress = () => {
