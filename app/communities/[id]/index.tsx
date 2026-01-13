@@ -1,4 +1,5 @@
 import { communityDetailById } from "@/api/endPoints/communities";
+import { CommunityOptionsModal } from "@/components/communities/CommunityOptionsModal";
 import { CreateClanModal } from "@/components/communities/CreateClanModal";
 import { Box } from "@/components/ui/box";
 import { Center } from "@/components/ui/center";
@@ -44,6 +45,7 @@ export default function CommunityDetailScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedClan, setSelectedClan] = useState<string | null>(null);
   const [showCreateClanModal, setShowCreateClanModal] = useState(false);
+  const [showCommunityOptions, setShowCommunityOptions] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
   const { data, isLoading, error } = useQuery({
@@ -171,10 +173,17 @@ export default function CommunityDetailScreen() {
                   <Text className="text-xs text-typography-500">
                     {community._count?.members || 0} members
                   </Text>
+                  <Shield size={12} color="#6b7280" />
+                  <Text className="text-xs text-typography-500">
+                    {community._count?.clans || 0} clans
+                  </Text>
                 </HStack>
               </VStack>
             </HStack>
-            <Pressable className="p-2">
+            <Pressable
+              className="p-2"
+              onPress={() => setShowCommunityOptions(true)}
+            >
               <MoreVertical size={20} color="#6b7280" />
             </Pressable>
           </HStack>
@@ -355,22 +364,6 @@ export default function CommunityDetailScreen() {
             <VStack className="flex-1">
               {/* Header with Create Clan Button */}
               <HStack className="px-4 py-3 bg-background-50 items-center justify-between border-b border-outline-200">
-                <VStack>
-                  <Heading size="sm" className="text-typography-900">
-                    {community.name}
-                  </Heading>
-                  <HStack space="xs" className="items-center">
-                    <Users size={12} color="#6b7280" />
-                    <Text className="text-xs text-typography-500">
-                      {community._count?.members || 0} members
-                    </Text>
-                    <Text className="text-xs text-typography-400">•</Text>
-                    <Shield size={12} color="#6b7280" />
-                    <Text className="text-xs text-typography-500">
-                      {community._count?.clans || 0} clans
-                    </Text>
-                  </HStack>
-                </VStack>
                 <Pressable
                   className="bg-primary-600 px-4 py-2 rounded-lg flex-row items-center gap-2"
                   onPress={() => setShowCreateClanModal(true)}
@@ -516,6 +509,13 @@ export default function CommunityDetailScreen() {
         visible={showCreateClanModal}
         onClose={() => setShowCreateClanModal(false)}
         communityId={id as string}
+      />
+
+      {/* Community Options Modal */}
+      <CommunityOptionsModal
+        visible={showCommunityOptions}
+        onClose={() => setShowCommunityOptions(false)}
+        communityName={community?.name}
       />
     </SafeAreaView>
   );
