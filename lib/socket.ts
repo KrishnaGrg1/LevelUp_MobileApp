@@ -22,6 +22,7 @@ export const getSocket = (): Socket => {
       reconnectionDelay: 1000,
       timeout: 20000,
       transports: ["websocket", "polling"],
+      extraHeaders: {},
     });
 
     // Connection event listeners
@@ -47,12 +48,18 @@ export const getSocket = (): Socket => {
 
 /**
  * Connect socket with authentication
+ * Sends session token in Authorization header as expected by backend
  */
 export const connectSocket = (authToken?: string, userId?: string) => {
   const socket = getSocket();
 
-  if (authToken || userId) {
-    socket.auth = { token: authToken, userId };
+  // Set Authorization header with Bearer token (matches backend expectations)
+  if (authToken) {
+    socket.io.opts.extraHeaders = {
+      ...socket.io.opts.extraHeaders,
+      authorization: `Bearer ${authToken}`,
+    };
+    console.log("🔑 Socket auth configured for user:", userId);
   }
 
   if (!socket.connected) {

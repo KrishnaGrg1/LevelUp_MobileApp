@@ -9,29 +9,21 @@ import { CommunitiesSection } from "@/components/dashboard/CommunitiesSection";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 
 import { useMyCommunities } from "@/hooks/queries/useCommunities";
-import { useGetMe } from "@/hooks/useUser";
-import authStore from "@/stores/auth.store";
 
 function DashboardPage() {
   const [refreshing, setRefreshing] = React.useState(false);
   const { refetch: refetchCommunities } = useMyCommunities();
-  const { refetch: refetchMe, data } = useGetMe();
-  const setUser = authStore.getState().setUser;
-  console.log("data", data);
+
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     try {
       await refetchCommunities();
-      const result = await refetchMe();
-      if (result.data?.body.data) {
-        setUser(result.data.body.data);
-      }
     } catch (error) {
       console.error("Error refreshing dashboard:", error);
     } finally {
       setRefreshing(false);
     }
-  }, [refetchCommunities, refetchMe, setUser]);
+  }, [refetchCommunities]);
 
   return (
     <Box className="flex-1 bg-background-50">

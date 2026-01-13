@@ -1,6 +1,5 @@
 import { connectSocket, disconnectSocket } from "@/lib/socket";
 import useAuthStore from "@/stores/auth.store";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect } from "react";
 
 interface SocketProviderProps {
@@ -8,36 +7,31 @@ interface SocketProviderProps {
 }
 
 /**
- * Global socket connection manager
- * Connects socket when user is authenticated
+ * SocketProvider - Manages WebSocket connections
+ * Should be wrapped by AuthProvider to ensure user data is available
+ * Automatically connects/disconnects socket based on auth state
  */
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
+  const authSession = useAuthStore((state) => state.authSession);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
-    const initSocket = async () => {
-      if (isAuthenticated && user) {
-        // Get auth token from AsyncStorage
-        const token = await AsyncStorage.getItem("authToken");
+    if (isAuthenticated && user?.id && authSession) {
+      // Connect socket with authentication token
+      connectSocket(authSession, user.id);
+      console.log("✅ Socket connected for user:", user.id);
 
-        // Connect socket with authentication
-        connectSocket(token || undefined, user.id);
-        console.log("✅ Socket connected for user:", user.id);
-      } else {
-        // Disconnect when user logs out
+      // Cleanup: disconnect on unmount or when dependencies change
+      return () => {
         disconnectSocket();
-      }
-    };
-
-    initSocket();
-
-    return () => {
-      if (!isAuthenticated) {
-        disconnectSocket();
-      }
-    };
-  }, [isAuthenticated, user]);
+        console.log("🔌 Socket disconnected");
+      };
+    } else {
+      // Ensure socket is disconnected if not authenticated
+      disconnectSocket();
+    }
+  }, [isAuthenticated, user?.id, authSession]);
 
   return <>{children}</>;
 };

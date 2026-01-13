@@ -47,7 +47,7 @@ function ProfilePage() {
     const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
     return date.toLocaleDateString();
   };
-
+  console.log("data", user);
   const userStats = {
     level: user?.level || 1,
     profilePicture: user?.profilePicture,

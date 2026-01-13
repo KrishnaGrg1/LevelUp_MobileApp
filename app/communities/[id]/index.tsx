@@ -31,9 +31,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  SafeAreaView,
   TextInput,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CommunityDetailScreen() {
   const { id } = useLocalSearchParams();
