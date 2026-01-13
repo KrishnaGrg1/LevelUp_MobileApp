@@ -9,12 +9,13 @@ import type {
   fullUserObjectResponse,
 } from "../generated";
 
-export const getMe = async (lang: Language) => {
+export const getMe = async (lang: Language, sessionCookie: string) => {
   try {
     const response = await axiosInstance.get<GetMeResponse>(`/auth/me`, {
       withCredentials: true,
       headers: {
         "X-Language": lang,
+        Authorization: `Bearer ${sessionCookie}`,
       },
     });
     return response.data;

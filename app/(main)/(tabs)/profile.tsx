@@ -1,10 +1,10 @@
-import React from "react";
-import { RefreshControl } from "react-native";
-
-import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallbackText,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Box } from "@/components/ui/box";
-import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
@@ -13,7 +13,9 @@ import { Pressable } from "@/components/ui/pressable";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import React from "react";
 
+import LogOutButton from "@/components/LogOutButton";
 import authStore from "@/stores/auth.store";
 import { useTranslation } from "@/translation";
 import { router } from "expo-router";
@@ -23,7 +25,6 @@ import {
   ChevronRight,
   Crown,
   Edit,
-  LogOut,
   Mail,
   Settings,
   Star,
@@ -34,32 +35,28 @@ import {
 } from "lucide-react-native";
 
 function ProfilePage() {
+  // Call all hooks first in consistent order
   const { t } = useTranslation();
-  const [refreshing, setRefreshing] = React.useState(false);
   const user = authStore((state) => state.user);
+
   const isAdmin = authStore((state) => state.isAdmin);
-  const logout = authStore((state) => state.logout);
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    // TODO: Fetch user profile data
-    setTimeout(() => setRefreshing(false), 1500);
-  }, []);
-
-  const handleLogout = () => {
-    logout();
-    router.replace("/(auth)/login");
+  const completedChallenges =
+    user?.Quest?.filter((x) => x.isCompleted).length || 0;
+  const formatDate = (dateInput: Date | string | undefined) => {
+    if (!dateInput) return "Unknown";
+    const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
+    return date.toLocaleDateString();
   };
 
-  // Mock data - replace with real API data
   const userStats = {
     level: user?.level || 1,
+    profilePicture: user?.profilePicture,
     xp: user?.xp || 0,
     xpToNextLevel: 1000,
     totalChallenges: 24,
-    completedChallenges: 12,
+    completedChallenges: completedChallenges,
     streak: 7,
-    joinedDate: "Jan 2025",
+    joinedDate: formatDate(user?.createdAt),
     rank: 125,
     badges: 8,
   };
@@ -130,13 +127,9 @@ function ProfilePage() {
     },
   ];
 
+  // Main render
   return (
-    <ScrollView
-      className="flex-1 bg-background-0"
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
+    <ScrollView className="flex-1 bg-background-0">
       {/* Header with Profile Info */}
       <Box className="bg-primary-500 px-6 pb-8 pt-12">
         <VStack className="items-center">
@@ -146,6 +139,11 @@ function ProfilePage() {
               <AvatarFallbackText className="text-white">
                 {user?.UserName || "User"}
               </AvatarFallbackText>
+              <AvatarImage
+                source={{
+                  uri: userStats.profilePicture,
+                }}
+              />
             </Avatar>
             {isAdmin && (
               <Box className="absolute -right-2 -top-2 h-10 w-10 items-center justify-center rounded-full bg-yellow-500 border-4 border-primary-500">
@@ -304,16 +302,7 @@ function ProfilePage() {
         </VStack>
 
         {/* Logout Button */}
-        <Button
-          variant="outline"
-          className="border-red-500"
-          onPress={handleLogout}
-        >
-          <Icon as={LogOut} size="sm" className="text-red-500" />
-          <ButtonText className="ml-2 text-red-500">
-            {t("profile.logout", "Logout")}
-          </ButtonText>
-        </Button>
+        <LogOutButton />
 
         {/* Account Info */}
         <Card className="mt-6 border-0 bg-white dark:bg-background-900 p-4 shadow-sm">

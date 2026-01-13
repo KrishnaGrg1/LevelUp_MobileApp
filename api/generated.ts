@@ -160,10 +160,9 @@ export interface UserLoginResponse {
   body: {
     data: {
       id: string;
-      UserName: string;
       isadmin: boolean;
-      hasOnboarded: boolean;
       expiredAt: string;
+      authSession: string;
     };
     message: string;
   };
@@ -549,6 +548,16 @@ export interface GetCommunityStatsResponse {
   body: {
     message: string;
     data: CommunityStats;
+  };
+}
+
+export interface ForgetPasswordResponse {
+  statusCode: number;
+  body: {
+    data: {
+      userId: string;
+    };
+    message: string;
   };
 }
 

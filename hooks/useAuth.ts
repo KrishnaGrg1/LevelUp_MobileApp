@@ -1,5 +1,6 @@
 import {
   login,
+  logout,
   registerUser,
   requestPasswordReset,
   resetPasswordWithOtp,
@@ -9,7 +10,6 @@ import { User } from "@/api/generated";
 import { ForgetPasswordInput } from "@/schemas/auth/forgetPassword";
 import { LoginInput } from "@/schemas/auth/login";
 import { RegisterInput } from "@/schemas/auth/register";
-import { ResetPasswordAPIInput } from "@/schemas/auth/resetPassword";
 import { VerifyInput } from "@/schemas/auth/verifyEmail";
 import authStore from "@/stores/auth.store";
 import LanguageStore from "@/stores/language.store";
@@ -25,30 +25,29 @@ export function useLogin() {
 
     onSuccess: (data) => {
       console.log("Login success:", data);
-      const loginData = data?.body?.data;
+      const {
+        setAuthenticated,
+        setAdminStatus,
+        authSession,
+        setAuthSession,
+        setUser,
+      } = authStore.getState();
 
-      if (loginData) {
-        const { setAuthenticated, setAdminStatus, setUser } =
-          authStore.getState();
-
-        // Set authentication status
-        setAuthenticated(true);
-
-        // Set admin status from login response
-        setAdminStatus(loginData.isadmin);
-
-        // Set user data if available
-        if (data?.body?.data) {
-          setUser({
-            id: loginData.id,
-            UserName: loginData.UserName, // This will now be saved in Zustand
-            isAdmin: loginData.isadmin,
-          } as User);
-        }
-
-        // Navigate to main dashboard (can be customized based on requirements)
-        router.replace("/(main)/dashboard");
+      // Set authentication status
+      setAuthenticated(true);
+      // Set admin status from login response
+      const isAdmin = data?.body?.data?.isadmin || false;
+      setAdminStatus(isAdmin);
+      if (data?.body?.data) {
+        setUser({
+          id: data.body.data.id,
+          isAdmin: data.body.data.isadmin,
+        } as User);
       }
+      setAuthSession(data.body.data.authSession);
+      console.log("authsession", authSession);
+      // Navigate to main dashboard (can be customized based on requirements)
+      router.replace("/(main)/(tabs)/dashboard");
     },
     onError: (error: any) => {
       console.error("Login failed:", error);
@@ -109,7 +108,11 @@ export function useForgetPassword() {
 
 export function useResetPassword() {
   return useMutation({
-    mutationFn: (data: ResetPasswordAPIInput) => {
+    mutationFn: (data: {
+      userId: string;
+      otp: string;
+      newPassword: string;
+    }) => {
       const language = LanguageStore.getState().language;
       return resetPasswordWithOtp(data, language);
     },
@@ -151,7 +154,29 @@ export function useVerifyEmail() {
       setAdminStatus(isAdmin);
 
       // Navigate to dashboard
-      router.replace("/(main)/dashboard");
+      router.replace("/(main)/(tabs)/dashboard");
+    },
+
+    onError: (error: any) => {
+      console.error("Verify email failed:", error);
+      // Error is handled by the mutation error state
+    },
+  });
+}
+
+export function useLogOut() {
+  return useMutation({
+    mutationFn: () => {
+      const language = LanguageStore.getState().language;
+      const authSession = authStore.getState().authSession as string;
+      return logout(language, authSession);
+    },
+
+    onSuccess: (data) => {
+      const { logout } = authStore.getState();
+      // Clear auth state
+      logout();
+      // Navigate to login screen
     },
 
     onError: (error: any) => {

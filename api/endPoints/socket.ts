@@ -1,5 +1,5 @@
-import { io, Socket } from 'socket.io-client';
-import { Message } from '../generated';
+import { io, Socket } from "socket.io-client";
+import { Message } from "../generated";
 
 interface AuthSocket extends Socket {
   auth: {
@@ -13,7 +13,8 @@ interface AuthSocket extends Socket {
 
 let socket: AuthSocket | null = null;
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:8080';
+const SOCKET_URL =
+  process.env.EXPO_PUBLIC_SOCKET_URL || "http://localhost:8080";
 
 export const getSocket = (): AuthSocket => {
   if (!socket) {
@@ -24,32 +25,32 @@ export const getSocket = (): AuthSocket => {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       timeout: 20000,
-      transports: ['websocket', 'polling'],
+      transports: ["websocket", "polling"],
     }) as AuthSocket;
 
     // Socket connection event handlers
-    socket.on('connect', () => {
-      console.log('✅ Socket Connected:', socket?.id);
+    socket.on("connect", () => {
+      console.log("✅ Socket Connected:", socket?.id);
     });
 
-    socket.on('disconnect', reason => {
-      console.log('❌ Socket Disconnected:', reason);
+    socket.on("disconnect", (reason) => {
+      console.log("❌ Socket Disconnected:", reason);
     });
 
-    socket.on('connect_error', error => {
-      console.error('❌ Socket Connection error:', error.message);
+    socket.on("connect_error", (error) => {
+      console.error("❌ Socket Connection error:", error.message);
     });
 
-    socket.on('reconnect', attemptNumber => {
-      console.log('🔄 Socket reconnected after', attemptNumber, 'attempts');
+    socket.on("reconnect", (attemptNumber) => {
+      console.log("🔄 Socket reconnected after", attemptNumber, "attempts");
     });
 
-    socket.on('reconnect_error', error => {
-      console.error('❌ Socket reconnection error:', error.message);
+    socket.on("reconnect_error", (error) => {
+      console.error("❌ Socket reconnection error:", error.message);
     });
 
-    socket.on('reconnect_failed', () => {
-      console.error('❌ Socket reconnection failed');
+    socket.on("reconnect_failed", () => {
+      console.error("❌ Socket reconnection failed");
     });
   }
 
@@ -84,92 +85,100 @@ export const disconnectSocket = () => {
 // Community room management
 export const joinCommunity = (communityId: string) => {
   const socket = getSocket();
-  socket.emit('join-community', { communityId });
-  console.log('📥 Joined community');
+  socket.emit("join-community", { communityId });
+  console.log("📥 Joined community");
 };
 
 export const leaveCommunity = (communityId: string) => {
   const socket = getSocket();
-  socket.emit('leave-community', { communityId });
+  socket.emit("leave-community", { communityId });
 };
 
 export const sendCommunityMessage = (communityId: string, content: string) => {
   const socket = getSocket();
-  socket.emit('community:send-message', { communityId, content });
+  socket.emit("community:send-message", { communityId, content });
 };
 
 export const joinClan = (clanId: string) => {
   const socket = getSocket();
-  socket.emit('join-clan', { clanId });
-  console.log('📥 Joined clan');
+  socket.emit("join-clan", { clanId });
+  console.log("📥 Joined clan");
 };
 
 export const leaveClan = (clanId: string) => {
   const socket = getSocket();
-  socket.emit('leave-clan', { clanId });
+  socket.emit("leave-clan", { clanId });
 };
 
 export const sendClanMessage = (clanId: string, content: string) => {
   const socket = getSocket();
-  socket.emit('clan:send-message', { clanId, content });
+  socket.emit("clan:send-message", { clanId, content });
 };
 
 // Message event listeners
 export const onNewMessage = (callback: (message: Message) => void) => {
   const socket = getSocket();
-  socket.on('new-message', callback);
+  socket.on("new-message", callback);
 };
 
 export const offNewMessage = () => {
   const socket = getSocket();
-  socket.off('new-message');
+  socket.off("new-message");
 };
 
 export const onCommunityMessage = (callback: (message: Message) => void) => {
   const socket = getSocket();
-  socket.on('community:new-message', callback);
+  socket.on("community:new-message", callback);
 };
 
 export const offCommunityMessage = () => {
   const socket = getSocket();
-  socket.off('community:new-message');
+  socket.off("community:new-message");
 };
 
 export const onClanMessage = (callback: (message: Message) => void) => {
   const socket = getSocket();
-  socket.on('clan:new-message', callback);
+  socket.on("clan:new-message", callback);
 };
 
 export const offClanMessage = () => {
   const socket = getSocket();
-  socket.off('clan:new-message');
+  socket.off("clan:new-message");
 };
 
 // Typing indicator events
 export const sendTyping = (roomId: string, isTyping: boolean) => {
   const socket = getSocket();
-  socket.emit('typing', { roomId, isTyping });
+  socket.emit("typing", { roomId, isTyping });
 };
 
 export const onTyping = (
-  callback: (data: { userId: string; userName: string; isTyping: boolean }) => void,
+  callback: (data: {
+    userId: string;
+    userName: string;
+    isTyping: boolean;
+  }) => void
 ) => {
   const socket = getSocket();
-  socket.on('user-typing', callback);
+  socket.on("user-typing", callback);
 };
 
 export const offTyping = () => {
   const socket = getSocket();
-  socket.off('user-typing');
+  socket.off("user-typing");
 };
 
 // User Presence
-export const onUserJoined = (callback: (data: { userId: string; userName: string }) => void) => {
+export const onUserJoined = (
+  callback: (data: { userId: string; userName: string }) => void
+) => {
   const socket = getSocket();
-  socket.on('user-joined', callback);
+  socket.on("user-joined", callback);
 };
 
-export const onUserLeft = (callback: (data: { userId: string; userName: string }) => void) => {
+export const onUserLeft = (
+  callback: (data: { userId: string; userName: string }) => void
+) => {
   const socket = getSocket();
-  socket.on('user-left', callback);
+  socket.on("user-left", callback);
 };

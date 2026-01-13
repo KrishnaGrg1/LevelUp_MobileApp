@@ -197,7 +197,7 @@ export const oauthRegisterUser = async (data: OAuthRequest, lang: Language) => {
   }
 };
 
-export const logout = async (lang: Language) => {
+export const logout = async (lang: Language, sessionCookie: string) => {
   try {
     const response = await axiosInstance.post<LogoutResponse>(
       `/auth/logout`,
@@ -206,6 +206,7 @@ export const logout = async (lang: Language) => {
         withCredentials: true,
         headers: {
           "X-Language": lang,
+          Authorization: `Bearer ${sessionCookie}`,
         },
       }
     );

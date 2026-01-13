@@ -135,7 +135,7 @@ export function CommunitiesSection() {
   };
 
   const handleViewAllPress = () => {
-    router.push("/(main)/learn"); // Navigate to communities list
+    router.push("/(main)/(tabs)/learn"); // Navigate to communities list
   };
 
   if (isLoading) {
