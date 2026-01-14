@@ -1,16 +1,16 @@
-import React from "react";
+import React from 'react';
 
-import { RegisterForm } from "@/components/auth/RegisterForm";
-import { Box } from "@/components/ui/box";
-import { Center } from "@/components/ui/center";
-import { Heading } from "@/components/ui/heading";
-import { Icon } from "@/components/ui/icon";
-import { ScrollView } from "@/components/ui/scroll-view";
-import { Text } from "@/components/ui/text";
-import { useTranslation } from "@/translation";
+import { RegisterForm } from '@/components/auth/RegisterForm';
+import { Box } from '@/components/ui/box';
+import { Center } from '@/components/ui/center';
+import { Heading } from '@/components/ui/heading';
+import { Icon } from '@/components/ui/icon';
+import { ScrollView } from '@/components/ui/scroll-view';
+import { Text } from '@/components/ui/text';
+import { useTranslation } from '@/translation';
 // import { Link } from "expo-router";
-import { router } from "expo-router";
-import { Sparkles } from "lucide-react-native";
+import { router } from 'expo-router';
+import { Sparkles } from 'lucide-react-native';
 export default function RegisterScreen() {
   const { t } = useTranslation();
 
@@ -26,17 +26,17 @@ export default function RegisterScreen() {
 
         {/* Title */}
         <Heading size="2xl" className="mb-2 text-center text-typography-900">
-          {t("auth.register.title")}
+          {t('auth.register.title')}
         </Heading>
 
         {/* Subtitle */}
         <Text className="mb-8 text-center text-typography-500">
-          {t("auth.register.hasAccount")}{" "}
+          {t('auth.register.hasAccount')}{' '}
           <Text
-            onPress={() => router.replace("/(auth)/login")}
+            onPress={() => router.replace('/(auth)/login')}
             className="font-medium text-typography-900 underline"
           >
-            {t("auth.register.loginLink")}
+            {t('auth.register.loginLink')}
           </Text>
         </Text>
 

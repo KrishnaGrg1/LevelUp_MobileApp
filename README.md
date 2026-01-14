@@ -95,7 +95,6 @@ Before you begin, ensure you have the following installed:
 2. **Run on different platforms**
 
    In the terminal output, you'll find options to:
-
    - Press `i` - Open in iOS simulator
    - Press `a` - Open in Android emulator
    - Press `w` - Open in web browser
@@ -295,7 +294,7 @@ function LoginForm() {
 - **Usage**:
 
   ```tsx
-  import { Box, Button, Text } from "@/components/ui";
+  import { Box, Button, Text } from '@/components/ui';
 
   <Box className="p-4">
     <Text>Hello World</Text>

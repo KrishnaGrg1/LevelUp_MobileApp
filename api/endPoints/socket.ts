@@ -13,7 +13,7 @@ interface AuthSocket extends Socket {
 
 let socket: AuthSocket | null = null;
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:8080';
+const SOCKET_URL = process.env.EXPO_PUBLIC_SOCKET_URL || 'http://localhost:8080';
 
 export const getSocket = (): AuthSocket => {
   if (!socket) {

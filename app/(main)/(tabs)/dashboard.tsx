@@ -1,14 +1,14 @@
-import React from "react";
-import { RefreshControl } from "react-native";
+import React from 'react';
+import { RefreshControl } from 'react-native';
 
-import { Box } from "@/components/ui/box";
-import { ScrollView } from "@/components/ui/scroll-view";
-import { VStack } from "@/components/ui/vstack";
+import { Box } from '@/components/ui/box';
+import { ScrollView } from '@/components/ui/scroll-view';
+import { VStack } from '@/components/ui/vstack';
 
-import { CommunitiesSection } from "@/components/dashboard/CommunitiesSection";
-import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
+import { CommunitiesSection } from '@/components/dashboard/CommunitiesSection';
+import { WelcomeHeader } from '@/components/dashboard/WelcomeHeader';
 
-import { useMyCommunities } from "@/hooks/queries/useCommunities";
+import { useMyCommunities } from '@/hooks/queries/useCommunities';
 
 function DashboardPage() {
   const [refreshing, setRefreshing] = React.useState(false);
@@ -19,7 +19,7 @@ function DashboardPage() {
     try {
       await refetchCommunities();
     } catch (error) {
-      console.error("Error refreshing dashboard:", error);
+      console.error('Error refreshing dashboard:', error);
     } finally {
       setRefreshing(false);
     }
@@ -33,9 +33,7 @@ function DashboardPage() {
       {/* Scrollable Content */}
       <ScrollView
         className="flex-1"
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         <VStack space="md" className="pb-6">
           {/* Communities Section - Horizontal Scroll */}

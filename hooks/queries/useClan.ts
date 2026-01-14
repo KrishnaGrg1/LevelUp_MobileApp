@@ -7,9 +7,9 @@ import {
   getClansByCommunity,
   joinClan,
   leaveClan,
-} from "@/api/endPoints/clans";
-import LanguageStore from "@/stores/language.store";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+} from '@/api/endPoints/clans';
+import LanguageStore from '@/stores/language.store';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 /**
  * Get clans by community
@@ -17,7 +17,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export const useClansByCommunity = (communityId: string) => {
   const language = LanguageStore.getState().language;
   return useQuery({
-    queryKey: ["clans", communityId],
+    queryKey: ['clans', communityId],
     queryFn: () => getClansByCommunity(communityId, language),
     enabled: !!communityId,
     staleTime: 2 * 60 * 1000, // 2 minutes
@@ -30,7 +30,7 @@ export const useClansByCommunity = (communityId: string) => {
 export const useClanInfo = (clanId: string) => {
   const language = LanguageStore.getState().language;
   return useQuery({
-    queryKey: ["clan", clanId],
+    queryKey: ['clan', clanId],
     queryFn: () => getClanInfo(clanId, language),
     enabled: !!clanId,
     staleTime: 2 * 60 * 1000,
@@ -43,7 +43,7 @@ export const useClanInfo = (clanId: string) => {
 export const useClanMembers = (clanId: string) => {
   const language = LanguageStore.getState().language;
   return useQuery({
-    queryKey: ["clan", clanId, "members"],
+    queryKey: ['clan', clanId, 'members'],
     queryFn: () => getClanMembers(clanId, language),
     enabled: !!clanId,
     staleTime: 2 * 60 * 1000,
@@ -62,7 +62,7 @@ export const useCreateClan = () => {
     onSuccess: (data, variables) => {
       // Invalidate clans list for the specific community
       queryClient.invalidateQueries({
-        queryKey: ["clans", variables.communityId],
+        queryKey: ['clans', variables.communityId],
       });
     },
   });
@@ -79,8 +79,8 @@ export const useJoinClan = () => {
     mutationFn: (clanId: string) => joinClan(language, clanId),
     onSuccess: () => {
       // Invalidate queries to refresh clan data
-      queryClient.invalidateQueries({ queryKey: ["clans"] });
-      queryClient.invalidateQueries({ queryKey: ["clan"] });
+      queryClient.invalidateQueries({ queryKey: ['clans'] });
+      queryClient.invalidateQueries({ queryKey: ['clan'] });
     },
   });
 };
@@ -96,8 +96,8 @@ export const useLeaveClan = () => {
     mutationFn: (clanId: string) => leaveClan(clanId, language),
     onSuccess: () => {
       // Invalidate queries to refresh clan data
-      queryClient.invalidateQueries({ queryKey: ["clans"] });
-      queryClient.invalidateQueries({ queryKey: ["clan"] });
+      queryClient.invalidateQueries({ queryKey: ['clans'] });
+      queryClient.invalidateQueries({ queryKey: ['clan'] });
     },
   });
 };
@@ -113,7 +113,7 @@ export const useDeleteClan = () => {
     mutationFn: (clanId: string) => deleteClan(clanId, language),
     onSuccess: () => {
       // Invalidate queries to refresh clan data
-      queryClient.invalidateQueries({ queryKey: ["clans"] });
+      queryClient.invalidateQueries({ queryKey: ['clans'] });
     },
   });
 };

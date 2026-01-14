@@ -141,6 +141,7 @@ This document details the **ACTUAL current state** of the LevelUp Mobile App. Th
     _hasHydrated: boolean;
   }
   ```
+
   - Auto-detects admin status from login response
   - Persists user data across app restarts
   - Hydration tracking for splash screen
@@ -188,8 +189,8 @@ Each language has:
 
 ```typescript
 const { t } = useTranslation();
-t("auth:login.title"); // "Log in to LevelUp"
-t("error.auth.emailRequired"); // "Email is required"
+t('auth:login.title'); // "Log in to LevelUp"
+t('error.auth.emailRequired'); // "Email is required"
 ```
 
 #### Language Switcher Component
@@ -224,7 +225,6 @@ t("error.auth.emailRequired"); // "Email is required"
 #### Theme Implementation
 
 - ✅ `providers/ThemeProvider.tsx`
-
   - GluestackUI integration
   - System theme detection with `Appearance.getColorScheme()`
   - Auto-sync when system theme changes
@@ -233,10 +233,11 @@ t("error.auth.emailRequired"); // "Email is required"
 - ✅ `stores/theme.store.ts` - Zustand store
   ```typescript
   interface ThemeState {
-    theme: "light" | "dark" | "system";
+    theme: 'light' | 'dark' | 'system';
     setTheme: (theme) => void;
   }
   ```
+
   - AsyncStorage persistence
   - Defaults to 'system'
 
@@ -269,6 +270,7 @@ t("error.auth.emailRequired"); // "Email is required"
     </QueryProviders>
   </ThemeProvider>
   ```
+
   - Theme provider wraps entire app
   - TanStack Query provider configured
   - Stack navigator at root
@@ -284,7 +286,6 @@ t("error.auth.emailRequired"); // "Email is required"
 #### Main App Routes - `app/(main)/`
 
 - ✅ `_layout.tsx` - Bottom tabs navigator
-
   - Dashboard tab (Home icon)
   - Learn tab (BookOpen icon)
   - Challenges tab (Trophy icon)
@@ -576,23 +577,23 @@ userStats = {
   totalChallenges: 24,
   completedChallenges: 12,
   streak: 7,
-  joinedDate: "Jan 2025",
+  joinedDate: 'Jan 2025',
   rank: 125,
   badges: 8,
 };
 
 achievements = [
-  { name: "Early Adopter", earned: true },
-  { name: "Week Warrior", earned: true },
-  { name: "Quick Learner", earned: true },
-  { name: "Challenge Master", earned: false },
+  { name: 'Early Adopter', earned: true },
+  { name: 'Week Warrior', earned: true },
+  { name: 'Quick Learner', earned: true },
+  { name: 'Challenge Master', earned: false },
   // ... 4 more
 ];
 
 recentActivity = [
-  { action: "Completed challenge", timestamp: "2 hours ago" },
-  { action: "Earned badge", timestamp: "5 hours ago" },
-  { action: "Reached Level 5", timestamp: "1 day ago" },
+  { action: 'Completed challenge', timestamp: '2 hours ago' },
+  { action: 'Earned badge', timestamp: '5 hours ago' },
+  { action: 'Reached Level 5', timestamp: '1 day ago' },
 ];
 ```
 
@@ -652,11 +653,11 @@ stats = {
 
 challenges = [
   {
-    title: "Complete 5 Coding Problems",
-    difficulty: "Medium",
+    title: 'Complete 5 Coding Problems',
+    difficulty: 'Medium',
     xpReward: 500,
     participants: 1234,
-    timeLeft: "2 days",
+    timeLeft: '2 days',
     progress: 3,
     total: 5,
     isActive: true,
@@ -710,20 +711,20 @@ challenges = [
 
 ```typescript
 categories = [
-  { name: "Programming", count: 24, color: "bg-blue-500" },
-  { name: "Design", count: 18, color: "bg-purple-500" },
-  { name: "Marketing", count: 12, color: "bg-green-500" },
-  { name: "Business", count: 15, color: "bg-orange-500" },
+  { name: 'Programming', count: 24, color: 'bg-blue-500' },
+  { name: 'Design', count: 18, color: 'bg-purple-500' },
+  { name: 'Marketing', count: 12, color: 'bg-green-500' },
+  { name: 'Business', count: 15, color: 'bg-orange-500' },
 ];
 
 courses = [
   {
-    title: "Introduction to React Native",
-    description: "Learn the basics",
-    duration: "4h 30m",
+    title: 'Introduction to React Native',
+    description: 'Learn the basics',
+    duration: '4h 30m',
     lessons: 12,
     rating: 4.8,
-    thumbnail: "📱",
+    thumbnail: '📱',
     progress: 65,
   },
   // ... more courses

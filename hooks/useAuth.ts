@@ -1,20 +1,20 @@
 import {
   login,
+  logout,
   registerUser,
   requestPasswordReset,
   resetPasswordWithOtp,
   VerifyUser,
-} from "@/api/endPoints/auth.service";
-import { User } from "@/api/generated";
-import { ForgetPasswordInput } from "@/schemas/auth/forgetPassword";
-import { LoginInput } from "@/schemas/auth/login";
-import { RegisterInput } from "@/schemas/auth/register";
-import { ResetPasswordAPIInput } from "@/schemas/auth/resetPassword";
-import { VerifyInput } from "@/schemas/auth/verifyEmail";
-import authStore from "@/stores/auth.store";
-import LanguageStore from "@/stores/language.store";
-import { useMutation } from "@tanstack/react-query";
-import { router } from "expo-router";
+} from '@/api/endPoints/auth.service';
+import { User } from '@/api/generated';
+import { ForgetPasswordInput } from '@/schemas/auth/forgetPassword';
+import { LoginInput } from '@/schemas/auth/login';
+import { RegisterInput } from '@/schemas/auth/register';
+import { VerifyInput } from '@/schemas/auth/verifyEmail';
+import authStore from '@/stores/auth.store';
+import LanguageStore from '@/stores/language.store';
+import { useMutation } from '@tanstack/react-query';
+import { router } from 'expo-router';
 
 export function useLogin() {
   return useMutation({
@@ -23,35 +23,29 @@ export function useLogin() {
       return login(data, language);
     },
 
-    onSuccess: (data) => {
-      console.log("Login success:", data);
-      const loginData = data?.body?.data;
+    onSuccess: data => {
+      console.log('Login success:', data);
+      const { setAuthenticated, setAdminStatus, authSession, setAuthSession, setUser } =
+        authStore.getState();
 
-      if (loginData) {
-        const { setAuthenticated, setAdminStatus, setUser } =
-          authStore.getState();
-
-        // Set authentication status
-        setAuthenticated(true);
-
-        // Set admin status from login response
-        setAdminStatus(loginData.isadmin);
-
-        // Set user data if available
-        if (data?.body?.data) {
-          setUser({
-            id: loginData.id,
-            UserName: loginData.UserName, // This will now be saved in Zustand
-            isAdmin: loginData.isadmin,
-          } as User);
-        }
-
-        // Navigate to main dashboard (can be customized based on requirements)
-        router.replace("/(main)/dashboard");
+      // Set authentication status
+      setAuthenticated(true);
+      // Set admin status from login response
+      const isAdmin = data?.body?.data?.isadmin || false;
+      setAdminStatus(isAdmin);
+      if (data?.body?.data) {
+        setUser({
+          id: data.body.data.id,
+          isAdmin: data.body.data.isadmin,
+        } as User);
       }
+      setAuthSession(data.body.data.authSession);
+      console.log('authsession', authSession);
+      // Navigate to main dashboard (can be customized based on requirements)
+      router.replace('/(main)/(tabs)/dashboard');
     },
     onError: (error: any) => {
-      console.error("Login failed:", error);
+      console.error('Login failed:', error);
       // Error is handled by the mutation error state
     },
   });
@@ -64,19 +58,19 @@ export function useRegister() {
       return registerUser(data, language);
     },
 
-    onSuccess: (data) => {
-      console.log("Register success:", data.body);
+    onSuccess: data => {
+      console.log('Register success:', data.body);
       const { setUser } = authStore.getState();
 
       // Set user data for verification flow
       setUser({ id: String(data.body.data.id) } as User);
 
       // Navigate to email verification
-      router.replace("/(auth)/verifyEmail");
+      router.replace('/(auth)/verifyEmail');
     },
 
     onError: (error: any) => {
-      console.error("Register failed:", error);
+      console.error('Register failed:', error);
       // Error is handled by the mutation error state
     },
   });
@@ -89,19 +83,19 @@ export function useForgetPassword() {
       return requestPasswordReset(data.email, language);
     },
 
-    onSuccess: (data) => {
-      console.log("Forget password success:", data);
+    onSuccess: data => {
+      console.log('Forget password success:', data);
       const { setUser } = authStore.getState();
 
       // Store user ID for reset password flow
       setUser({ id: String(data.body.data.userId) } as User);
 
       // Navigate to reset password screen
-      router.push("/(auth)/resetPassword");
+      router.push('/(auth)/resetPassword');
     },
 
     onError: (error: any) => {
-      console.error("Forget password failed:", error);
+      console.error('Forget password failed:', error);
       // Error is handled by the mutation error state
     },
   });
@@ -109,24 +103,24 @@ export function useForgetPassword() {
 
 export function useResetPassword() {
   return useMutation({
-    mutationFn: (data: ResetPasswordAPIInput) => {
+    mutationFn: (data: { userId: string; otp: string; newPassword: string }) => {
       const language = LanguageStore.getState().language;
       return resetPasswordWithOtp(data, language);
     },
 
-    onSuccess: (data) => {
-      console.log("Reset password success:", data);
+    onSuccess: data => {
+      console.log('Reset password success:', data);
       const { logout } = authStore.getState();
 
       // Clear auth state
       logout();
 
       // Navigate to login screen
-      router.push("/(auth)/login");
+      router.push('/(auth)/login');
     },
 
     onError: (error: any) => {
-      console.error("Reset password failed:", error);
+      console.error('Reset password failed:', error);
       // Error is handled by the mutation error state
     },
   });
@@ -139,8 +133,8 @@ export function useVerifyEmail() {
       return VerifyUser(data, language);
     },
 
-    onSuccess: (data) => {
-      console.log("Verify email success:", data);
+    onSuccess: data => {
+      console.log('Verify email success:', data);
       const { setAuthenticated, setAdminStatus } = authStore.getState();
 
       // Set authentication status
@@ -151,11 +145,33 @@ export function useVerifyEmail() {
       setAdminStatus(isAdmin);
 
       // Navigate to dashboard
-      router.replace("/(main)/dashboard");
+      router.replace('/(main)/(tabs)/dashboard');
     },
 
     onError: (error: any) => {
-      console.error("Verify email failed:", error);
+      console.error('Verify email failed:', error);
+      // Error is handled by the mutation error state
+    },
+  });
+}
+
+export function useLogOut() {
+  return useMutation({
+    mutationFn: () => {
+      const language = LanguageStore.getState().language;
+      const authSession = authStore.getState().authSession as string;
+      return logout(language, authSession);
+    },
+
+    onSuccess: data => {
+      const { logout } = authStore.getState();
+      // Clear auth state
+      logout();
+      // Navigate to login screen
+    },
+
+    onError: (error: any) => {
+      console.error('Verify email failed:', error);
       // Error is handled by the mutation error state
     },
   });

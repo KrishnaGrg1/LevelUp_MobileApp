@@ -1,9 +1,8 @@
 {
-
-    "title": "الإعدادات",
-    "theme": "السمة",
-    "language": "اللغة",
-    "themeAuto": "تلقائي",
-    "themeLight": "فاتح",
-    "themeDark": "داكن"
+  "title": "الإعدادات",
+  "theme": "السمة",
+  "language": "اللغة",
+  "themeAuto": "تلقائي",
+  "themeLight": "فاتح",
+  "themeDark": "داكن"
 }

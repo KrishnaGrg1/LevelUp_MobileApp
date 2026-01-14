@@ -1,5 +1,5 @@
-import { Language } from "@/stores/language.store";
-import axiosInstance from "../client";
+import { Language } from '@/stores/language.store';
+import axiosInstance from '../client';
 import type {
   GetAllUsersResponse,
   GetMeResponse,
@@ -7,14 +7,15 @@ import type {
   adminOverviewResponse,
   changePasswordResponse,
   fullUserObjectResponse,
-} from "../generated";
+} from '../generated';
 
-export const getMe = async (lang: Language) => {
+export const getMe = async (lang: Language, sessionCookie: string) => {
   try {
     const response = await axiosInstance.get<GetMeResponse>(`/auth/me`, {
       withCredentials: true,
       headers: {
-        "X-Language": lang,
+        'X-Language': lang,
+        Authorization: `Bearer ${sessionCookie}`,
       },
     });
     return response.data;
@@ -23,34 +24,27 @@ export const getMe = async (lang: Language) => {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Login failed";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Login failed';
     throw new Error(errorMessage);
   }
 };
 
 export const getAllUsers = async (lang: Language, pramas: URLSearchParams) => {
   try {
-    const response = await axiosInstance.get<GetAllUsersResponse>(
-      `/admin/users/all`,
-      {
-        withCredentials: true,
-        headers: {
-          "X-Language": lang,
-        },
-        params: pramas,
-      }
-    );
+    const response = await axiosInstance.get<GetAllUsersResponse>(`/admin/users/all`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+      },
+      params: pramas,
+    });
     return response.data;
   } catch (error: unknown) {
     const err = error as {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Login failed";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Login failed';
     throw new Error(errorMessage);
   }
 };
@@ -61,7 +55,7 @@ export const changePassword = async (
     newPassword: string;
     confirmNewPassword: string;
   },
-  lang: Language
+  lang: Language,
 ) => {
   try {
     const response = await axiosInstance.post<changePasswordResponse>(
@@ -70,9 +64,9 @@ export const changePassword = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
+          'X-Language': lang,
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -86,11 +80,8 @@ export const changePassword = async (
       };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Change password failed";
-    const errorDetail =
-      err.response?.data?.body?.error || err.response?.data?.error;
+      err.response?.data?.body?.message || err.response?.data?.message || 'Change password failed';
+    const errorDetail = err.response?.data?.body?.error || err.response?.data?.error;
 
     throw { message: errorMessage, error: errorDetail };
   }
@@ -101,7 +92,7 @@ export const deleteUserByAdmin = async (id: string, lang: Language) => {
     const response = await axiosInstance.delete(`/admin/users/delete`, {
       withCredentials: true,
       headers: {
-        "X-Language": lang,
+        'X-Language': lang,
       },
       data: { id },
     });
@@ -117,11 +108,8 @@ export const deleteUserByAdmin = async (id: string, lang: Language) => {
       };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Delete user failed";
-    const errorDetail =
-      err.response?.data?.body?.error || err.response?.data?.error;
+      err.response?.data?.body?.message || err.response?.data?.message || 'Delete user failed';
+    const errorDetail = err.response?.data?.body?.error || err.response?.data?.error;
 
     throw { message: errorMessage, error: errorDetail };
   }
@@ -129,42 +117,31 @@ export const deleteUserByAdmin = async (id: string, lang: Language) => {
 
 export const adminOverview = async (lang: Language) => {
   try {
-    const response = await axiosInstance.get<adminOverviewResponse>(
-      `/admin/overview`,
-      {
-        withCredentials: true,
-        headers: {
-          "X-Language": lang,
-        },
-      }
-    );
+    const response = await axiosInstance.get<adminOverviewResponse>(`/admin/overview`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+      },
+    });
     return response.data;
   } catch (error: unknown) {
     const err = error as {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Admin Overview failed";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Admin Overview failed';
     throw new Error(errorMessage);
   }
 };
 
-export const adminUserGrowth = async (
-  lang: Language,
-  range: "day" | "week" | "month"
-) => {
+export const adminUserGrowth = async (lang: Language, range: 'day' | 'week' | 'month') => {
   try {
-    const response = await axiosInstance.get(
-      `/admin/user-growth?range=${range}`,
-      {
-        withCredentials: true,
-        headers: {
-          "X-Language": lang,
-        },
-      }
-    );
+    const response = await axiosInstance.get(`/admin/user-growth?range=${range}`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+      },
+    });
     return response.data;
   } catch (error: unknown) {
     const err = error as {
@@ -177,11 +154,8 @@ export const adminUserGrowth = async (
       };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Delete user failed";
-    const errorDetail =
-      err.response?.data?.body?.error || err.response?.data?.error;
+      err.response?.data?.body?.message || err.response?.data?.message || 'Delete user failed';
+    const errorDetail = err.response?.data?.body?.error || err.response?.data?.error;
 
     throw { message: errorMessage, error: errorDetail };
   }
@@ -190,34 +164,25 @@ export const adminUserGrowth = async (
 // Get user by ID
 export const getUserById = async (lang: Language, userId: string) => {
   try {
-    const response = await axiosInstance.get<fullUserObjectResponse>(
-      `/admin/users/${userId}`,
-      {
-        withCredentials: true,
-        headers: {
-          "X-Language": lang,
-        },
-      }
-    );
+    const response = await axiosInstance.get<fullUserObjectResponse>(`/admin/users/${userId}`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+      },
+    });
     return response.data;
   } catch (error: unknown) {
     const err = error as {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Failed to fetch user";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to fetch user';
     throw new Error(errorMessage);
   }
 };
 
 // Update user
-export const updateUser = async (
-  lang: Language,
-  userId: string,
-  data: UpdateUserPayload
-) => {
+export const updateUser = async (lang: Language, userId: string, data: UpdateUserPayload) => {
   try {
     const response = await axiosInstance.patch<fullUserObjectResponse>(
       `/admin/users/${userId}`,
@@ -225,10 +190,10 @@ export const updateUser = async (
       {
         withCredentials: true,
         headers: {
-          "X-Language": lang,
-          "Content-Type": "application/json",
+          'X-Language': lang,
+          'Content-Type': 'application/json',
         },
-      }
+      },
     );
     return response.data;
   } catch (error: unknown) {
@@ -236,9 +201,7 @@ export const updateUser = async (
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message ||
-      err.response?.data?.message ||
-      "Failed to update user";
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to update user';
     throw new Error(errorMessage);
   }
 };

@@ -1,4 +1,4 @@
-import axiosInstance from "../client";
+import axiosInstance from '../client';
 
 // ============================================================================
 // Types
@@ -57,11 +57,9 @@ export interface GlobalLeaderboardResponse {
  * Get top users ranked by global XP
  */
 export async function getGlobalLeaderboard(
-  params?: PaginationParams
+  params?: PaginationParams,
 ): Promise<GlobalLeaderboardResponse> {
-  const response = await axiosInstance.get<
-    ApiResponse<GlobalLeaderboardResponse>
-  >("/leaderboard", {
+  const response = await axiosInstance.get<ApiResponse<GlobalLeaderboardResponse>>('/leaderboard', {
     params,
   });
   const fallback: GlobalLeaderboardResponse = {
@@ -109,11 +107,12 @@ export interface CommunityLeaderboardResponse {
  */
 export async function getCommunityLeaderboard(
   communityId: string,
-  params?: PaginationParams
+  params?: PaginationParams,
 ): Promise<CommunityLeaderboardResponse> {
-  const response = await axiosInstance.get<
-    ApiResponse<CommunityLeaderboardResponse>
-  >(`/leaderboard/community/${communityId}`, { params });
+  const response = await axiosInstance.get<ApiResponse<CommunityLeaderboardResponse>>(
+    `/leaderboard/community/${communityId}`,
+    { params },
+  );
   return unwrapData(response.data)!;
 }
 
@@ -130,8 +129,8 @@ export interface TopCommunity {
   createdAt: string;
 }
 
-export type CommunitySortBy = "xp" | "members" | "createdAt";
-export type SortOrder = "asc" | "desc";
+export type CommunitySortBy = 'xp' | 'members' | 'createdAt';
+export type SortOrder = 'asc' | 'desc';
 
 export interface TopCommunitiesParams extends PaginationParams {
   sortBy?: CommunitySortBy;
@@ -149,16 +148,16 @@ export interface TopCommunitiesResponse {
  * Get top communities ranked by XP, member count, or creation date
  */
 export async function getTopCommunities(
-  params?: TopCommunitiesParams
+  params?: TopCommunitiesParams,
 ): Promise<TopCommunitiesResponse> {
   const response = await axiosInstance.get<ApiResponse<TopCommunitiesResponse>>(
-    "/leaderboard/top-communities",
-    { params }
+    '/leaderboard/top-communities',
+    { params },
   );
   const fallback: TopCommunitiesResponse = {
     results: [],
-    sortBy: params?.sortBy ?? "xp",
-    order: params?.order ?? "desc",
+    sortBy: params?.sortBy ?? 'xp',
+    order: params?.order ?? 'desc',
     pagination: {
       page: params?.page ?? 1,
       limit: params?.limit ?? 20,
@@ -200,11 +199,12 @@ export interface ClanLeaderboardResponse {
  */
 export async function getClanLeaderboard(
   clanId: string,
-  params?: PaginationParams
+  params?: PaginationParams,
 ): Promise<ClanLeaderboardResponse> {
-  const response = await axiosInstance.get<
-    ApiResponse<ClanLeaderboardResponse>
-  >(`/leaderboard/clan/${clanId}`, { params });
+  const response = await axiosInstance.get<ApiResponse<ClanLeaderboardResponse>>(
+    `/leaderboard/clan/${clanId}`,
+    { params },
+  );
   return unwrapData(response.data)!;
 }
 
@@ -222,7 +222,7 @@ export interface TopClan {
   createdAt: string;
 }
 
-export type ClanSortBy = "xp" | "members" | "createdAt";
+export type ClanSortBy = 'xp' | 'members' | 'createdAt';
 
 export interface TopClansParams extends PaginationParams {
   sortBy?: ClanSortBy;
@@ -241,17 +241,15 @@ export interface TopClansResponse {
  * Get top clans ranked by XP, member count, or creation date
  * Optionally filter by community
  */
-export async function getTopClans(
-  params?: TopClansParams
-): Promise<TopClansResponse> {
+export async function getTopClans(params?: TopClansParams): Promise<TopClansResponse> {
   const response = await axiosInstance.get<ApiResponse<TopClansResponse>>(
-    "/leaderboard/top-clans",
-    { params }
+    '/leaderboard/top-clans',
+    { params },
   );
   const fallback: TopClansResponse = {
     results: [],
-    sortBy: params?.sortBy ?? "xp",
-    order: params?.order ?? "desc",
+    sortBy: params?.sortBy ?? 'xp',
+    order: params?.order ?? 'desc',
     pagination: {
       page: params?.page ?? 1,
       limit: params?.limit ?? 20,
@@ -290,7 +288,7 @@ export interface QuestCompletionXPUpdate {
 export function buildLeaderboardParams(
   page: number = 1,
   limit: number = 20,
-  additionalParams?: Record<string, string | number>
+  additionalParams?: Record<string, string | number>,
 ): Record<string, string | number> {
   return {
     page: Math.max(1, page),
@@ -302,10 +300,6 @@ export function buildLeaderboardParams(
 /**
  * Get leaderboard rank position from page and index
  */
-export function getLeaderboardRank(
-  page: number,
-  limit: number,
-  index: number
-): number {
+export function getLeaderboardRank(page: number, limit: number, index: number): number {
   return (page - 1) * limit + index + 1;
 }

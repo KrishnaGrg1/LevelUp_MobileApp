@@ -1,38 +1,37 @@
-import { Box } from "@/components/ui/box";
-import { Icon } from "@/components/ui/icon";
-import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu";
-import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
-import LanguageStore, { Language } from "@/stores/language.store";
-import { useTranslation } from "@/translation";
-import { Check, ChevronRight, Languages } from "lucide-react-native";
-import React from "react";
-import { useShallow } from "zustand/react/shallow";
+import { Box } from '@/components/ui/box';
+import { Icon } from '@/components/ui/icon';
+import { Menu, MenuItem, MenuItemLabel } from '@/components/ui/menu';
+import { Pressable } from '@/components/ui/pressable';
+import { Text } from '@/components/ui/text';
+import LanguageStore, { Language } from '@/stores/language.store';
+import { useTranslation } from '@/translation';
+import { Check, ChevronRight, Languages } from 'lucide-react-native';
+import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
 const languages = [
-  { code: "eng" as Language, name: "English", flag: "🇺🇸" },
-  { code: "fr" as Language, name: "Français", flag: "🇫🇷" },
-  { code: "nep" as Language, name: "नेपाली", flag: "🇳🇵" },
-  { code: "arab" as Language, name: "العربية", flag: "🇸🇦" },
-  { code: "chin" as Language, name: "中文", flag: "🇨🇳" },
-  { code: "span" as Language, name: "Español", flag: "🇪🇸" },
-  { code: "jap" as Language, name: "日本語", flag: "🇯🇵" },
+  { code: 'eng' as Language, name: 'English', flag: '🇺🇸' },
+  { code: 'fr' as Language, name: 'Français', flag: '🇫🇷' },
+  { code: 'nep' as Language, name: 'नेपाली', flag: '🇳🇵' },
+  { code: 'arab' as Language, name: 'العربية', flag: '🇸🇦' },
+  { code: 'chin' as Language, name: '中文', flag: '🇨🇳' },
+  { code: 'span' as Language, name: 'Español', flag: '🇪🇸' },
+  { code: 'jap' as Language, name: '日本語', flag: '🇯🇵' },
 ];
 
 export function LanguageSwitcher() {
   const { t } = useTranslation();
   const { language, setLanguage } = LanguageStore(
-    useShallow((state) => ({
+    useShallow(state => ({
       language: state.language,
       setLanguage: state.setLanguage,
-    }))
+    })),
   );
 
-  const currentLanguage =
-    languages.find((lang) => lang.code === language) || languages[0];
+  const currentLanguage = languages.find(lang => lang.code === language) || languages[0];
 
   const changeLanguage = (languageCode: Language) => {
     setLanguage(languageCode);
-    console.log("Language changed to:", languageCode, language);
+    console.log('Language changed to:', languageCode, language);
   };
 
   return (
@@ -48,7 +47,7 @@ export function LanguageSwitcher() {
             <Box className="flex-row items-center gap-2">
               <Icon as={Languages} size="md" className="text-typography-900" />
               <Text size="lg" className="text-typography-900">
-                {t("settings.language")}
+                {t('settings.language')}
               </Text>
             </Box>
             <Box className="flex-row items-center gap-2">
@@ -56,37 +55,24 @@ export function LanguageSwitcher() {
               <Text size="md" className="text-typography-700">
                 {currentLanguage.name}
               </Text>
-              <Icon
-                as={ChevronRight}
-                size="lg"
-                className="text-typography-700"
-              />
+              <Icon as={ChevronRight} size="lg" className="text-typography-700" />
             </Box>
           </Pressable>
         );
       }}
     >
-      {languages.map((lang) => {
+      {languages.map(lang => {
         const isActive = language === lang.code;
         return (
-          <MenuItem
-            key={lang.code}
-            textValue={lang.name}
-            onPress={() => changeLanguage(lang.code)}
-          >
+          <MenuItem key={lang.code} textValue={lang.name} onPress={() => changeLanguage(lang.code)}>
             <Box className="min-w-[200px] flex-row items-center justify-between">
               <Box className="flex-row items-center gap-2">
                 <Text size="lg">{lang.flag}</Text>
-                <MenuItemLabel
-                  size="sm"
-                  className={isActive ? "font-semibold" : ""}
-                >
+                <MenuItemLabel size="sm" className={isActive ? 'font-semibold' : ''}>
                   {lang.name}
                 </MenuItemLabel>
               </Box>
-              {isActive && (
-                <Icon as={Check} size="sm" className="text-primary-500" />
-              )}
+              {isActive && <Icon as={Check} size="sm" className="text-primary-500" />}
             </Box>
           </MenuItem>
         );

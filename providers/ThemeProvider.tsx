@@ -1,12 +1,12 @@
-import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { useThemeStore } from "@/stores/theme.store";
-import { PropsWithChildren, useEffect, useState } from "react";
-import { Appearance, ColorSchemeName } from "react-native";
+import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+import { useThemeStore } from '@/stores/theme.store';
+import { PropsWithChildren, useEffect, useState } from 'react';
+import { Appearance, ColorSchemeName } from 'react-native';
 
 export function ThemeProvider({ children }: PropsWithChildren) {
-  const mode = useThemeStore((s) => s.theme);
-  const [currentSystemTheme, setCurrentSystemTheme] = useState<ColorSchemeName>(
-    () => Appearance.getColorScheme()
+  const mode = useThemeStore(s => s.theme);
+  const [currentSystemTheme, setCurrentSystemTheme] = useState<ColorSchemeName>(() =>
+    Appearance.getColorScheme(),
   );
 
   // Listen for system theme changes
@@ -26,9 +26,7 @@ export function ThemeProvider({ children }: PropsWithChildren) {
   }, [mode]); // Re-run when mode changes
 
   // Determine the actual theme to use
-  const activeTheme = mode === "system" ? currentSystemTheme ?? "light" : mode;
+  const activeTheme = mode === 'system' ? (currentSystemTheme ?? 'light') : mode;
 
-  return (
-    <GluestackUIProvider mode={activeTheme}>{children}</GluestackUIProvider>
-  );
+  return <GluestackUIProvider mode={activeTheme}>{children}</GluestackUIProvider>;
 }

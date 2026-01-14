@@ -1,6 +1,6 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
-import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import React from 'react';
+import { useForm } from 'react-hook-form';
 
 import {
   FormControl,
@@ -11,23 +11,20 @@ import {
   FormControlHelperText,
   FormControlLabel,
   FormControlLabelText,
-} from "@/components/ui/form-control";
+} from '@/components/ui/form-control';
 
-import { Box } from "@/components/ui/box";
-import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
-import { Center } from "@/components/ui/center";
-import { Input, InputField } from "@/components/ui/input";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
+import { Box } from '@/components/ui/box';
+import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button';
+import { Center } from '@/components/ui/center';
+import { Input, InputField } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
 
-import { useForgetPassword } from "@/hooks/useAuth";
-import {
-  ForgetPasswordInput,
-  ForgetPasswordSchema,
-} from "@/schemas/auth/forgetPassword";
-import { useTranslation } from "@/translation";
-import { router } from "expo-router";
-import { AlertCircle } from "lucide-react-native";
+import { useForgetPassword } from '@/hooks/useAuth';
+import { ForgetPasswordInput, ForgetPasswordSchema } from '@/schemas/auth/forgetPassword';
+import { useTranslation } from '@/translation';
+import { router } from 'expo-router';
+import { AlertCircle } from 'lucide-react-native';
 
 export function ForgetPasswordForm() {
   const { t } = useTranslation();
@@ -36,9 +33,9 @@ export function ForgetPasswordForm() {
   const form = useForm<ForgetPasswordInput>({
     resolver: zodResolver(ForgetPasswordSchema),
     defaultValues: {
-      email: "",
+      email: '',
     },
-    mode: "onChange",
+    mode: 'onChange',
   });
 
   const {
@@ -52,9 +49,9 @@ export function ForgetPasswordForm() {
     try {
       await forgetPassword(data);
     } catch (err: any) {
-      const errorMessage = err?.message || t("error.auth.forgetPasswordFailed");
-      setError("root", {
-        type: "server",
+      const errorMessage = err?.message || t('error.auth.forgetPasswordFailed');
+      setError('root', {
+        type: 'server',
         message: errorMessage,
       });
     }
@@ -66,20 +63,14 @@ export function ForgetPasswordForm() {
       <FormControl isInvalid={!!errors.email} isRequired>
         <FormControlLabel>
           <FormControlLabelText className="text-typography-900">
-            {t("auth.forgetPassword.email")}
+            {t('auth.forgetPassword.email')}
           </FormControlLabelText>
         </FormControlLabel>
-        <Input
-          className="border-outline-300"
-          size="lg"
-          isInvalid={!!errors.email}
-        >
+        <Input className="border-outline-300" size="lg" isInvalid={!!errors.email}>
           <InputField
             type="text"
-            placeholder={t("auth.forgetPassword.emailPlaceholder")}
-            onChangeText={(txt) =>
-              setValue("email", txt, { shouldValidate: true })
-            }
+            placeholder={t('auth.forgetPassword.emailPlaceholder')}
+            onChangeText={txt => setValue('email', txt, { shouldValidate: true })}
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
@@ -88,10 +79,7 @@ export function ForgetPasswordForm() {
         {!errors.email && (
           <FormControlHelper>
             <FormControlHelperText>
-              {t(
-                "auth.forgetPassword.helperText",
-                "We'll send a reset code to this email"
-              )}
+              {t('auth.forgetPassword.helperText', "We'll send a reset code to this email")}
             </FormControlHelperText>
           </FormControlHelper>
         )}
@@ -105,11 +93,9 @@ export function ForgetPasswordForm() {
 
       {/* Error Message */}
       {(error || errors.root) && (
-        <Box className="rounded-lg bg-error-50 border border-error-200 p-3">
+        <Box className="rounded-lg border border-error-200 bg-error-50 p-3">
           <Text className="text-center text-sm text-error-700">
-            {errors.root?.message ||
-              error?.message ||
-              t("error.auth.forgetPasswordFailed")}
+            {errors.root?.message || error?.message || t('error.auth.forgetPasswordFailed')}
           </Text>
         </Box>
       )}
@@ -124,24 +110,22 @@ export function ForgetPasswordForm() {
         {isPending ? (
           <>
             <ButtonSpinner className="mr-2" />
-            <ButtonText>
-              {t("auth.forgetPassword.sending", "Sending...")}
-            </ButtonText>
+            <ButtonText>{t('auth.forgetPassword.sending', 'Sending...')}</ButtonText>
           </>
         ) : (
-          <ButtonText>{t("auth.forgetPassword.submit")}</ButtonText>
+          <ButtonText>{t('auth.forgetPassword.submit')}</ButtonText>
         )}
       </Button>
 
       {/* Back to Login */}
       <Center className="mt-4">
         <Text className="text-center text-sm text-typography-500">
-          {t("auth.forgetPassword.rememberPassword", "Remember your password?")}{" "}
+          {t('auth.forgetPassword.rememberPassword', 'Remember your password?')}{' '}
           <Text
-            onPress={() => router.replace("/(auth)/login")}
+            onPress={() => router.replace('/(auth)/login')}
             className="font-medium text-typography-900 underline"
           >
-            {t("auth.forgetPassword.loginLink", "Log in")}
+            {t('auth.forgetPassword.loginLink', 'Log in')}
           </Text>
         </Text>
       </Center>

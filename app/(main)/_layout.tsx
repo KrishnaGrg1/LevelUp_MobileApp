@@ -1,54 +1,26 @@
-import { Tabs } from "expo-router";
-import { BookOpen, Home, Trophy, User } from "lucide-react-native";
-import React from "react";
-import { useColorScheme } from "react-native";
+import { AuthProvider } from '@/providers/AuthProvider';
+import { SocketProvider } from '@/providers/SocketProvider';
+import authStore from '@/stores/auth.store';
+import { Redirect, Slot } from 'expo-router';
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+/**
+ * MainLayout - Protected routes layout
+ * Ensures user is authenticated before rendering
+ * Wraps with AuthProvider → SocketProvider for proper initialization
+ */
+export default function MainLayout() {
+  const isAuthenticated = authStore(state => state.isAuthenticated);
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Redirect href="/(auth)/login" />;
+  }
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: "#3b82f6",
-        tabBarInactiveTintColor: isDark ? "#9ca3af" : "#6b7280",
-        tabBarStyle: {
-          backgroundColor: isDark ? "#000000" : "#ffffff",
-          borderTopColor: isDark ? "#1f2937" : "#e5e7eb",
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="dashboard"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
-        }}
-      />
-      <Tabs.Screen
-        name="learn"
-        options={{
-          title: "Learn",
-          tabBarIcon: ({ color, size }) => (
-            <BookOpen color={color} size={size} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="challenges"
-        options={{
-          title: "Challenges",
-          tabBarIcon: ({ color, size }) => <Trophy color={color} size={size} />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
-        }}
-      />
-    </Tabs>
+    <AuthProvider>
+      <SocketProvider>
+        <Slot />
+      </SocketProvider>
+    </AuthProvider>
   );
 }

@@ -1,6 +1,6 @@
-import { getSocket } from "@/lib/socket";
-import { useSocketStore } from "@/stores/socket.store";
-import { useEffect } from "react";
+import { getSocket } from '@/lib/socket';
+import { useSocketStore } from '@/stores/socket.store';
+import { useEffect } from 'react';
 
 /**
  * Hook to track socket connection state
@@ -14,15 +14,15 @@ export const useSocket = () => {
     const handleConnect = () => setIsConnected(true);
     const handleDisconnect = () => setIsConnected(false);
 
-    socket.on("connect", handleConnect);
-    socket.on("disconnect", handleDisconnect);
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
 
     // Set initial state
     setIsConnected(socket.connected);
 
     return () => {
-      socket.off("connect", handleConnect);
-      socket.off("disconnect", handleDisconnect);
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
     };
   }, [setIsConnected]);
 
