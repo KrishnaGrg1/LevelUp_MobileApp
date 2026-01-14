@@ -8,6 +8,7 @@ import {
 import { communitiesService } from '@/api/endPoints/communities.service';
 
 import { CreateCommunityDto } from '@/api/generated';
+import authStore from '@/stores/auth.store';
 
 import LanguageStore from '@/stores/language.store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -16,10 +17,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
  */
 export const useMyCommunities = () => {
   const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
   return useQuery({
     queryKey: ['userCommunities'],
 
-    queryFn: () => getMyCommunities(language),
+    queryFn: () => getMyCommunities(language, authSession),
+
     staleTime: 3 * 60 * 1000, // 3 minutes
   });
 };
@@ -29,9 +32,10 @@ export const useMyCommunities = () => {
  */
 export const useSearchCommunities = (searchQuery: string) => {
   const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
   return useQuery({
     queryKey: ['search-communities', searchQuery],
-    queryFn: () => searchCommunities(language, searchQuery),
+    queryFn: () => searchCommunities(language, searchQuery, authSession),
     enabled: searchQuery.length > 0,
     staleTime: 1 * 60 * 1000, // 1 minute
   });
@@ -41,6 +45,7 @@ export const useSearchCommunities = (searchQuery: string) => {
  * Get community by ID
  */
 export const useCommunity = (id: string) => {
+  const authSession = authStore.getState().authSession as string;
   return useQuery({
     queryKey: ['communities', id],
     queryFn: () => communitiesService.getById(id),
@@ -67,9 +72,9 @@ export const useCommunityMembers = (id: string) => {
 export const useCreateCommunity = () => {
   const queryClient = useQueryClient();
   const language = LanguageStore.getState().language;
-
+  const authSession = authStore.getState().authSession as string;
   return useMutation({
-    mutationFn: (payload: FormData) => createCommunity(language, payload),
+    mutationFn: (payload: FormData) => createCommunity(language, payload, authSession),
     onSuccess: () => {
       // Invalidate communities list
       queryClient.invalidateQueries({ queryKey: ['communities'] });
@@ -84,9 +89,9 @@ export const useCreateCommunity = () => {
 export const useJoinPrivateCommunity = () => {
   const queryClient = useQueryClient();
   const language = LanguageStore.getState().language;
-
+  const authSession = authStore.getState().authSession as string;
   return useMutation({
-    mutationFn: (joinCode: string) => joinPrivateCommunity(language, joinCode),
+    mutationFn: (joinCode: string) => joinPrivateCommunity(language, joinCode, authSession),
     onSuccess: () => {
       // Refresh the user's community list so the new one shows up
       queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
@@ -101,9 +106,9 @@ export const useJoinPrivateCommunity = () => {
 export const useJoinCommunity = () => {
   const queryClient = useQueryClient();
   const language = LanguageStore.getState().language;
-
+  const authSession = authStore.getState().authSession as string;
   return useMutation({
-    mutationFn: (communityId: string) => joinCommunity(language, communityId),
+    mutationFn: (communityId: string) => joinCommunity(language, communityId, authSession),
     onSuccess: () => {
       // Refresh the user's community list
       queryClient.invalidateQueries({ queryKey: ['userCommunities'] });

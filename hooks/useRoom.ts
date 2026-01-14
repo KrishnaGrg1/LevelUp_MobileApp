@@ -1,5 +1,11 @@
 import { checkClanMembership } from '@/api/endPoints/message.service';
-import { getSocket, joinClan, joinCommunity, leaveClan, leaveCommunity } from '@/lib/socket';
+import {
+  getSocket,
+  joinClan,
+  joinCommunity,
+  leaveClan,
+  leaveCommunity,
+} from '@/api/endPoints/socket';
 import useAuthStore from '@/stores/auth.store';
 import { useEffect, useRef, useState } from 'react';
 import { useSocket } from './useSocket';

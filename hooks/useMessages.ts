@@ -1,11 +1,12 @@
 import { getClanMessages, getCommunityMessages } from '@/api/endPoints/message.service';
+
 import {
   getSocket,
   onClanMessage,
   onCommunityMessage,
   sendClanMessage,
   sendCommunityMessage,
-} from '@/lib/socket';
+} from '@/api/endPoints/socket';
 import authStore from '@/stores/auth.store';
 import LanguageStore from '@/stores/language.store';
 import { Message } from '@/types/message.types';

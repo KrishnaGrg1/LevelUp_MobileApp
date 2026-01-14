@@ -1,4 +1,4 @@
-import { connectSocket, disconnectSocket } from '@/lib/socket';
+import { connectSocket, disconnectSocket } from '@/api/endPoints/socket';
 import useAuthStore from '@/stores/auth.store';
 import React, { useEffect } from 'react';
 

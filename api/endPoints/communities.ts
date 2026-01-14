@@ -10,12 +10,13 @@ import {
 } from '../generated';
 
 // Get user's communities
-export const getMyCommunities = async (lang: Language) => {
+export const getMyCommunities = async (lang: Language, authSession: string) => {
   try {
     const response = await axiosInstance.get<GetMyCommunities>(`/community/my`, {
       withCredentials: true,
       headers: {
         'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
     });
     return response.data;
@@ -32,12 +33,13 @@ export const getMyCommunities = async (lang: Language) => {
 };
 
 // Get all communities
-export const getAllCommunities = async (lang: Language) => {
+export const getAllCommunities = async (lang: Language, authSession: string) => {
   try {
     const response = await axiosInstance.get<GetMyCommunities>(`/community`, {
       withCredentials: true,
       headers: {
         'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
     });
     return response.data;
@@ -54,7 +56,7 @@ export const getAllCommunities = async (lang: Language) => {
 };
 
 // Create new community
-export const togglePin = async (lang: Language, communityIds: string[]) => {
+export const togglePin = async (lang: Language, communityIds: string[], authSession: string) => {
   try {
     const response = await axiosInstance.post<TogglePinResponse>(
       `/community/toggle-pin`,
@@ -63,6 +65,7 @@ export const togglePin = async (lang: Language, communityIds: string[]) => {
         withCredentials: true,
         headers: {
           'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
           'Content-Type': 'application/json',
         },
       },
@@ -79,7 +82,7 @@ export const togglePin = async (lang: Language, communityIds: string[]) => {
   }
 };
 // Create new community
-export const createCommunity = async (lang: Language, formData: FormData) => {
+export const createCommunity = async (lang: Language, formData: FormData, authSession: string) => {
   try {
     const response = await axiosInstance.post<CreateCommunityResponse>(
       `/community/create`,
@@ -88,6 +91,7 @@ export const createCommunity = async (lang: Language, formData: FormData) => {
         withCredentials: true,
         headers: {
           'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
           'Content-Type': 'multipart/form-data',
         },
       },
@@ -104,13 +108,14 @@ export const createCommunity = async (lang: Language, formData: FormData) => {
 };
 
 // Search  communities
-export const searchCommunities = async (lang: Language, query: string) => {
+export const searchCommunities = async (lang: Language, query: string, authSession: string) => {
   try {
     const response = await axiosInstance.get<searchCommunitiesResponse>(`/community/search`, {
       params: { q: query },
       withCredentials: true,
       headers: {
         'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
     });
     return response.data;
@@ -127,7 +132,7 @@ export const searchCommunities = async (lang: Language, query: string) => {
 };
 
 // Join a community
-export const joinCommunity = async (lang: Language, communityId: string) => {
+export const joinCommunity = async (lang: Language, communityId: string, authSession: string) => {
   try {
     const response = await axiosInstance.post<{
       success: boolean;
@@ -139,6 +144,7 @@ export const joinCommunity = async (lang: Language, communityId: string) => {
         withCredentials: true,
         headers: {
           'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
         },
       },
     );
@@ -156,7 +162,11 @@ export const joinCommunity = async (lang: Language, communityId: string) => {
 };
 
 // Join a community
-export const joinPrivateCommunity = async (lang: Language, joinCode: string) => {
+export const joinPrivateCommunity = async (
+  lang: Language,
+  joinCode: string,
+  authSession: string,
+) => {
   try {
     const response = await axiosInstance.post<{
       success: boolean;
@@ -168,6 +178,7 @@ export const joinPrivateCommunity = async (lang: Language, joinCode: string) => 
         withCredentials: true,
         headers: {
           'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
         },
       },
     );
@@ -185,7 +196,11 @@ export const joinPrivateCommunity = async (lang: Language, joinCode: string) => 
 };
 
 // Specific   Community Detail
-export const communityDetailById = async (lang: Language, communityId: string) => {
+export const communityDetailById = async (
+  lang: Language,
+  communityId: string,
+  authSession: string,
+) => {
   try {
     const response = await axiosInstance.get<communityDetailByIdResponse>(
       `/community/${communityId}`,
@@ -193,6 +208,7 @@ export const communityDetailById = async (lang: Language, communityId: string) =
         withCredentials: true,
         headers: {
           'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
         },
       },
     );
@@ -211,12 +227,13 @@ export const communityDetailById = async (lang: Language, communityId: string) =
 
 // Get Categories for communities
 
-export const getCategories = async (lang: Language) => {
+export const getCategories = async (lang: Language, authSession: string) => {
   try {
     const response = await axiosInstance.get<getCategoriesResponse>(`/auth/categories`, {
       withCredentials: true,
       headers: {
         'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
     });
     return response.data;

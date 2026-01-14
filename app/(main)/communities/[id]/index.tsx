@@ -47,10 +47,10 @@ export default function CommunityDetailScreen() {
   const [showCreateClanModal, setShowCreateClanModal] = useState(false);
   const [showCommunityOptions, setShowCommunityOptions] = useState(false);
   const flatListRef = useRef<FlatList>(null);
-
+  const authSession = authStore.getState().authSession as string;
   const { data, isLoading, error } = useQuery({
     queryKey: ['community', id, language],
-    queryFn: () => communityDetailById(language as any, id as string),
+    queryFn: () => communityDetailById(language as any, id as string, authSession),
     enabled: !!id,
   });
 

@@ -1,4 +1,4 @@
-import { getSocket } from '@/lib/socket';
+import { getSocket } from '@/api/endPoints/socket';
 import { useSocketStore } from '@/stores/socket.store';
 import { useEffect } from 'react';
 
