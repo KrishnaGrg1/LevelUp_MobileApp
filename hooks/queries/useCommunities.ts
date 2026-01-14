@@ -1,11 +1,12 @@
 import {
   createCommunity,
+  getAllMembersOfCommunity,
   getMyCommunities,
   joinCommunity,
   joinPrivateCommunity,
   searchCommunities,
+  updatecommunityById,
 } from '@/api/endPoints/communities';
-import { communitiesService } from '@/api/endPoints/communities.service';
 
 import { CreateCommunityDto } from '@/api/generated';
 import authStore from '@/stores/auth.store';
@@ -46,9 +47,10 @@ export const useSearchCommunities = (searchQuery: string) => {
  */
 export const useCommunity = (id: string) => {
   const authSession = authStore.getState().authSession as string;
+  const lang = LanguageStore.getState().language;
   return useQuery({
     queryKey: ['communities', id],
-    queryFn: () => communitiesService.getById(id),
+    queryFn: () => joinCommunity(lang, id, authSession),
     enabled: !!id,
     staleTime: 3 * 60 * 1000,
   });
@@ -58,9 +60,11 @@ export const useCommunity = (id: string) => {
  * Get community members
  */
 export const useCommunityMembers = (id: string) => {
+  const authSession = authStore.getState().authSession;
+  const lang = LanguageStore.getState().language;
   return useQuery({
     queryKey: ['communities', id, 'members'],
-    queryFn: () => communitiesService.getMembers(id),
+    queryFn: () => getAllMembersOfCommunity(id, lang, authSession as string),
     enabled: !!id,
     staleTime: 2 * 60 * 1000,
   });
@@ -164,10 +168,11 @@ export const useJoinCommunity = () => {
  */
 export const useUpdateCommunity = () => {
   const queryClient = useQueryClient();
-
+  const lang = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: Partial<CreateCommunityDto> }) =>
-      communitiesService.updateSettings(id, payload),
+      updatecommunityById(lang, payload, id, authSession),
     onSuccess: (data, { id }) => {
       queryClient.setQueryData(['communities', id], data);
       queryClient.invalidateQueries({ queryKey: ['communities'] });
@@ -178,14 +183,3 @@ export const useUpdateCommunity = () => {
 /**
  * Delete community mutation (admin only)
  */
-export const useDeleteCommunity = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => communitiesService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['communities'] });
-      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
-    },
-  });
-};

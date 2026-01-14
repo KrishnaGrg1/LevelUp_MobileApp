@@ -564,3 +564,26 @@ export interface CreateCommunityDto {
   memberLimit?: number;
   isPrivate: boolean;
 }
+
+export interface CommunityMemberDTO {
+  id: string;
+  userId: string;
+  userName: string;
+  profilePicture: string | null;
+  level: number;
+  xp: number;
+  role: 'ADMIN' | 'MODERATOR' | 'MEMBER';
+  isPinned: boolean;
+  joinedAt: string; // ISO date
+}
+export interface GetCommunityMembersSuccessResponse {
+  statusCode: 200;
+  headers?: Record<string, string>;
+  body: {
+    message: string;
+    data: {
+      members: CommunityMemberDTO[];
+      count: number;
+    };
+  };
+}

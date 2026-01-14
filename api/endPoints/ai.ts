@@ -96,41 +96,44 @@ export interface ApiResponse<T> {
   };
 }
 
-export const fetchDailyQuests = async (lang: Language) => {
+export const fetchDailyQuests = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.get<ApiResponse<DailyQuestsData>>(`/ai/quests/daily`, {
-    headers: { 'X-Language': lang },
+    headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
     withCredentials: true,
   });
   console.log('fetchDailyQuests response:', res.data);
   return res.data;
 };
 
-export const fetchWeeklyQuests = async (lang: Language) => {
+export const fetchWeeklyQuests = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.get<ApiResponse<WeeklyQuestsData>>(`/ai/quests/weekly`, {
-    headers: { 'X-Language': lang },
+    headers: {
+      'X-Language': lang,
+      Authorization: `Bearer ${authSession}`,
+    },
     withCredentials: true,
   });
   return res.data;
 };
 
-export const generateDailyQuests = async (lang: Language) => {
+export const generateDailyQuests = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.post<ApiResponse<{ today: Quest[] }>>(
     `/ai/generate/daily`,
     undefined,
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
   return res.data;
 };
 
-export const generateWeeklyQuests = async (lang: Language) => {
+export const generateWeeklyQuests = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.post<ApiResponse<{ thisWeek: Quest[] }>>(
     `/ai/generate/weekly`,
     undefined,
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
@@ -153,24 +156,24 @@ export interface StartQuestResponse {
   quest: Quest;
 }
 
-export const startQuest = async (questId: string, lang: Language) => {
+export const startQuest = async (questId: string, lang: Language, authSession: string) => {
   const res = await axiosInstance.post<ApiResponse<StartQuestResponse>>(
     `/ai/quests/start`,
     { questId },
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
   return res.data;
 };
 
-export const completeQuest = async (questId: string, lang: Language) => {
+export const completeQuest = async (questId: string, lang: Language, authSession: string) => {
   const res = await axiosInstance.patch<ApiResponse<CompleteQuestResponse>>(
     `/ai/quests/complete`,
     { questId },
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
@@ -191,6 +194,7 @@ export interface CompletedQuestsResponse {
 
 export const fetchCompletedQuests = async (
   lang: Language,
+  authSession: string,
   page: number = 1,
   limit: number = 20,
   type?: 'Daily' | 'Weekly',
@@ -204,7 +208,7 @@ export const fetchCompletedQuests = async (
   const res = await axiosInstance.get<ApiResponse<CompletedQuestsResponse>>(
     `/ai/quests/completed?${params.toString()}`,
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
@@ -219,11 +223,11 @@ export interface QuestWithCommunity extends Quest {
   };
 }
 
-export const fetchSingleQuest = async (questId: string, lang: Language) => {
+export const fetchSingleQuest = async (questId: string, lang: Language, authSession: string) => {
   const res = await axiosInstance.get<ApiResponse<{ quest: QuestWithCommunity }>>(
     `/ai/quests/${questId}`,
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
@@ -234,12 +238,12 @@ export interface AIChatResponse {
   reply: string;
 }
 
-export const sendAIChat = async (prompt: string, lang: Language) => {
+export const sendAIChat = async (prompt: string, lang: Language, authSession: string) => {
   const res = await axiosInstance.post<ApiResponse<AIChatResponse>>(
     `/ai/chat`,
     { prompt },
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
@@ -289,9 +293,9 @@ export interface AIConfigResponse {
   };
 }
 
-export const fetchAIConfig = async (lang: Language) => {
+export const fetchAIConfig = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.get<ApiResponse<AIConfigResponse>>(`/ai/config`, {
-    headers: { 'X-Language': lang },
+    headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
     withCredentials: true,
   });
   return res.data;
@@ -326,26 +330,26 @@ export interface AIHealthResponse {
   };
 }
 
-export const fetchAIHealth = async (lang: Language) => {
+export const fetchAIHealth = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.get<ApiResponse<AIHealthResponse>>(`/ai/health`, {
-    headers: { 'X-Language': lang },
+    headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
     withCredentials: true,
   });
   return res.data;
 };
 
 // User can force generate their own quests
-export const forceGenerateDailyQuests = async (lang: Language) => {
+export const forceGenerateDailyQuests = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.post<
     ApiResponse<{ today: QuestWithCommunity[]; count: number; forced: boolean }>
   >(`/ai/generate/daily/force`, undefined, {
-    headers: { 'X-Language': lang },
+    headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
     withCredentials: true,
   });
   return res.data;
 };
 
-export const forceGenerateWeeklyQuests = async (lang: Language) => {
+export const forceGenerateWeeklyQuests = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.post<
     ApiResponse<{
       thisWeek: QuestWithCommunity[];
@@ -353,18 +357,18 @@ export const forceGenerateWeeklyQuests = async (lang: Language) => {
       forced: boolean;
     }>
   >(`/ai/generate/weekly/force`, undefined, {
-    headers: { 'X-Language': lang },
+    headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
     withCredentials: true,
   });
   return res.data;
 };
 
 // Admin only - delete quest
-export const deleteQuest = async (questId: string, lang: Language) => {
+export const deleteQuest = async (questId: string, lang: Language, authSession: string) => {
   const res = await axiosInstance.delete<ApiResponse<{ deletedQuestId: string; userId: string }>>(
     `/ai/quests/${questId}`,
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
@@ -390,11 +394,11 @@ export interface CommunityMembershipsResponse {
   memberships: CommunityMembership[];
 }
 
-export const getCommunityMemberships = async (lang: Language) => {
+export const getCommunityMemberships = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.get<ApiResponse<CommunityMembershipsResponse>>(
     `/ai/community/memberships`,
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
@@ -455,12 +459,12 @@ export interface BulkDeleteResponse {
 }
 
 // Admin: Generate daily quests for all users
-export const adminGenerateDailyAll = async (lang: Language) => {
+export const adminGenerateDailyAll = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.post<ApiResponse<AdminGenerateAllResponse>>(
     `/ai/admin/generate/daily/all`,
     undefined,
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
@@ -468,12 +472,16 @@ export const adminGenerateDailyAll = async (lang: Language) => {
 };
 
 // Admin: Generate daily quests for specific user
-export const adminGenerateDailyUser = async (userId: string, lang: Language) => {
+export const adminGenerateDailyUser = async (
+  userId: string,
+  lang: Language,
+  authSession: string,
+) => {
   const res = await axiosInstance.post<ApiResponse<AdminGenerateUserResponse>>(
     `/ai/admin/generate/daily/${userId}`,
     undefined,
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
@@ -481,12 +489,12 @@ export const adminGenerateDailyUser = async (userId: string, lang: Language) => 
 };
 
 // Admin: Generate weekly quests for all users
-export const adminGenerateWeeklyAll = async (lang: Language) => {
+export const adminGenerateWeeklyAll = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.post<ApiResponse<AdminGenerateAllResponse>>(
     `/ai/admin/generate/weekly/all`,
     undefined,
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
@@ -494,12 +502,16 @@ export const adminGenerateWeeklyAll = async (lang: Language) => {
 };
 
 // Admin: Generate weekly quests for specific user
-export const adminGenerateWeeklyUser = async (userId: string, lang: Language) => {
+export const adminGenerateWeeklyUser = async (
+  userId: string,
+  lang: Language,
+  authSession: string,
+) => {
   const res = await axiosInstance.post<ApiResponse<AdminGenerateUserResponse>>(
     `/ai/admin/generate/weekly/${userId}`,
     undefined,
     {
-      headers: { 'X-Language': lang },
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
       withCredentials: true,
     },
   );
@@ -507,18 +519,22 @@ export const adminGenerateWeeklyUser = async (userId: string, lang: Language) =>
 };
 
 // Admin: Get quest statistics
-export const adminGetQuestStats = async (lang: Language) => {
+export const adminGetQuestStats = async (lang: Language, authSession: string) => {
   const res = await axiosInstance.get<ApiResponse<QuestStatsResponse>>(`/ai/admin/quests/stats`, {
-    headers: { 'X-Language': lang },
+    headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
     withCredentials: true,
   });
   return res.data;
 };
 
 // Admin: Bulk delete quests
-export const adminBulkDeleteQuests = async (filters: BulkDeleteFilter, lang: Language) => {
+export const adminBulkDeleteQuests = async (
+  filters: BulkDeleteFilter,
+  lang: Language,
+  authSession: string,
+) => {
   const res = await axiosInstance.delete<ApiResponse<BulkDeleteResponse>>(`/ai/admin/quests`, {
-    headers: { 'X-Language': lang },
+    headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
     data: filters,
     withCredentials: true,
   });

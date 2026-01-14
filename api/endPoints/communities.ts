@@ -2,8 +2,10 @@ import { Language } from '@/stores/language.store';
 import axiosInstance from '../client';
 import {
   communityDetailByIdResponse,
+  CreateCommunityDto,
   CreateCommunityResponse,
   getCategoriesResponse,
+  GetCommunityMembersSuccessResponse,
   GetMyCommunities,
   searchCommunitiesResponse,
   TogglePinResponse,
@@ -245,6 +247,65 @@ export const getCategories = async (lang: Language, authSession: string) => {
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
       'Failed to get categories';
+    throw new Error(errorMessage);
+  }
+};
+
+export const getAllMembersOfCommunity = async (
+  communityId: string,
+  lang: Language,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.get<GetCommunityMembersSuccessResponse>(
+      `community/${communityId}/members`,
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to get categories';
+    throw new Error(errorMessage);
+  }
+};
+
+export const updatecommunityById = async (
+  lang: Language,
+  payload: Partial<CreateCommunityDto>,
+  communityId: string,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.patch<communityDetailByIdResponse>(
+      `/community/${communityId}`,
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to search community';
     throw new Error(errorMessage);
   }
 };

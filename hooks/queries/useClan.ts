@@ -8,6 +8,7 @@ import {
   joinClan,
   leaveClan,
 } from '@/api/endPoints/clans';
+import authStore from '@/stores/auth.store';
 import LanguageStore from '@/stores/language.store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -16,9 +17,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
  */
 export const useClansByCommunity = (communityId: string) => {
   const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
   return useQuery({
     queryKey: ['clans', communityId],
-    queryFn: () => getClansByCommunity(communityId, language),
+    queryFn: () => getClansByCommunity(communityId, language, authSession),
     enabled: !!communityId,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
@@ -29,9 +31,10 @@ export const useClansByCommunity = (communityId: string) => {
  */
 export const useClanInfo = (clanId: string) => {
   const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
   return useQuery({
     queryKey: ['clan', clanId],
-    queryFn: () => getClanInfo(clanId, language),
+    queryFn: () => getClanInfo(clanId, language, authSession),
     enabled: !!clanId,
     staleTime: 2 * 60 * 1000,
   });
@@ -42,9 +45,10 @@ export const useClanInfo = (clanId: string) => {
  */
 export const useClanMembers = (clanId: string) => {
   const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
   return useQuery({
     queryKey: ['clan', clanId, 'members'],
-    queryFn: () => getClanMembers(clanId, language),
+    queryFn: () => getClanMembers(clanId, language, authSession),
     enabled: !!clanId,
     staleTime: 2 * 60 * 1000,
   });
@@ -56,9 +60,9 @@ export const useClanMembers = (clanId: string) => {
 export const useCreateClan = () => {
   const queryClient = useQueryClient();
   const language = LanguageStore.getState().language;
-
+  const authSession = authStore.getState().authSession as string;
   return useMutation({
-    mutationFn: (payload: CreateClanPayload) => createClan(payload, language),
+    mutationFn: (payload: CreateClanPayload) => createClan(payload, language, authSession),
     onSuccess: (data, variables) => {
       // Invalidate clans list for the specific community
       queryClient.invalidateQueries({
@@ -74,9 +78,9 @@ export const useCreateClan = () => {
 export const useJoinClan = () => {
   const queryClient = useQueryClient();
   const language = LanguageStore.getState().language;
-
+  const authSession = authStore.getState().authSession as string;
   return useMutation({
-    mutationFn: (clanId: string) => joinClan(language, clanId),
+    mutationFn: (clanId: string) => joinClan(language, clanId, authSession),
     onSuccess: () => {
       // Invalidate queries to refresh clan data
       queryClient.invalidateQueries({ queryKey: ['clans'] });
@@ -91,9 +95,9 @@ export const useJoinClan = () => {
 export const useLeaveClan = () => {
   const queryClient = useQueryClient();
   const language = LanguageStore.getState().language;
-
+  const authSession = authStore.getState().authSession as string;
   return useMutation({
-    mutationFn: (clanId: string) => leaveClan(clanId, language),
+    mutationFn: (clanId: string) => leaveClan(clanId, language, authSession),
     onSuccess: () => {
       // Invalidate queries to refresh clan data
       queryClient.invalidateQueries({ queryKey: ['clans'] });
@@ -108,9 +112,9 @@ export const useLeaveClan = () => {
 export const useDeleteClan = () => {
   const queryClient = useQueryClient();
   const language = LanguageStore.getState().language;
-
+  const authSession = authStore.getState().authSession as string;
   return useMutation({
-    mutationFn: (clanId: string) => deleteClan(clanId, language),
+    mutationFn: (clanId: string) => deleteClan(clanId, language, authSession),
     onSuccess: () => {
       // Invalidate queries to refresh clan data
       queryClient.invalidateQueries({ queryKey: ['clans'] });

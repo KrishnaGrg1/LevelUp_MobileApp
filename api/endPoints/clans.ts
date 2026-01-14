@@ -101,12 +101,17 @@ export interface UpdateClanPayload {
 }
 
 // Get all clans for a community
-export const getClansByCommunity = async (communityId: string, lang: Language) => {
+export const getClansByCommunity = async (
+  communityId: string,
+  lang: Language,
+  authSession: string,
+) => {
   try {
     const response = await axiosInstance.get<GetClansResponse>(`/clan/${communityId}`, {
       withCredentials: true,
       headers: {
         'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
     });
     return response.data;
@@ -121,7 +126,11 @@ export const getClansByCommunity = async (communityId: string, lang: Language) =
 };
 
 // Create a new clan
-export const createClan = async (payload: CreateClanPayload, lang: Language) => {
+export const createClan = async (
+  payload: CreateClanPayload,
+  lang: Language,
+  authSession: string,
+) => {
   try {
     const response = await axiosInstance.post<{
       statusCode: number;
@@ -130,6 +139,7 @@ export const createClan = async (payload: CreateClanPayload, lang: Language) => 
       withCredentials: true,
       headers: {
         'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
     });
     return response.data;
@@ -144,7 +154,7 @@ export const createClan = async (payload: CreateClanPayload, lang: Language) => 
 };
 
 // Join a clan
-export const joinClan = async (lang: Language, clanId: string) => {
+export const joinClan = async (lang: Language, clanId: string, authSession: string) => {
   try {
     const response = await axiosInstance.post(
       '/clan/join',
@@ -153,6 +163,7 @@ export const joinClan = async (lang: Language, clanId: string) => {
         withCredentials: true,
         headers: {
           'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
         },
       },
     );
@@ -168,7 +179,7 @@ export const joinClan = async (lang: Language, clanId: string) => {
 };
 
 // Leave a clan
-export const leaveClan = async (clanId: string, lang: Language) => {
+export const leaveClan = async (clanId: string, lang: Language, authSession: string) => {
   try {
     const response = await axiosInstance.post(
       '/clan/leave',
@@ -177,6 +188,7 @@ export const leaveClan = async (clanId: string, lang: Language) => {
         withCredentials: true,
         headers: {
           'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
         },
       },
     );
@@ -192,12 +204,13 @@ export const leaveClan = async (clanId: string, lang: Language) => {
 };
 
 // Delete a clan
-export const deleteClan = async (clanId: string, lang: Language) => {
+export const deleteClan = async (clanId: string, lang: Language, authSession: string) => {
   try {
     const response = await axiosInstance.delete(`/clan/${clanId}`, {
       withCredentials: true,
       headers: {
         'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
     });
     return response.data;
@@ -212,12 +225,13 @@ export const deleteClan = async (clanId: string, lang: Language) => {
 };
 
 // Get clan members
-export const getClanMembers = async (clanId: string, lang: Language) => {
+export const getClanMembers = async (clanId: string, lang: Language, authSession: string) => {
   try {
     const response = await axiosInstance.get<GetClanMembersResponse>(`/clan/members/${clanId}`, {
       withCredentials: true,
       headers: {
         'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
     });
     return response.data;
@@ -234,12 +248,13 @@ export const getClanMembers = async (clanId: string, lang: Language) => {
 };
 
 // Get clan info
-export const getClanInfo = async (clanId: string, lang: Language) => {
+export const getClanInfo = async (clanId: string, lang: Language, authSession: string) => {
   try {
     const response = await axiosInstance.get<GetClanInfoResponse>(`/clan/info/${clanId}`, {
       withCredentials: true,
       headers: {
         'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
     });
     return response.data;
@@ -256,7 +271,12 @@ export const getClanInfo = async (clanId: string, lang: Language) => {
 };
 
 // Update clan
-export const updateClan = async (clanId: string, payload: UpdateClanPayload, lang: Language) => {
+export const updateClan = async (
+  clanId: string,
+  payload: UpdateClanPayload,
+  lang: Language,
+  authSession: string,
+) => {
   try {
     const response = await axiosInstance.put<{
       statusCode: number;
@@ -265,6 +285,7 @@ export const updateClan = async (clanId: string, payload: UpdateClanPayload, lan
       withCredentials: true,
       headers: {
         'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
     });
     return response.data;
@@ -279,12 +300,13 @@ export const updateClan = async (clanId: string, payload: UpdateClanPayload, lan
 };
 
 // Get user's clans
-export const getUserClans = async (userId: string, lang: Language) => {
+export const getUserClans = async (userId: string, lang: Language, authSession: string) => {
   try {
     const response = await axiosInstance.get(`/clan/user/${userId}`, {
       withCredentials: true,
       headers: {
         'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
     });
     return response.data;
