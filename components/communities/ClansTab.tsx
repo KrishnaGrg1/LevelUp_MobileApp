@@ -43,11 +43,23 @@ export function ClansTab({ communityId, communityName }: ClansTabProps) {
     isRefetching: isRefetchingAvailable,
   } = useAvailableClans(communityId);
 
-  
+  // Debug logs
+  console.log('Joined Clans Query:', { 
+    loading: joinedLoading, 
+    error: joinedError?.message,
+    errorObj: joinedError,
+    data: joinedClansData?.body?.data?.length,
+    rawData: joinedClansData
+  });
+  console.log('Available Clans Query:', { 
+    loading: availableLoading, 
+    error: availableError?.message,
+    data: availableClansData?.body?.data?.length 
+  });
 
   // If joined endpoint fails, treat it as empty array but log the error
   if (joinedError) {
-    console.error(' Joined clans endpoint error:', joinedError);
+    console.error('❌ Joined clans endpoint error:', joinedError);
   }
 
   // Join clan mutations
