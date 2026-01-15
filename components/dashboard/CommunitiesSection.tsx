@@ -16,7 +16,7 @@ import { useThemeStore } from '@/stores/theme.store';
 import { useRouter } from 'expo-router';
 import { ChevronRight, Lock, Users } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Dimensions, FlatList, Pressable } from 'react-native';
+import { Dimensions, FlatList, Image, Pressable } from 'react-native';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.85;
@@ -39,9 +39,19 @@ function CommunityCard({ community, onPress }: CommunityCardProps) {
         <VStack space="md">
           {/* Top Section: Avatar and Name */}
           <HStack space="md" className="items-center">
-            <Avatar size="lg" className="bg-primary-100">
-              <AvatarFallbackText>{community.name}</AvatarFallbackText>
-            </Avatar>
+            {community.photo ? (
+              <Box className="h-16 w-16 overflow-hidden rounded-full bg-primary-100">
+                <Image
+                  source={{ uri: community.photo }}
+                  style={{ width: 64, height: 64 }}
+                  resizeMode="cover"
+                />
+              </Box>
+            ) : (
+              <Avatar size="lg" className="bg-primary-100">
+                <AvatarFallbackText>{community.name}</AvatarFallbackText>
+              </Avatar>
+            )}
 
             <VStack className="flex-1">
               <Heading size="md" className="text-typography-900" numberOfLines={1}>
