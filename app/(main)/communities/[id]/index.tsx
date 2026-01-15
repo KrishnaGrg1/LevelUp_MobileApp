@@ -16,21 +16,21 @@ import LanguageStore from '@/stores/language.store';
 import { useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
 import {
-    MessageCircle,
-    MoreVertical,
-    Paperclip,
-    Send,
-    Shield,
-    Users,
+  MessageCircle,
+  MoreVertical,
+  Paperclip,
+  Send,
+  Shield,
+  Users,
 } from 'lucide-react-native';
 import React, { useRef, useState } from 'react';
 import {
-    ActivityIndicator,
-    FlatList,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    TextInput,
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
