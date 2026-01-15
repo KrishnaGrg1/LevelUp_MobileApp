@@ -1,6 +1,7 @@
 import { communityDetailById } from '@/api/endPoints/communities';
 import { ClansTab } from '@/components/communities/ClansTab';
 import { CommunityOptionsModal } from '@/components/communities/CommunityOptionsModal';
+import { TransferOwnershipModal } from '@/components/communities/TransferOwnershipModal';
 import { Box } from '@/components/ui/box';
 import { Center } from '@/components/ui/center';
 import { Heading } from '@/components/ui/heading';
@@ -15,21 +16,21 @@ import LanguageStore from '@/stores/language.store';
 import { useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
 import {
-  MessageCircle,
-  MoreVertical,
-  Paperclip,
-  Send,
-  Shield,
-  Users,
+    MessageCircle,
+    MoreVertical,
+    Paperclip,
+    Send,
+    Shield,
+    Users,
 } from 'lucide-react-native';
 import React, { useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  TextInput,
+    ActivityIndicator,
+    FlatList,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -41,6 +42,7 @@ export default function CommunityDetailScreen() {
     'chat' | 'quests' | 'profile' | 'clans' | 'leaderboard'
   >('chat');
   const [showCommunityOptions, setShowCommunityOptions] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const authSession = authStore.getState().authSession as string;
   const { data, isLoading, error } = useQuery({
@@ -326,8 +328,20 @@ export default function CommunityDetailScreen() {
       <CommunityOptionsModal
         visible={showCommunityOptions}
         onClose={() => setShowCommunityOptions(false)}
+        onTransferOwnership={() => {
+          setShowCommunityOptions(false);
+          setShowTransferModal(true);
+        }}
         communityName={community?.name}
         communityId={id as string}
+      />
+
+      {/* Transfer Ownership Modal */}
+      <TransferOwnershipModal
+        visible={showTransferModal}
+        onClose={() => setShowTransferModal(false)}
+        communityId={id as string}
+        communityName={community?.name}
       />
     </SafeAreaView>
   );

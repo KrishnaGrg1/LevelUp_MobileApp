@@ -6,6 +6,7 @@ import {
   joinPrivateCommunity,
   leaveCommunity,
   searchCommunities,
+  transferOwnership,
   updatecommunityById,
 } from '@/api/endPoints/communities';
 
@@ -162,3 +163,23 @@ export const useUpdateCommunity = () => {
 /**
  * Delete community mutation (admin only)
  */
+
+/**
+ * Transfer ownership mutation (owner only)
+ */
+export const useTransferOwnership = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+
+  return useMutation({
+    mutationFn: ({ communityId, newOwnerId }: { communityId: string; newOwnerId: string }) =>
+      transferOwnership(communityId, newOwnerId, language, authSession),
+    onSuccess: (data, { communityId }) => {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['communities', communityId] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
+      queryClient.invalidateQueries({ queryKey: ['communities', communityId, 'members'] });
+    },
+  });
+};

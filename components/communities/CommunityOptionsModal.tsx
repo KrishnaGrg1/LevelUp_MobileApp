@@ -3,13 +3,14 @@ import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { useLeaveCommunity } from '@/hooks/queries/useCommunities';
-import { Bell, Info, LogOut, Settings, UserPlus, VolumeX } from 'lucide-react-native';
+import { Bell, Crown, Info, LogOut, Settings, UserPlus, VolumeX } from 'lucide-react-native';
 import React from 'react';
 import { Alert, Modal, Pressable } from 'react-native';
 
 interface CommunityOptionsModalProps {
   visible: boolean;
   onClose: () => void;
+  onTransferOwnership?: () => void;
   communityName?: string;
   communityId?: string;
 }
@@ -17,6 +18,7 @@ interface CommunityOptionsModalProps {
 export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
   visible,
   onClose,
+  onTransferOwnership,
   communityName,
   communityId,
 }) => {
@@ -38,11 +40,14 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
       color: '#6b7280',
     },
     { id: 'mute', label: 'Mute', icon: VolumeX, color: '#6b7280' },
+    { id: 'transfer', label: 'Transfer Ownership', icon: Crown, color: '#f59e0b' },
     { id: 'leave', label: 'Leave Community', icon: LogOut, color: '#ef4444' },
   ];
 
   const handleOptionPress = (optionId: string) => {
-    if (optionId === 'leave' && communityId) {
+    if (optionId === 'transfer' && communityId && onTransferOwnership) {
+      onTransferOwnership();
+    } else if (optionId === 'leave' && communityId) {
       // Show confirmation dialog
       Alert.alert(
         'Leave Community',
@@ -100,7 +105,11 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
                   </Box>
                   <Text
                     className={`text-base ${
-                      option.id === 'leave' ? 'font-semibold text-error-500' : 'text-typography-900'
+                      option.id === 'leave' 
+                        ? 'font-semibold text-error-500' 
+                        : option.id === 'transfer'
+                        ? 'font-semibold text-amber-600'
+                        : 'text-typography-900'
                     }`}
                   >
                     {option.id === 'leave' && isLeaving ? 'Leaving...' : option.label}
