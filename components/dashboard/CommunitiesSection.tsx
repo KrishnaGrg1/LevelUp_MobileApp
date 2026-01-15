@@ -164,19 +164,6 @@ export function CommunitiesSection() {
 
   const communitiesData = communities?.body?.data || [];
 
-  if (!communitiesData || communitiesData.length === 0) {
-    return (
-      <VStack space="md" className="py-4">
-        <HStack className="items-center justify-between px-4">
-          <Heading size="lg" className="text-typography-900">
-            My Communities
-          </Heading>
-        </HStack>
-        <EmptyState />
-      </VStack>
-    );
-  }
-
   return (
     <VStack space="md" className="py-6">
       {/* Header */}
