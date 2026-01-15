@@ -1,8 +1,10 @@
 // stores/auth.store.ts
 import { User } from '@/api/generated';
+import { setIntentionalLogout } from '@/providers/SocketProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { useShallow } from 'zustand/react/shallow';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -37,13 +39,18 @@ const authStore = create<AuthState>()(
         set({ authSession, isAuthenticated: !!authSession });
       },
       setAdminStatus: (isAdmin: boolean) => set({ isAdmin }),
-      logout: () =>
+      logout: () => {
+        // Signal intentional logout so socket can disconnect properly
+        setIntentionalLogout(true);
         set({
           user: undefined,
           isAuthenticated: false,
           isAdmin: false,
           authSession: undefined,
-        }),
+        });
+        // Reset flag after cleanup completes
+        setTimeout(() => setIntentionalLogout(false), 100);
+      },
       _hasHydrated: false,
       setHasHydrated: (state: boolean) => set({ _hasHydrated: state }),
     }),
@@ -57,4 +64,29 @@ const authStore = create<AuthState>()(
   ),
 );
 
+// Hook to subscribe to username changes
+// Returns username or undefined, ensuring stable reference
+export function useUsername(): string | undefined {
+  return authStore(state => state.user?.UserName);
+}
+
 export default authStore;
+
+
+export function useUser(): User | undefined {
+  // Use useShallow to combine both selectors
+  const { user, hasHydrated } = authStore(
+    useShallow(state => ({
+      user: state.user,
+      hasHydrated: state._hasHydrated,
+    })),
+  );
+
+  // Always return a language - no conditional returns
+  // If not hydrated or no language, use default
+  if (!hasHydrated || !user) {
+    return undefined;
+  }
+
+  return user;
+}

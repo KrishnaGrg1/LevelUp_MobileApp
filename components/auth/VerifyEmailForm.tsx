@@ -29,13 +29,14 @@ import authStore from '@/stores/auth.store';
 import { useTranslation } from '@/translation';
 import { useRouter } from 'expo-router';
 import { AlertCircle, ArrowLeft } from 'lucide-react-native';
+import { Toast, ToastTitle, useToast } from '../ui/toast';
 
 export function VerifyEmailForm() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { mutate: verifyEmail, isPending, error } = useVerifyEmail();
+  const { mutate: verifyEmail, isPending, error, data: d } = useVerifyEmail();
   const userId = authStore.getState().user?.id;
-
+  const toast = useToast();
   const form = useForm<VerifyInput>({
     resolver: zodResolver(VerifySchema),
     defaultValues: {
@@ -55,6 +56,17 @@ export function VerifyEmailForm() {
   const onSubmit = async (data: VerifyInput) => {
     try {
       await verifyEmail({ ...data, userId: userId || data.userId });
+      toast.show({
+        placement: 'bottom right',
+        duration: 3000,
+        render: () => {
+          return (
+            <Toast action="muted" variant="solid">
+              <ToastTitle> {d?.body.message}</ToastTitle>
+            </Toast>
+          );
+        },
+      });
     } catch (err: any) {
       const errorMessage = err?.message || t('error.auth.verifyEmailFailed');
       setError('root', {

@@ -1,5 +1,6 @@
 import LanguageStore, { Language } from '@/stores/language.store';
 import { DEFAULT_LANGUAGE } from '@/translation/language';
+import { useShallow } from 'zustand/react/shallow';
 
 // language imports
 import arab from './arab';
@@ -114,14 +115,29 @@ export function t(key: string, params?: Record<string, string | number> | string
   return result;
 }
 
-// Hook to subscribe to language changes
+// FIXED: Hook to subscribe to language changes
+// Always returns a language, never conditionally
 export function useLanguage(): Language {
-  const language = LanguageStore(state => state.language);
-  return language || defaultLocale;
+  // Use useShallow to combine both selectors
+  const { language, hasHydrated } = LanguageStore(
+    useShallow(state => ({
+      language: state.language,
+      hasHydrated: state._hasHydrated,
+    })),
+  );
+
+  // Always return a language - no conditional returns
+  // If not hydrated or no language, use default
+  if (!hasHydrated || !language) {
+    return defaultLocale;
+  }
+
+  return language;
 }
 
-// Hook for reactive translations (use this in components)
+// FIXED: Hook for reactive translations
 export function useTranslation() {
+  // This always calls the same number of hooks
   const language = useLanguage();
 
   const translate = (key: string, fallback?: string): string => {
@@ -130,6 +146,11 @@ export function useTranslation() {
 
   return { t: translate, language };
 }
+
+// Export selective hooks for better performance
+export const useLanguageHydrated = () => LanguageStore(state => state._hasHydrated);
+
+export const useSetLanguage = () => LanguageStore(state => state.setLanguage);
 
 export {
   DEFAULT_LANGUAGE,
