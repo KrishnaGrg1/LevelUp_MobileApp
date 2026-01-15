@@ -45,6 +45,7 @@ export default function CommunityDetailScreen() {
   const [showTransferModal, setShowTransferModal] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const authSession = authStore.getState().authSession as string;
+  const currentUserId = authStore.getState().user?.id;
   const { data, isLoading, error } = useQuery({
     queryKey: ['community', id, language],
     queryFn: () => communityDetailById(language as any, id as string, authSession),
@@ -332,6 +333,7 @@ export default function CommunityDetailScreen() {
           setShowCommunityOptions(false);
           setShowTransferModal(true);
         }}
+        isOwner={community?.ownerId === currentUserId}
         communityName={community?.name}
         communityId={id as string}
       />

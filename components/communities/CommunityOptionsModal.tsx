@@ -11,6 +11,7 @@ interface CommunityOptionsModalProps {
   visible: boolean;
   onClose: () => void;
   onTransferOwnership?: () => void;
+  isOwner?: boolean;
   communityName?: string;
   communityId?: string;
 }
@@ -19,6 +20,7 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
   visible,
   onClose,
   onTransferOwnership,
+  isOwner = false,
   communityName,
   communityId,
 }) => {
@@ -40,7 +42,7 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
       color: '#6b7280',
     },
     { id: 'mute', label: 'Mute', icon: VolumeX, color: '#6b7280' },
-    { id: 'transfer', label: 'Transfer Ownership', icon: Crown, color: '#f59e0b' },
+    ...(isOwner ? [{ id: 'transfer', label: 'Transfer Ownership', icon: Crown, color: '#f59e0b' }] : []),
     { id: 'leave', label: 'Leave Community', icon: LogOut, color: '#ef4444' },
   ];
 
