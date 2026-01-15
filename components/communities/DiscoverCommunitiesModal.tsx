@@ -294,7 +294,7 @@ function CommunityItem({ community, onJoin, isJoining }: CommunityItemProps) {
         </VStack>
 
         <Button
-          // onPress={() => onJoin(community.id)}
+          onPress={() => onJoin(community.id)}
           isDisabled={isJoining}
           size="sm"
           className={`${isPrivate ? 'bg-warning-500' : 'bg-success-500'} px-4`}

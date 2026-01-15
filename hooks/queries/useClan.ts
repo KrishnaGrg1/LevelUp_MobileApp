@@ -2,10 +2,13 @@ import {
   createClan,
   CreateClanPayload,
   deleteClan,
+  getAvailableClans,
   getClanInfo,
   getClanMembers,
   getClansByCommunity,
+  getJoinedClans,
   joinClan,
+  joinClanWithCode,
   leaveClan,
 } from '@/api/endPoints/clans';
 import authStore from '@/stores/auth.store';
@@ -21,6 +24,34 @@ export const useClansByCommunity = (communityId: string) => {
   return useQuery({
     queryKey: ['clans', communityId],
     queryFn: () => getClansByCommunity(communityId, language, authSession),
+    enabled: !!communityId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+/**
+ * Get joined clans for a community
+ */
+export const useJoinedClans = (communityId: string) => {
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+  return useQuery({
+    queryKey: ['clans', communityId, 'joined'],
+    queryFn: () => getJoinedClans(communityId, language, authSession),
+    enabled: !!communityId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+/**
+ * Get available clans (not joined) for a community
+ */
+export const useAvailableClans = (communityId: string) => {
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+  return useQuery({
+    queryKey: ['clans', communityId, 'available'],
+    queryFn: () => getAvailableClans(communityId, language, authSession),
     enabled: !!communityId,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
@@ -68,6 +99,12 @@ export const useCreateClan = () => {
       queryClient.invalidateQueries({
         queryKey: ['clans', variables.communityId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ['clans', variables.communityId, 'joined'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['clans', variables.communityId, 'available'],
+      });
     },
   });
 };
@@ -85,6 +122,28 @@ export const useJoinClan = () => {
       // Invalidate queries to refresh clan data
       queryClient.invalidateQueries({ queryKey: ['clans'] });
       queryClient.invalidateQueries({ queryKey: ['clan'] });
+      queryClient.invalidateQueries({ queryKey: ['joinedClans'] });
+      queryClient.invalidateQueries({ queryKey: ['availableClans'] });
+    },
+  });
+};
+
+/**
+ * Join private clan with code mutation
+ */
+export const useJoinClanWithCode = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+  return useMutation({
+    mutationFn: ({ clanId, inviteCode }: { clanId: string; inviteCode: string }) =>
+      joinClanWithCode(language, clanId, inviteCode, authSession),
+    onSuccess: () => {
+      // Invalidate queries to refresh clan data
+      queryClient.invalidateQueries({ queryKey: ['clans'] });
+      queryClient.invalidateQueries({ queryKey: ['clan'] });
+      queryClient.invalidateQueries({ queryKey: ['joinedClans'] });
+      queryClient.invalidateQueries({ queryKey: ['availableClans'] });
     },
   });
 };
@@ -102,6 +161,8 @@ export const useLeaveClan = () => {
       // Invalidate queries to refresh clan data
       queryClient.invalidateQueries({ queryKey: ['clans'] });
       queryClient.invalidateQueries({ queryKey: ['clan'] });
+      queryClient.invalidateQueries({ queryKey: ['joinedClans'] });
+      queryClient.invalidateQueries({ queryKey: ['availableClans'] });
     },
   });
 };
@@ -118,6 +179,8 @@ export const useDeleteClan = () => {
     onSuccess: () => {
       // Invalidate queries to refresh clan data
       queryClient.invalidateQueries({ queryKey: ['clans'] });
+      queryClient.invalidateQueries({ queryKey: ['joinedClans'] });
+      queryClient.invalidateQueries({ queryKey: ['availableClans'] });
     },
   });
 };

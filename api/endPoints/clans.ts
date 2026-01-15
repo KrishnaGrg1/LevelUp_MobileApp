@@ -178,6 +178,38 @@ export const joinClan = async (lang: Language, clanId: string, authSession: stri
   }
 };
 
+// Join a private clan with code
+export const joinClanWithCode = async (
+  lang: Language,
+  clanId: string,
+  inviteCode: string,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.post(
+      '/clan/requestJoin',
+      { clanId, joinCode: inviteCode },
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to join private clan';
+    throw new Error(errorMessage);
+  }
+};
+
 // Leave a clan
 export const leaveClan = async (clanId: string, lang: Language, authSession: string) => {
   try {
@@ -338,6 +370,56 @@ export const checkClanMembership = async (userId: string, clanId: string) => {
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
       'Failed to check clan membership';
+    throw new Error(errorMessage);
+  }
+};
+
+// Get joined clans for a community
+export const getJoinedClans = async (
+  communityId: string,
+  lang: Language,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.get<GetClansResponse>(`/clan/${communityId}/joined`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to fetch joined clans';
+    throw new Error(errorMessage);
+  }
+};
+
+// Get available clans (not joined) for a community
+export const getAvailableClans = async (
+  communityId: string,
+  lang: Language,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.get<GetClansResponse>(`/clan/${communityId}/available`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to fetch available clans';
     throw new Error(errorMessage);
   }
 };

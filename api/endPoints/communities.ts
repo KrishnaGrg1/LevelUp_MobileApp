@@ -309,3 +309,68 @@ export const updatecommunityById = async (
     throw new Error(errorMessage);
   }
 };
+
+// Leave a community
+export const leaveCommunity = async (
+  communityId: string,
+  lang: Language,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/community/${communityId}/leave`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to leave community';
+    throw new Error(errorMessage);
+  }
+};
+
+
+//Tranfer Ownership of a community
+
+export const transferOwnership = async (
+  communityId: string,
+  newOwnerId: string,
+  lang: Language,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/community/${communityId}/transfer-ownership`,
+      {newOwnerId},
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to leave community';
+    throw new Error(errorMessage);
+  }
+};

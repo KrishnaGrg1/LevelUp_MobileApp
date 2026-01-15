@@ -363,6 +363,7 @@ export interface fullUserObjectResponse {
 interface communityDetailById {
   id: string;
   name: string;
+  ownerId: string;
   description: string;
   memberLimit: number;
   photo?: string;
