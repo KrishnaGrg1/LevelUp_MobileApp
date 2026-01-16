@@ -2,6 +2,7 @@ import { communityDetailById } from '@/api/endPoints/communities';
 import { ClansTab } from '@/components/communities/ClansTab';
 import { CommunityOptionsModal } from '@/components/communities/CommunityOptionsModal';
 import { InviteMembersModal } from '@/components/communities/InviteMembersModal';
+import { ProfileTab } from '@/components/communities/ProfileTab';
 import { TransferOwnershipModal } from '@/components/communities/TransferOwnershipModal';
 import { Box } from '@/components/ui/box';
 import { Center } from '@/components/ui/center';
@@ -323,7 +324,11 @@ export default function CommunityDetailScreen() {
             <ClansTab communityId={id as string} communityName={community?.name} />
           )}
 
-          {activeTab !== 'chat' && activeTab !== 'clans' && (
+          {activeTab === 'profile' && (
+            <ProfileTab community={community} onViewAllClans={() => setActiveTab('clans')} />
+          )}
+
+          {activeTab !== 'chat' && activeTab !== 'clans' && activeTab !== 'profile' && (
             <Center className="flex-1">
               <Text className="capitalize text-typography-500">
                 {activeTab} for {community.name} coming soon
@@ -342,6 +347,7 @@ export default function CommunityDetailScreen() {
           setShowTransferModal(true);
         }}
         onInviteMembers={() => setShowInviteModal(true)}
+        onCommunityInfo={() => setActiveTab('profile')}
         isOwner={community?.ownerId === currentUserId}
         communityName={community?.name}
         communityId={id as string}

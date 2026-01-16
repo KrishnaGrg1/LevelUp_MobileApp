@@ -380,6 +380,28 @@ interface communityDetailById {
   description: string;
   memberLimit: number;
   photo?: string;
+  isPrivate: boolean;
+  owner: {
+    UserName: string;
+  };
+  members: Array<{
+    user: {
+      UserName: string;
+    };
+    joinedAt: string;
+  }>;
+  clans: Array<{
+    id: string;
+    name: string;
+    isPrivate: boolean;
+    createdAt: string;
+    owner: {
+      UserName: string;
+    };
+    _count: {
+      members: number;
+    };
+  }>;
   _count: {
     members: number;
     clans: number;

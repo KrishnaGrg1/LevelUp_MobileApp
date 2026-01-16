@@ -2,7 +2,7 @@ import { Box } from '@/components/ui/box';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
-import { Bell, Info, LogOut, Settings, UserPlus, VolumeX } from 'lucide-react-native';
+import { Info, LogOut, UserPlus } from 'lucide-react-native';
 import React from 'react';
 import { Modal, Pressable } from 'react-native';
 
@@ -23,10 +23,8 @@ export const ClanOptionsModal: React.FC<ClanOptionsModalProps> = ({
     { id: 'info', label: 'Clan Info', icon: Info, color: '#6b7280' },
     ...(isMember
       ? [
-          { id: 'settings', label: 'Settings', icon: Settings, color: '#6b7280' },
           { id: 'invite', label: 'Invite Members', icon: UserPlus, color: '#6b7280' },
-          { id: 'notifications', label: 'Notifications', icon: Bell, color: '#6b7280' },
-          { id: 'mute', label: 'Mute', icon: VolumeX, color: '#6b7280' },
+
           { id: 'leave', label: 'Leave Clan', icon: LogOut, color: '#ef4444' },
         ]
       : []),
