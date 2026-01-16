@@ -3,6 +3,7 @@ import { ClansTab } from '@/components/communities/ClansTab';
 import { CommunityOptionsModal } from '@/components/communities/CommunityOptionsModal';
 import { InviteMembersModal } from '@/components/communities/InviteMembersModal';
 import { TransferOwnershipModal } from '@/components/communities/TransferOwnershipModal';
+import AIQuestsComponent from '@/components/quests/AIQuestsComponent';
 import { Box } from '@/components/ui/box';
 import { Center } from '@/components/ui/center';
 import { Heading } from '@/components/ui/heading';
@@ -19,19 +20,19 @@ import { useLocalSearchParams } from 'expo-router';
 import { MessageCircle, MoreVertical, Paperclip, Send, Shield, Users } from 'lucide-react-native';
 import React, { useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  TextInput,
+    ActivityIndicator,
+    FlatList,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CommunityDetailScreen() {
   const { id } = useLocalSearchParams();
-  const language = LanguageStore.getState().language;
+  const language = LanguageStore(state => state.language);
   const [inputMessage, setInputMessage] = useState('');
   const [activeTab, setActiveTab] = useState<
     'chat' | 'quests' | 'profile' | 'clans' | 'leaderboard'
@@ -40,8 +41,8 @@ export default function CommunityDetailScreen() {
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const flatListRef = useRef<FlatList>(null);
-  const authSession = authStore.getState().authSession as string;
-  const currentUserId = authStore.getState().user?.id;
+  const authSession = authStore(state => state.authSession) as string;
+  const currentUserId = authStore(state => state.user?.id);
   const { data, isLoading, error } = useQuery({
     queryKey: ['community', id, language],
     queryFn: () => communityDetailById(language as any, id as string, authSession),
@@ -323,7 +324,11 @@ export default function CommunityDetailScreen() {
             <ClansTab communityId={id as string} communityName={community?.name} />
           )}
 
-          {activeTab !== 'chat' && activeTab !== 'clans' && (
+          {activeTab === 'quests' && (
+            <AIQuestsComponent communityId={id as string} showTitle={false} />
+          )}
+
+          {activeTab !== 'chat' && activeTab !== 'clans' && activeTab !== 'quests' && (
             <Center className="flex-1">
               <Text className="capitalize text-typography-500">
                 {activeTab} for {community.name} coming soon
