@@ -3,7 +3,7 @@ import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { useLeaveCommunity } from '@/hooks/queries/useCommunities';
-import { Bell, Crown, Info, LogOut, Settings, UserPlus, VolumeX } from 'lucide-react-native';
+import { Crown, Info, LogOut, UserPlus } from 'lucide-react-native';
 import React from 'react';
 import { Alert, Modal, Pressable } from 'react-native';
 
@@ -12,6 +12,7 @@ interface CommunityOptionsModalProps {
   onClose: () => void;
   onTransferOwnership?: () => void;
   onInviteMembers?: () => void;
+  onCommunityInfo?: () => void;
   isOwner?: boolean;
   communityName?: string;
   communityId?: string;
@@ -22,6 +23,7 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
   onClose,
   onTransferOwnership,
   onInviteMembers,
+  onCommunityInfo,
   isOwner = false,
   communityName,
   communityId,
@@ -30,20 +32,13 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
 
   const options = [
     { id: 'info', label: 'Community Info', icon: Info, color: '#6b7280' },
-    { id: 'settings', label: 'Settings', icon: Settings, color: '#6b7280' },
+
     {
       id: 'invite',
       label: 'Invite Members',
       icon: UserPlus,
       color: '#6b7280',
     },
-    {
-      id: 'notifications',
-      label: 'Notifications',
-      icon: Bell,
-      color: '#6b7280',
-    },
-    { id: 'mute', label: 'Mute', icon: VolumeX, color: '#6b7280' },
     ...(isOwner
       ? [{ id: 'transfer', label: 'Transfer Ownership', icon: Crown, color: '#f59e0b' }]
       : []),
@@ -51,7 +46,12 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
   ];
 
   const handleOptionPress = (optionId: string) => {
-    if (optionId === 'transfer' && communityId && onTransferOwnership) {
+    if (optionId === 'info' && onCommunityInfo) {
+      onClose();
+      setTimeout(() => {
+        onCommunityInfo();
+      }, 300);
+    } else if (optionId === 'transfer' && communityId && onTransferOwnership) {
       onTransferOwnership();
     } else if (optionId === 'invite' && communityId && onInviteMembers) {
       onClose();
