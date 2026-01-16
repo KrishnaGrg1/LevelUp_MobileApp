@@ -24,16 +24,22 @@ interface AIQuestsComponentProps {
   showTitle?: boolean;
 }
 
-const AIQuestsComponent: React.FC<AIQuestsComponentProps> = ({ 
+const languageSelector = (state: any) => state.language;
+
+export default function AIQuestsComponent({
   communityId,
-  showTitle = true 
-}) => {
-  // Hooks: Always at top level and fix order
-  const queryClient = useQueryClient();
-  const language = LanguageStore(state => state.language);
+  showTitle = true,
+}: AIQuestsComponentProps) {
+  // 1. State hooks
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly'>('daily');
 
-  // Fetch daily quests
+  // 2. Query Client (Context hook)
+  const queryClient = useQueryClient();
+
+  // 3. Store hook
+  const language = LanguageStore(languageSelector);
+
+  // 4. Fetch daily quests
   const {
     data: dailyData,
     isLoading: dailyLoading,
@@ -43,7 +49,7 @@ const AIQuestsComponent: React.FC<AIQuestsComponentProps> = ({
     queryFn: () => fetchDailyQuests(language),
   });
 
-  // Fetch weekly quests
+  // 5. Fetch weekly quests
   const {
     data: weeklyData,
     isLoading: weeklyLoading,
@@ -53,7 +59,7 @@ const AIQuestsComponent: React.FC<AIQuestsComponentProps> = ({
     queryFn: () => fetchWeeklyQuests(language),
   });
 
-  // Generate daily quests mutation
+  // 6. Generate daily quests mutation
   const generateDailyMutation = useMutation({
     mutationFn: () => generateDailyQuests(language),
     onSuccess: () => {
@@ -65,7 +71,7 @@ const AIQuestsComponent: React.FC<AIQuestsComponentProps> = ({
     },
   });
 
-  // Generate weekly quests mutation
+  // 7. Generate weekly quests mutation
   const generateWeeklyMutation = useMutation({
     mutationFn: () => generateWeeklyQuests(language),
     onSuccess: () => {
@@ -77,7 +83,7 @@ const AIQuestsComponent: React.FC<AIQuestsComponentProps> = ({
     },
   });
 
-  // Start quest mutation
+  // 8. Start quest mutation
   const startMutation = useMutation({
     mutationFn: (questId: string) => startQuest(questId, language),
     onSuccess: () => {
@@ -89,7 +95,7 @@ const AIQuestsComponent: React.FC<AIQuestsComponentProps> = ({
     },
   });
 
-  // Complete quest mutation
+  // 9. Complete quest mutation
   const completeMutation = useMutation({
     mutationFn: (questId: string) => completeQuest(questId, language),
     onSuccess: (response: any) => {
@@ -120,7 +126,14 @@ const AIQuestsComponent: React.FC<AIQuestsComponentProps> = ({
     refetchWeekly();
   };
 
-  // Filter logic remains outside of hooks but inside component
+  const isRefreshing = dailyLoading || weeklyLoading;
+  const isActionLoading =
+    startMutation.isPending ||
+    completeMutation.isPending ||
+    generateDailyMutation.isPending ||
+    generateWeeklyMutation.isPending;
+
+  // Filter logic remains inside of function but below hooks
   const filterQuestList = (list: Quest[] | undefined) => {
     if (!list) return [];
     if (!communityId) return list;
@@ -131,13 +144,6 @@ const AIQuestsComponent: React.FC<AIQuestsComponentProps> = ({
   const yesterdayQuests = filterQuestList(dailyData?.body?.data?.yesterday);
   const thisWeekQuests = filterQuestList(weeklyData?.body?.data?.thisWeek);
   const lastWeekQuests = filterQuestList(weeklyData?.body?.data?.lastWeek);
-
-  const isRefreshing = dailyLoading || weeklyLoading;
-  const isActionLoading =
-    startMutation.isPending ||
-    completeMutation.isPending ||
-    generateDailyMutation.isPending ||
-    generateWeeklyMutation.isPending;
 
   return (
     <Box className="flex-1 bg-background-0 dark:bg-background-950">
@@ -287,6 +293,4 @@ const AIQuestsComponent: React.FC<AIQuestsComponentProps> = ({
       </ScrollView>
     </Box>
   );
-};
-
-export default AIQuestsComponent;
+}
