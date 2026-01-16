@@ -353,6 +353,7 @@ export default function CommunityDetailScreen() {
         onClose={() => setShowInviteModal(false)}
         communityId={id as string}
         communityName={community?.name}
+        isOwner={community?.ownerId === currentUserId}
       />
 
       {/* Transfer Ownership Modal */}

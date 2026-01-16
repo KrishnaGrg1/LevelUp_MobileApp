@@ -394,3 +394,34 @@ export const transferOwnership = async (
     throw new Error(errorMessage);
   }
 };
+
+// Regenerate invite code for a community
+export const regenerateInviteCode = async (
+  communityId: string,
+  lang: Language,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/community/${communityId}/regenerate-invite-code`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to regenerate invite code';
+    throw new Error(errorMessage);
+  }
+};

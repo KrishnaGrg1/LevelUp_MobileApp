@@ -6,6 +6,7 @@ import {
   joinCommunity,
   joinWithCodeCommunity,
   leaveCommunity,
+  regenerateInviteCode,
   searchCommunities,
   transferOwnership,
   updatecommunityById,
@@ -197,5 +198,22 @@ export const useGetInviteCode = (communityId: string, enabled: boolean = false) 
     queryFn: () => getInviteCode(communityId, language, authSession),
     enabled: enabled && !!communityId,
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+/**
+ * Regenerate invite code for a community (owner only)
+ */
+export const useRegenerateInviteCode = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+
+  return useMutation({
+    mutationFn: (communityId: string) => regenerateInviteCode(communityId, language, authSession),
+    onSuccess: (data, communityId) => {
+      // Invalidate the invite code query to refresh with new code
+      queryClient.invalidateQueries({ queryKey: ['community', communityId, 'invite-code'] });
+    },
   });
 };
