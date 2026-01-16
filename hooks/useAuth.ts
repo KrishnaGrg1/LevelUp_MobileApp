@@ -25,23 +25,30 @@ export function useLogin() {
 
     onSuccess: data => {
       console.log('Login success:', data);
-      const { setAuthenticated, setAdminStatus, authSession, setAuthSession, setUser } =
-        authStore.getState();
+      const { setAuthenticated, setAdminStatus, setUser } = authStore.getState();
 
+      // Extract data from response
+      const userData = data?.body?.data;
+      const isAdmin = userData?.isadmin || false;
+      const userId = userData?.id;
+      
       // Set authentication status
       setAuthenticated(true);
-      // Set admin status from login response
-      const isAdmin = data?.body?.data?.isadmin || false;
       setAdminStatus(isAdmin);
-      if (data?.body?.data) {
+      
+      // Set user data if available
+      if (userId) {
         setUser({
-          id: data.body.data.id,
-          isAdmin: data.body.data.isadmin,
+          id: userId,
+          isAdmin: isAdmin,
         } as User);
       }
-      setAuthSession(data.body.data.authSession);
-      console.log('authsession', authSession);
-      // Navigate to main dashboard (can be customized based on requirements)
+      
+      // Authentication is handled via HTTP-only cookies (withCredentials: true)
+      // No need to store authSession since it's in cookies
+      console.log('User authenticated:', { userId, isAdmin });
+      
+      // Navigate to main dashboard
       router.replace('/(main)/(tabs)/dashboard');
     },
     onError: (error: any) => {

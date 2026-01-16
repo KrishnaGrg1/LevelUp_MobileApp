@@ -124,11 +124,13 @@ export function CommunitiesSection() {
   const [joinWithCodeModalVisible, setJoinWithCodeModalVisible] = useState(false);
 
   React.useEffect(() => {
-    console.log('Communities data:', communities);
-    console.log('Is loading:', isLoading);
-    console.log('Is error:', isError);
-    if (error) console.log('Error:', error);
-  }, [communities, isLoading, isError, error]);
+    // Log only meaningful states to avoid noisy console spam
+    if (error) {
+      console.log('Communities error:', error);
+    } else if (!isLoading && communities) {
+      console.log('✅ Communities loaded:', communities?.body?.data?.length ?? 0);
+    }
+  }, [communities, isLoading, error]);
 
   const handleCommunityPress = (communityId: string) => {
     router.push(`/communities/${communityId}` as any);

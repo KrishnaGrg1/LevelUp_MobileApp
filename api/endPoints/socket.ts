@@ -1,5 +1,13 @@
 import { io, Socket } from 'socket.io-client';
 import { Message } from '../generated';
+import type {
+  ChatCancelPayload,
+  ChatChunkData,
+  ChatCompleteData,
+  ChatErrorData,
+  ChatSendPayload,
+  TokenStatusData,
+} from '../types/ai';
 
 interface AuthSocket extends Socket {
   auth: {
@@ -172,4 +180,95 @@ export const onUserJoined = (callback: (data: { userId: string; userName: string
 export const onUserLeft = (callback: (data: { userId: string; userName: string }) => void) => {
   const socket = getSocket();
   socket.on('user-left', callback);
+};
+
+// ========== AI CHAT FUNCTIONALITY ==========
+
+// Check token balance
+export const checkAIChatTokens = () => {
+  const socket = getSocket();
+  socket.emit('ai-chat:check-tokens');
+};
+
+// Send AI chat message
+export const sendAIChatMessage = (payload: ChatSendPayload) => {
+  const socket = getSocket();
+  socket.emit('ai-chat:send', payload);
+};
+
+// Cancel AI chat
+export const cancelAIChat = (payload: ChatCancelPayload) => {
+  const socket = getSocket();
+  socket.emit('ai-chat:cancel', payload);
+};
+
+// AI Chat event listeners
+export const onAIChatTokenStatus = (callback: (data: TokenStatusData) => void) => {
+  const socket = getSocket();
+  socket.on('ai-chat:token-status', callback);
+};
+
+export const offAIChatTokenStatus = () => {
+  const socket = getSocket();
+  socket.off('ai-chat:token-status');
+};
+
+export const onAIChatStart = (callback: () => void) => {
+  const socket = getSocket();
+  socket.on('ai-chat:start', callback);
+};
+
+export const offAIChatStart = () => {
+  const socket = getSocket();
+  socket.off('ai-chat:start');
+};
+
+export const onAIChatChunk = (callback: (data: ChatChunkData) => void) => {
+  const socket = getSocket();
+  socket.on('ai-chat:chunk', callback);
+};
+
+export const offAIChatChunk = () => {
+  const socket = getSocket();
+  socket.off('ai-chat:chunk');
+};
+
+export const onAIChatComplete = (callback: (data: ChatCompleteData) => void) => {
+  const socket = getSocket();
+  socket.on('ai-chat:complete', callback);
+};
+
+export const offAIChatComplete = () => {
+  const socket = getSocket();
+  socket.off('ai-chat:complete');
+};
+
+export const onAIChatCancelled = (callback: () => void) => {
+  const socket = getSocket();
+  socket.on('ai-chat:cancelled', callback);
+};
+
+export const offAIChatCancelled = () => {
+  const socket = getSocket();
+  socket.off('ai-chat:cancelled');
+};
+
+export const onAIChatTokens = (callback: (data: { tokens: number }) => void) => {
+  const socket = getSocket();
+  socket.on('ai-chat:tokens', callback);
+};
+
+export const offAIChatTokens = () => {
+  const socket = getSocket();
+  socket.off('ai-chat:tokens');
+};
+
+export const onAIChatError = (callback: (error: ChatErrorData) => void) => {
+  const socket = getSocket();
+  socket.on('ai-chat:error', callback);
+};
+
+export const offAIChatError = () => {
+  const socket = getSocket();
+  socket.off('ai-chat:error');
 };

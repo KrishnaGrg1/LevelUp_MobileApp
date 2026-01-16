@@ -51,7 +51,7 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginInput) => {
     try {
-      await login(data);
+      login(data);
     } catch (err: any) {
       const errorMessage = err?.message || t('error.auth.loginFailed');
       setError('root', {

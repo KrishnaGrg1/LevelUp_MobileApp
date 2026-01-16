@@ -8,11 +8,19 @@ import { Icon } from '@/components/ui/icon';
 import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
+import authStore from '@/stores/auth.store';
 import { useTranslation } from '@/translation';
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { X } from 'lucide-react-native';
+
 export default function App() {
   const { t } = useTranslation();
+  const isAuthenticated = authStore(state => state.isAuthenticated);
+
+  // Redirect authenticated users to dashboard
+  if (isAuthenticated) {
+    return <Redirect href="/(main)/(tabs)/dashboard" />;
+  }
 
   return (
     <Box className="flex-1 bg-background-0">
