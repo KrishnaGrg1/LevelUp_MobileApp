@@ -296,6 +296,7 @@ export interface CommunityDTO {
   currentMembers: number; // number of members
   maxMembers: number; // member limit
   isPrivate: boolean;
+  photo?: string;
   userRole: 'ADMIN' | 'MEMBER';
   isPinned?: boolean;
   totalXP?: number;

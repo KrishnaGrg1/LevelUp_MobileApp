@@ -1,9 +1,18 @@
 import { useCreateCommunity } from '@/hooks/queries/useCommunities';
 import { CreateCommunityInput, createCommunitySchema } from '@/schemas/community/createCommunity';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react';
+import * as ImagePicker from 'expo-image-picker';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView } from 'react-native';
+import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+} from 'react-native';
 
 // gluestack-ui components
 import { Box } from '@/components/ui/box';
@@ -24,12 +33,14 @@ interface CreateCommunityModalProps {
 
 export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalProps) {
   const { mutate: createCommunity, isPending } = useCreateCommunity();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const {
     control,
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<CreateCommunityInput>({
     resolver: zodResolver(createCommunitySchema),
@@ -43,17 +54,51 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
 
   const isPrivate = watch('isPrivate');
 
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== 'granted') {
+      Alert.alert('Permission required', 'Please allow access to your photo library');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      const imageUri = result.assets[0].uri;
+      setSelectedImage(imageUri);
+      setValue('photo', imageUri);
+    }
+  };
+
   const onSubmit = (data: CreateCommunityInput) => {
     const formData = new FormData();
     formData.append('communityName', data.communityName);
     if (data.description) formData.append('description', data.description);
     if (data.memberLimit) formData.append('memberLimit', String(data.memberLimit));
     formData.append('isPrivate', String(data.isPrivate));
-    if (data.photo) formData.append('photo', data.photo);
+
+    if (data.photo) {
+      const filename = data.photo.split('/').pop() || 'photo.jpg';
+      const match = /\.([\w]+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+      formData.append('photo', {
+        uri: data.photo,
+        name: filename,
+        type,
+      } as any);
+    }
 
     createCommunity(formData, {
       onSuccess: () => {
         reset();
+        setSelectedImage(null);
         onClose();
       },
       onError: error => {
@@ -64,7 +109,7 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
 
   return (
     <Modal visible={visible} animationType="fade" transparent={true} onRequestClose={onClose}>
-      <Box className="flex-1 justify-center p-4 bg-background-900/70">
+      <Box className="flex-1 justify-center bg-background-900/70 p-4">
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
           <Box className="overflow-hidden rounded-[24px] border border-outline-300 bg-background-50 shadow-2xl">
             <ScrollView
@@ -93,13 +138,24 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
                     <Text className="self-start text-xs font-medium text-typography-900">
                       Community Image
                     </Text>
-                    <Pressable className="h-24 w-24 items-center justify-center rounded-full border-2 border-dashed border-outline-300 bg-background-100">
-                      <VStack space="xs" className="items-center">
-                        <Upload size={20} color="#8b5cf6" />
-                        <Text className="text-center text-[9px] font-bold uppercase text-primary-600">
-                          Upload{'\n'}Image
-                        </Text>
-                      </VStack>
+                    <Pressable
+                      onPress={pickImage}
+                      className="h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-outline-300 bg-background-100"
+                    >
+                      {selectedImage ? (
+                        <Image
+                          source={{ uri: selectedImage }}
+                          style={{ width: '100%', height: '100%' }}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <VStack space="xs" className="items-center">
+                          <Upload size={20} color="#8b5cf6" />
+                          <Text className="text-center text-[9px] font-bold uppercase text-primary-600">
+                            Upload{'\n'}Image
+                          </Text>
+                        </VStack>
+                      )}
                     </Pressable>
                   </VStack>
 
