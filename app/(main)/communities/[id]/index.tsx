@@ -1,6 +1,7 @@
 import { communityDetailById } from '@/api/endPoints/communities';
 import { ClansTab } from '@/components/communities/ClansTab';
 import { CommunityOptionsModal } from '@/components/communities/CommunityOptionsModal';
+import { InviteMembersModal } from '@/components/communities/InviteMembersModal';
 import { TransferOwnershipModal } from '@/components/communities/TransferOwnershipModal';
 import { Box } from '@/components/ui/box';
 import { Center } from '@/components/ui/center';
@@ -15,18 +16,12 @@ import authStore from '@/stores/auth.store';
 import LanguageStore from '@/stores/language.store';
 import { useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
-import {
-  MessageCircle,
-  MoreVertical,
-  Paperclip,
-  Send,
-  Shield,
-  Users,
-} from 'lucide-react-native';
+import { MessageCircle, MoreVertical, Paperclip, Send, Shield, Users } from 'lucide-react-native';
 import React, { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -43,6 +38,7 @@ export default function CommunityDetailScreen() {
   >('chat');
   const [showCommunityOptions, setShowCommunityOptions] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const authSession = authStore.getState().authSession as string;
   const currentUserId = authStore.getState().user?.id;
@@ -139,9 +135,19 @@ export default function CommunityDetailScreen() {
           {/* Community Header - Using Backend Data */}
           <HStack className="items-center justify-between border-b border-outline-200 bg-background-0 px-4 py-3">
             <HStack space="md" className="flex-1 items-center">
-              <Box className="h-12 w-12 items-center justify-center rounded-lg bg-primary-500">
-                <Text className="text-2xl">{community.photo || '🛡️'}</Text>
-              </Box>
+              {community.photo ? (
+                <Box className="h-12 w-12 overflow-hidden rounded-lg bg-primary-500">
+                  <Image
+                    source={{ uri: community.photo }}
+                    style={{ width: 48, height: 48 }}
+                    resizeMode="cover"
+                  />
+                </Box>
+              ) : (
+                <Box className="h-12 w-12 items-center justify-center rounded-lg bg-primary-500">
+                  <Text className="text-2xl">🛡️</Text>
+                </Box>
+              )}
               <VStack className="flex-1">
                 <Heading size="sm" className="leading-tight text-typography-900">
                   {community.name}
@@ -313,7 +319,9 @@ export default function CommunityDetailScreen() {
             </>
           )}
 
-          {activeTab === 'clans' && <ClansTab communityId={id as string} communityName={community?.name} />}
+          {activeTab === 'clans' && (
+            <ClansTab communityId={id as string} communityName={community?.name} />
+          )}
 
           {activeTab !== 'chat' && activeTab !== 'clans' && (
             <Center className="flex-1">
@@ -333,9 +341,18 @@ export default function CommunityDetailScreen() {
           setShowCommunityOptions(false);
           setShowTransferModal(true);
         }}
+        onInviteMembers={() => setShowInviteModal(true)}
         isOwner={community?.ownerId === currentUserId}
         communityName={community?.name}
         communityId={id as string}
+      />
+
+      {/* Invite Members Modal */}
+      <InviteMembersModal
+        visible={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        communityId={id as string}
+        communityName={community?.name}
       />
 
       {/* Transfer Ownership Modal */}

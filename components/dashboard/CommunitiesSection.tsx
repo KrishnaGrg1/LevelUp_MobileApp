@@ -1,7 +1,7 @@
 import { CommunityDTO } from '@/api/generated';
 import { CreateCommunityModal } from '@/components/communities/CreateCommunityModal';
 import { DiscoverCommunitiesModal } from '@/components/communities/DiscoverCommunitiesModal';
-import { JoinPrivateCommunityModal } from '@/components/communities/JoinPrivateCommunityModal';
+import { JoinWithCodeModal } from '@/components/communities/JoinWithCodeModal';
 import { Avatar, AvatarFallbackText } from '@/components/ui/avatar';
 import { Badge, BadgeText } from '@/components/ui/badge';
 import { Box } from '@/components/ui/box';
@@ -121,7 +121,7 @@ export function CommunitiesSection() {
 
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [discoverModalVisible, setDiscoverModalVisible] = useState(false);
-  const [joinPrivateModalVisible, setJoinPrivateModalVisible] = useState(false);
+  const [joinWithCodeModalVisible, setJoinWithCodeModalVisible] = useState(false);
 
   React.useEffect(() => {
     console.log('Communities data:', communities);
@@ -232,12 +232,12 @@ export function CommunitiesSection() {
         onClose={() => setDiscoverModalVisible(false)}
         onJoinPrivate={() => {
           setDiscoverModalVisible(false);
-          setJoinPrivateModalVisible(true);
+          setJoinWithCodeModalVisible(true);
         }}
       />
-      <JoinPrivateCommunityModal
-        visible={joinPrivateModalVisible}
-        onClose={() => setJoinPrivateModalVisible(false)}
+      <JoinWithCodeModal
+        visible={joinWithCodeModalVisible}
+        onClose={() => setJoinWithCodeModalVisible(false)}
       />
     </VStack>
   );

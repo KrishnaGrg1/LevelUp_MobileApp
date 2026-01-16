@@ -11,6 +11,7 @@ interface CommunityOptionsModalProps {
   visible: boolean;
   onClose: () => void;
   onTransferOwnership?: () => void;
+  onInviteMembers?: () => void;
   isOwner?: boolean;
   communityName?: string;
   communityId?: string;
@@ -20,6 +21,7 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
   visible,
   onClose,
   onTransferOwnership,
+  onInviteMembers,
   isOwner = false,
   communityName,
   communityId,
@@ -42,13 +44,21 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
       color: '#6b7280',
     },
     { id: 'mute', label: 'Mute', icon: VolumeX, color: '#6b7280' },
-    ...(isOwner ? [{ id: 'transfer', label: 'Transfer Ownership', icon: Crown, color: '#f59e0b' }] : []),
+    ...(isOwner
+      ? [{ id: 'transfer', label: 'Transfer Ownership', icon: Crown, color: '#f59e0b' }]
+      : []),
     { id: 'leave', label: 'Leave Community', icon: LogOut, color: '#ef4444' },
   ];
 
   const handleOptionPress = (optionId: string) => {
     if (optionId === 'transfer' && communityId && onTransferOwnership) {
       onTransferOwnership();
+    } else if (optionId === 'invite' && communityId && onInviteMembers) {
+      onClose();
+      // Delay to ensure modal closes before opening the new one
+      setTimeout(() => {
+        onInviteMembers();
+      }, 300);
     } else if (optionId === 'leave' && communityId) {
       // Show confirmation dialog
       Alert.alert(
@@ -71,7 +81,8 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
                 onError: (error: any) => {
                   console.error('Failed to leave community:', error);
                   // Extract error message from backend response
-                  const errorMessage = error?.message || 'Failed to leave community. Please try again.';
+                  const errorMessage =
+                    error?.message || 'Failed to leave community. Please try again.';
                   Alert.alert('Error', errorMessage);
                 },
               });
@@ -107,11 +118,11 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
                   </Box>
                   <Text
                     className={`text-base ${
-                      option.id === 'leave' 
-                        ? 'font-semibold text-error-500' 
+                      option.id === 'leave'
+                        ? 'font-semibold text-error-500'
                         : option.id === 'transfer'
-                        ? 'font-semibold text-amber-600'
-                        : 'text-typography-900'
+                          ? 'font-semibold text-amber-600'
+                          : 'text-typography-900'
                     }`}
                   >
                     {option.id === 'leave' && isLeaving ? 'Leaving...' : option.label}

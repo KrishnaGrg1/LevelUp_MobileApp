@@ -1,9 +1,10 @@
 import {
   createCommunity,
   getAllMembersOfCommunity,
+  getInviteCode,
   getMyCommunities,
   joinCommunity,
-  joinPrivateCommunity,
+  joinWithCodeCommunity,
   leaveCommunity,
   searchCommunities,
   transferOwnership,
@@ -90,14 +91,14 @@ export const useCreateCommunity = () => {
 };
 
 /**
- * Join Private community mutation
+ * Join With Code community mutation
  */
-export const useJoinPrivateCommunity = () => {
+export const useJoinWithCodeCommunity = () => {
   const queryClient = useQueryClient();
   const language = LanguageStore.getState().language;
   const authSession = authStore.getState().authSession as string;
   return useMutation({
-    mutationFn: (joinCode: string) => joinPrivateCommunity(language, joinCode, authSession),
+    mutationFn: (joinCode: string) => joinWithCodeCommunity(language, joinCode, authSession),
     onSuccess: () => {
       // Refresh the user's community list so the new one shows up
       queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
@@ -181,5 +182,20 @@ export const useTransferOwnership = () => {
       queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
       queryClient.invalidateQueries({ queryKey: ['communities', communityId, 'members'] });
     },
+  });
+};
+
+/**
+ * Get invite code for a community
+ */
+export const useGetInviteCode = (communityId: string, enabled: boolean = false) => {
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+
+  return useQuery({
+    queryKey: ['community', communityId, 'invite-code'],
+    queryFn: () => getInviteCode(communityId, language, authSession),
+    enabled: enabled && !!communityId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
