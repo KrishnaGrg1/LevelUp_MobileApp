@@ -15,14 +15,7 @@ import authStore from '@/stores/auth.store';
 import LanguageStore from '@/stores/language.store';
 import { useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
-import {
-  MessageCircle,
-  MoreVertical,
-  Paperclip,
-  Send,
-  Shield,
-  Users,
-} from 'lucide-react-native';
+import { MessageCircle, MoreVertical, Paperclip, Send, Shield, Users } from 'lucide-react-native';
 import React, { useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -139,9 +132,6 @@ export default function CommunityDetailScreen() {
           {/* Community Header - Using Backend Data */}
           <HStack className="items-center justify-between border-b border-outline-200 bg-background-0 px-4 py-3">
             <HStack space="md" className="flex-1 items-center">
-              <Box className="h-12 w-12 items-center justify-center rounded-lg bg-primary-500">
-                <Text className="text-2xl">{community.photo || '🛡️'}</Text>
-              </Box>
               <VStack className="flex-1">
                 <Heading size="sm" className="leading-tight text-typography-900">
                   {community.name}
@@ -313,7 +303,9 @@ export default function CommunityDetailScreen() {
             </>
           )}
 
-          {activeTab === 'clans' && <ClansTab communityId={id as string} communityName={community?.name} />}
+          {activeTab === 'clans' && (
+            <ClansTab communityId={id as string} communityName={community?.name} />
+          )}
 
           {activeTab !== 'chat' && activeTab !== 'clans' && (
             <Center className="flex-1">
