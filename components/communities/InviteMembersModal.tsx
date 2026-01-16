@@ -5,17 +5,18 @@ import { HStack } from '@/components/ui/hstack';
 import { Spinner } from '@/components/ui/spinner';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
-import { useGetInviteCode } from '@/hooks/queries/useCommunities';
+import { useGetInviteCode, useRegenerateInviteCode } from '@/hooks/queries/useCommunities';
 import * as Clipboard from 'expo-clipboard';
-import { Check, Copy, Share2, X } from 'lucide-react-native';
+import { Check, Copy, RefreshCw, X } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Modal, Pressable, Share } from 'react-native';
+import { Alert, Modal, Pressable } from 'react-native';
 
 interface InviteMembersModalProps {
   visible: boolean;
   onClose: () => void;
   communityId: string;
   communityName?: string;
+  isOwner?: boolean;
 }
 
 export const InviteMembersModal: React.FC<InviteMembersModalProps> = ({
@@ -23,9 +24,11 @@ export const InviteMembersModal: React.FC<InviteMembersModalProps> = ({
   onClose,
   communityId,
   communityName,
+  isOwner = false,
 }) => {
   const [copied, setCopied] = useState(false);
   const { data, isLoading, error } = useGetInviteCode(communityId, visible);
+  const { mutate: regenerateCode, isPending: isRegenerating } = useRegenerateInviteCode();
 
   const inviteCode = data?.body?.data?.inviteCode;
   const description = data?.body?.data?.description;
@@ -38,17 +41,33 @@ export const InviteMembersModal: React.FC<InviteMembersModalProps> = ({
     }
   };
 
-  const handleShare = async () => {
-    if (inviteCode) {
-      try {
-        await Share.share({
-          message: `Join "${communityName || 'our community'}" on LevelUp!\n\nInvite Code: ${inviteCode}\n\n${description || 'Join us and start leveling up together!'}`,
-          title: `Join ${communityName || 'our community'}`,
-        });
-      } catch (error) {
-        console.error('Error sharing:', error);
-      }
-    }
+  const handleRegenerateCode = () => {
+    Alert.alert(
+      'Regenerate Invite Code',
+      'Are you sure you want to regenerate the invite code? The old code will no longer work.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Regenerate',
+          style: 'destructive',
+          onPress: () => {
+            regenerateCode(communityId, {
+              onSuccess: () => {
+                Alert.alert('Success', 'Invite code has been regenerated successfully');
+              },
+              onError: (error: any) => {
+                const errorMessage =
+                  error?.message || 'Failed to regenerate invite code. Please try again.';
+                Alert.alert('Error', errorMessage);
+              },
+            });
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -122,6 +141,23 @@ export const InviteMembersModal: React.FC<InviteMembersModalProps> = ({
                   {copied && <Text className="text-xs text-success-600">Copied to clipboard!</Text>}
                 </VStack>
 
+                {/* Regenerate Button (Owner Only) */}
+                {isOwner && (
+                  <Button
+                    onPress={handleRegenerateCode}
+                    disabled={isRegenerating}
+                    variant="outline"
+                    className="rounded-lg border-amber-300 bg-amber-50"
+                  >
+                    <HStack space="xs" className="items-center">
+                      <RefreshCw size={16} color="#f59e0b" />
+                      <ButtonText className="text-amber-600">
+                        {isRegenerating ? 'Regenerating...' : 'Regenerate Code'}
+                      </ButtonText>
+                    </HStack>
+                  </Button>
+                )}
+
                 {/* Instructions */}
                 <Box className="rounded-lg bg-primary-50 p-3">
                   <Text className="text-xs text-typography-700">
@@ -132,15 +168,6 @@ export const InviteMembersModal: React.FC<InviteMembersModalProps> = ({
 
                 {/* Actions */}
                 <HStack space="md" className="mt-2">
-                  <Button
-                    onPress={handleShare}
-                    className="flex-1 rounded-lg bg-primary-600 active:bg-primary-700"
-                  >
-                    <HStack space="xs" className="items-center">
-                      <Share2 size={18} color="#ffffff" />
-                      <ButtonText className="text-white">Share</ButtonText>
-                    </HStack>
-                  </Button>
                   <Button
                     onPress={onClose}
                     variant="outline"
