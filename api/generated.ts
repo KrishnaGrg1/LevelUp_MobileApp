@@ -343,6 +343,18 @@ export interface TogglePinResponse {
   };
 }
 
+export interface GetInviteCodeResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: {
+      inviteCode: string;
+      communityName: string;
+      description?: string;
+    };
+  };
+}
+
 export interface searchCommunitiesResponse {
   statusCode: number;
   body: {

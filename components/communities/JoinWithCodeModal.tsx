@@ -5,21 +5,21 @@ import { HStack } from '@/components/ui/hstack';
 import { Input, InputField } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
-import { useJoinPrivateCommunity } from '@/hooks/queries/useCommunities'; // Import the hook
+import { useJoinWithCodeCommunity } from '@/hooks/queries/useCommunities'; // Import the hook
 import { AlertCircle, X } from 'lucide-react-native';
 import React from 'react';
 import { KeyboardAvoidingView, Modal, Platform, Pressable } from 'react-native';
 
-interface JoinPrivateCommunityModalProps {
+interface JoinWithCodeModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
-export function JoinPrivateCommunityModal({ visible, onClose }: JoinPrivateCommunityModalProps) {
+export function JoinWithCodeModal({ visible, onClose }: JoinWithCodeModalProps) {
   const [inviteCode, setInviteCode] = React.useState('');
 
   // Initialize the mutation hook
-  const { mutate: joinCommunity, isPending } = useJoinPrivateCommunity();
+  const { mutate: joinCommunity, isPending } = useJoinWithCodeCommunity();
 
   const handleJoin = () => {
     if (inviteCode.length < 8) {

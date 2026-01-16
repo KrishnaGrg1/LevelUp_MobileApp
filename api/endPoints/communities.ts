@@ -6,6 +6,7 @@ import {
   CreateCommunityResponse,
   getCategoriesResponse,
   GetCommunityMembersSuccessResponse,
+  GetInviteCodeResponse,
   GetMyCommunities,
   searchCommunitiesResponse,
   TogglePinResponse,
@@ -163,8 +164,8 @@ export const joinCommunity = async (lang: Language, communityId: string, authSes
   }
 };
 
-// Join a community
-export const joinPrivateCommunity = async (
+// Join a community with invite code
+export const joinWithCodeCommunity = async (
   lang: Language,
   joinCode: string,
   authSession: string,
@@ -250,7 +251,31 @@ export const getCategories = async (lang: Language, authSession: string) => {
     throw new Error(errorMessage);
   }
 };
-
+// Get invite code for a community
+export const getInviteCode = async (communityId: string, lang: Language, authSession: string) => {
+  try {
+    const response = await axiosInstance.get<GetInviteCodeResponse>(
+      `/community/${communityId}/invite-code`,
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to get invite code';
+    throw new Error(errorMessage);
+  }
+};
 export const getAllMembersOfCommunity = async (
   communityId: string,
   lang: Language,
@@ -311,11 +336,7 @@ export const updatecommunityById = async (
 };
 
 // Leave a community
-export const leaveCommunity = async (
-  communityId: string,
-  lang: Language,
-  authSession: string,
-) => {
+export const leaveCommunity = async (communityId: string, lang: Language, authSession: string) => {
   try {
     const response = await axiosInstance.post(
       `/community/${communityId}/leave`,
@@ -341,7 +362,6 @@ export const leaveCommunity = async (
   }
 };
 
-
 //Tranfer Ownership of a community
 
 export const transferOwnership = async (
@@ -353,7 +373,7 @@ export const transferOwnership = async (
   try {
     const response = await axiosInstance.post(
       `/community/${communityId}/transfer-ownership`,
-      {newOwnerId},
+      { newOwnerId },
       {
         withCredentials: true,
         headers: {
