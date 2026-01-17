@@ -25,8 +25,19 @@ export function useLogin() {
 
     onSuccess: data => {
       console.log('Login success:', data);
-      const { setAuthenticated, setAdminStatus, authSession, setAuthSession, setUser } =
-        authStore.getState();
+      const { setAuthenticated, setAdminStatus, setAuthSession, setUser } = authStore.getState();
+
+      const sessionToken =
+        data?.body?.data?.authSession ||
+        // Some backends return snake_case keys; handle both to avoid losing state
+        (data as any)?.body?.data?.auth_session ||
+        null;
+
+      // Persist session first so downstream hooks have access to it
+      setAuthSession(sessionToken ?? undefined);
+      if (!sessionToken) {
+        console.warn('Login succeeded but no auth session token was returned by the API.');
+      }
 
       // Set authentication status
       setAuthenticated(true);
@@ -39,8 +50,7 @@ export function useLogin() {
           isAdmin: data.body.data.isadmin,
         } as User);
       }
-      setAuthSession(data.body.data.authSession);
-      console.log('authsession', authSession);
+
       // Navigate to main dashboard (can be customized based on requirements)
       router.replace('/(main)/(tabs)/dashboard');
     },

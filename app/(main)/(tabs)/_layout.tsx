@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { BookOpen, Home, Trophy, User } from 'lucide-react-native';
+import { BookOpen, Bot, Home, Medal, Trophy, User } from 'lucide-react-native';
 import React from 'react';
 import { useColorScheme } from 'react-native';
 
@@ -27,17 +27,24 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="learn"
+        name="quests"
         options={{
-          title: 'Learn',
-          tabBarIcon: ({ color, size }) => <BookOpen color={color} size={size} />,
+          title: 'Quests',
+          tabBarIcon: ({ color, size }) => <Trophy color={color} size={size} />,
         }}
       />
       <Tabs.Screen
-        name="challenges"
+        name="leaderboard"
         options={{
-          title: 'Challenges',
-          tabBarIcon: ({ color, size }) => <Trophy color={color} size={size} />,
+          title: 'Leaderboard',
+          tabBarIcon: ({ color, size }) => <Medal color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="ai-chat"
+        options={{
+          title: 'AI Chat',
+          tabBarIcon: ({ color, size }) => <Bot color={color} size={size} />,
         }}
       />
       <Tabs.Screen

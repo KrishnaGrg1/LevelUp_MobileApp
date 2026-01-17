@@ -116,29 +116,7 @@ export const fetchWeeklyQuests = async (lang: Language, authSession: string) => 
   return res.data;
 };
 
-export const generateDailyQuests = async (lang: Language, authSession: string) => {
-  const res = await axiosInstance.post<ApiResponse<{ today: Quest[] }>>(
-    `/ai/generate/daily`,
-    undefined,
-    {
-      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
-      withCredentials: true,
-    },
-  );
-  return res.data;
-};
-
-export const generateWeeklyQuests = async (lang: Language, authSession: string) => {
-  const res = await axiosInstance.post<ApiResponse<{ thisWeek: Quest[] }>>(
-    `/ai/generate/weekly`,
-    undefined,
-    {
-      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
-      withCredentials: true,
-    },
-  );
-  return res.data;
-};
+// REMOVED: generateDailyQuests and generateWeeklyQuests. Do not use quest generation APIs in frontend.
 
 export interface CompleteQuestResponse {
   quest: Quest;
@@ -238,6 +216,33 @@ export interface AIChatResponse {
   reply: string;
 }
 
+export interface AIChatHistoryItem {
+  id: string;
+  sessionId: string;
+  prompt: string;
+  response: string;
+  tokensUsed?: number;
+  responseTime?: number;
+  createdAt: string;
+}
+
+export interface AIChatHistoryResponse {
+  history: AIChatHistoryItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasMore: boolean;
+  };
+}
+
+export interface AITokenBalanceResponse {
+  tokens: number;
+  totalChats: number;
+  costPerChat: number;
+}
+
 export const sendAIChat = async (prompt: string, lang: Language, authSession: string) => {
   const res = await axiosInstance.post<ApiResponse<AIChatResponse>>(
     `/ai/chat`,
@@ -247,6 +252,34 @@ export const sendAIChat = async (prompt: string, lang: Language, authSession: st
       withCredentials: true,
     },
   );
+  return res.data;
+};
+
+export const fetchAIChatHistory = async (
+  lang: Language,
+  authSession: string,
+  page: number = 1,
+  limit: number = 20,
+  sessionId?: string,
+) => {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (sessionId) params.append('sessionId', sessionId);
+
+  const res = await axiosInstance.get<ApiResponse<AIChatHistoryResponse>>(
+    `/ai/chat/history?${params.toString()}`,
+    {
+      headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
+      withCredentials: true,
+    },
+  );
+  return res.data;
+};
+
+export const fetchAITokenBalance = async (lang: Language, authSession: string) => {
+  const res = await axiosInstance.get<ApiResponse<AITokenBalanceResponse>>(`/ai/chat/tokens`, {
+    headers: { 'X-Language': lang, Authorization: `Bearer ${authSession}` },
+    withCredentials: true,
+  });
   return res.data;
 };
 
