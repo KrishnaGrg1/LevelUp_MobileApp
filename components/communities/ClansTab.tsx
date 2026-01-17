@@ -34,6 +34,7 @@ export function ClansTab({ communityId, communityName }: ClansTabProps) {
   } | null>(null);
   const [showClanOptions, setShowClanOptions] = useState(false);
   const [selectedClanForOptions, setSelectedClanForOptions] = useState<{
+    id: string;
     name: string;
     isMember: boolean;
   } | null>(null);
@@ -225,7 +226,7 @@ export function ClansTab({ communityId, communityName }: ClansTabProps) {
                       <HStack space="xs" className="items-center">
                         <Users size={14} color="#059669" />
                         <Text className="text-xs font-medium text-green-700">
-                          {clan.stats?.memberCount || 0} / {clan.limit} members
+                          {clan._count?.members || 0} / {clan.limit} members
                         </Text>
                       </HStack>
                     </VStack>
@@ -236,7 +237,11 @@ export function ClansTab({ communityId, communityName }: ClansTabProps) {
                       <Pressable
                         onPress={e => {
                           e.stopPropagation();
-                          setSelectedClanForOptions({ name: clan.name, isMember: true });
+                          setSelectedClanForOptions({
+                            id: clan.id,
+                            name: clan.name,
+                            isMember: true,
+                          });
                           setShowClanOptions(true);
                         }}
                         className="p-1"
@@ -307,7 +312,11 @@ export function ClansTab({ communityId, communityName }: ClansTabProps) {
                       <Pressable
                         onPress={e => {
                           e.stopPropagation();
-                          setSelectedClanForOptions({ name: clan.name, isMember: false });
+                          setSelectedClanForOptions({
+                            id: clan.id,
+                            name: clan.name,
+                            isMember: false,
+                          });
                           setShowClanOptions(true);
                         }}
                         className="p-1"
@@ -373,6 +382,7 @@ export function ClansTab({ communityId, communityName }: ClansTabProps) {
           setShowClanOptions(false);
           setSelectedClanForOptions(null);
         }}
+        clanId={selectedClanForOptions?.id}
         clanName={selectedClanForOptions?.name}
         isMember={selectedClanForOptions?.isMember}
       />

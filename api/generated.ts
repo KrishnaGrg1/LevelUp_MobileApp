@@ -381,11 +381,13 @@ interface communityDetailById {
   memberLimit: number;
   photo?: string;
   isPrivate: boolean;
+  createdAt: string;
   owner: {
     UserName: string;
   };
   members: Array<{
     user: {
+      id: string;
       UserName: string;
     };
     joinedAt: string;
@@ -531,6 +533,17 @@ export interface DeleteCommunityResponse {
     };
   };
 }
+
+export interface UploadCommunityPhotoResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: {
+      photo: string;
+    };
+  };
+}
+
 export interface UpdateCommunityPrivacyResponse {
   statusCode: number;
   body: {

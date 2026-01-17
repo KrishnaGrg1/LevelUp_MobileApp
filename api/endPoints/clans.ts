@@ -34,6 +34,9 @@ export interface Clan {
   updatedAt: string;
   owner: ClanOwner;
   isMember?: boolean;
+  _count?: {
+    members: number;
+  };
 }
 
 export interface ClanMember {
@@ -53,12 +56,26 @@ export interface ClanMember {
   };
 }
 
+// Member structure as returned by getClanInfo API
+export interface ClanInfoMember {
+  userId: string;
+  joinedAt: string;
+  user: {
+    id: string;
+    UserName: string;
+  };
+}
+
 export interface ClanInfoResponse extends Clan {
   community: {
     id: string;
     name: string;
+    isPrivate: boolean;
   };
-  members: ClanMember[];
+  members: ClanInfoMember[];
+  _count: {
+    members: number;
+  };
 }
 
 export interface GetClansResponse {
@@ -93,6 +110,49 @@ export interface CreateClanPayload {
   limit?: number;
 }
 
+export interface ClanInfoDetailResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: {
+      id: string;
+      name: string;
+      slug: string;
+      description: string | null;
+      isPrivate: boolean;
+      limit: number;
+      xp: number;
+      welcomeMessage: string;
+      createdAt: string;
+      ownerId: string;
+      communityId: string;
+      stats: {
+        battlesWon: number;
+        memberCount: number;
+      };
+      owner: {
+        id: string;
+        UserName: string;
+      };
+      community: {
+        id: string;
+        name: string;
+        isPrivate: boolean;
+      };
+      members: {
+        userId: string;
+        joinedAt: string;
+        user: {
+          id: string;
+          UserName: string;
+        };
+      }[];
+      _count: {
+        members: number;
+      };
+    };
+  };
+}
 export interface UpdateClanPayload {
   name?: string;
   description?: string;
@@ -282,13 +342,14 @@ export const getClanMembers = async (clanId: string, lang: Language, authSession
 // Get clan info
 export const getClanInfo = async (clanId: string, lang: Language, authSession: string) => {
   try {
-    const response = await axiosInstance.get<GetClanInfoResponse>(`/clan/info/${clanId}`, {
+    const response = await axiosInstance.get<ClanInfoDetailResponse>(`/clan/specific/${clanId}`, {
       withCredentials: true,
       headers: {
         'X-Language': lang,
         Authorization: `Bearer ${authSession}`,
       },
     });
+    console.log('Get Clan Info Response:', response.data.body.data);
     return response.data;
   } catch (error: unknown) {
     const err = error as {
@@ -375,11 +436,7 @@ export const checkClanMembership = async (userId: string, clanId: string) => {
 };
 
 // Get joined clans for a community
-export const getJoinedClans = async (
-  communityId: string,
-  lang: Language,
-  authSession: string,
-) => {
+export const getJoinedClans = async (communityId: string, lang: Language, authSession: string) => {
   try {
     const response = await axiosInstance.get<GetClansResponse>(`/clan/${communityId}/joined`, {
       withCredentials: true,
@@ -394,7 +451,9 @@ export const getJoinedClans = async (
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to fetch joined clans';
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to fetch joined clans';
     throw new Error(errorMessage);
   }
 };
@@ -419,7 +478,9 @@ export const getAvailableClans = async (
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to fetch available clans';
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to fetch available clans';
     throw new Error(errorMessage);
   }
 };
