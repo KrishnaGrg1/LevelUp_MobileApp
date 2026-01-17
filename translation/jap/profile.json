@@ -1,0 +1,20 @@
+{
+  "editProfile": "プロフィール編集",
+  "settings": "設定",
+  "joined": "参加日",
+  "accountInfo": "アカウント情報",
+  "changePassword": "パスワードの変更",
+  "form": {
+    "submit": "プロフィールを更新",
+    "submitting": "更新中..."
+  },
+  "deleteUser": {
+    "button": "アカウントを削除",
+    "deleting": "削除中...",
+    "confirmTitle": "アカウント削除",
+    "confirmMessage": "本当にアカウントを削除しますか？この操作は取り消せません。",
+    "confirmButton": "削除",
+    "success": "アカウントが削除されました",
+    "error": "アカウントの削除に失敗しました"
+  }
+}

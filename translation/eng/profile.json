@@ -1,0 +1,20 @@
+{
+  "editProfile": "Edit Profile",
+  "settings": "Settings",
+  "joined": "Joined",
+  "accountInfo": "Account Information",
+  "changePassword": "Change Password",
+  "form": {
+    "submit": "Update Profile",
+    "submitting": "Updating..."
+  },
+  "deleteUser": {
+    "button": "Delete My Account",
+    "deleting": "Deleting...",
+    "confirmTitle": "Delete Account",
+    "confirmMessage": "Are you sure you want to delete your account? This action cannot be undone.",
+    "confirmButton": "Delete",
+    "success": "Account deleted successfully",
+    "error": "Failed to delete account"
+  }
+}

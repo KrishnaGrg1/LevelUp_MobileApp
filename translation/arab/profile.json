@@ -1,0 +1,20 @@
+{
+  "editProfile": "تعديل الملف الشخصي",
+  "settings": "إعدادات",
+  "joined": "تاريخ الانضمام",
+  "accountInfo": "معلومات الحساب",
+  "changePassword": "تغيير كلمة المرور",
+  "form": {
+    "submit": "تحديث الملف الشخصي",
+    "submitting": "جاري التحديث..."
+  },
+  "deleteUser": {
+    "button": "حذف حسابي",
+    "deleting": "جارٍ الحذف...",
+    "confirmTitle": "حذف الحساب",
+    "confirmMessage": "هل أنت متأكد أنك تريد حذف حسابك؟ لا يمكن تراجع هذا الإجراء.",
+    "confirmButton": "حذف",
+    "success": "تم حذف الحساب بنجاح",
+    "error": "فشل حذف الحساب"
+  }
+}

@@ -26,15 +26,16 @@ import authStore from '@/stores/auth.store';
 import { useTranslation } from '@/translation';
 import { useRouter } from 'expo-router';
 import { AlertCircle, ArrowLeft, Eye, EyeOff } from 'lucide-react-native';
+import { Toast, ToastTitle, useToast } from '../ui/toast';
 
 export function ResetPasswordForm() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { mutate: resetPassword, isPending, error } = useResetPassword();
+  const { mutate: resetPassword, isPending, error, data: d } = useResetPassword();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { user } = authStore.getState();
-
+  const toast = useToast();
   const form = useForm<ResetPasswordInput>({
     resolver: zodResolver(ResetPasswordSchema),
     defaultValues: {
@@ -57,6 +58,17 @@ export function ResetPasswordForm() {
     try {
       const { confirmPassword, ...apiData } = data;
       await resetPassword(apiData);
+      toast.show({
+        placement: 'bottom right',
+        duration: 3000,
+        render: () => {
+          return (
+            <Toast action="muted" variant="solid">
+              <ToastTitle> {d?.message}</ToastTitle>
+            </Toast>
+          );
+        },
+      });
     } catch (err: any) {
       const errorMessage = err?.message || t('error.auth.resetPasswordFailed');
       setError('root', {

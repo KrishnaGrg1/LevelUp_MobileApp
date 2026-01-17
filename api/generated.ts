@@ -636,3 +636,12 @@ export interface GetCommunityMembersSuccessResponse {
     };
   };
 }
+
+
+export interface DeleteUserResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: null
+  };
+}

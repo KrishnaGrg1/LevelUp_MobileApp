@@ -1,5 +1,6 @@
 import LanguageStore, { Language } from '@/stores/language.store';
 import { DEFAULT_LANGUAGE } from '@/translation/language';
+import { useShallow } from 'zustand/react/shallow';
 
 // language imports
 import arab from './arab';
@@ -35,19 +36,31 @@ function getCurrentLanguage(): Language {
 }
 
 // Shared translation logic
+const missingKeyHandler = (lngs: string[], ns: string, key: string, fallback?: string) => {
+  console.warn(`Missing key: ${key} in ${ns} for ${lngs.join(', ')}`);
+};
+
 function getTranslation(language: Language, key: string, fallback?: string): string {
   const langPack = translations[language];
 
-  if (!langPack) return fallback || key;
+  if (!langPack) {
+    missingKeyHandler([language], 'root', key, fallback);
+    return fallback || key;
+  }
 
   let value: unknown;
+  let namespace = 'common';
 
   // Case 1: namespace:key
   if (key.includes(':')) {
-    const [namespace, rest] = key.split(':');
+    const [ns, rest] = key.split(':');
+    namespace = ns;
 
     const nsObject = langPack[namespace];
-    if (!nsObject || typeof nsObject !== 'object') return fallback || key;
+    if (!nsObject || typeof nsObject !== 'object') {
+       missingKeyHandler([language], namespace, key, fallback);
+       return fallback || key;
+    }
 
     const nestedKeys = rest.split('.');
     value = nsObject;
@@ -61,11 +74,17 @@ function getTranslation(language: Language, key: string, fallback?: string): str
   else {
     const keys = key.split('.');
     value = langPack;
+    // Try to guess namespace from first key for logging, though not strictly accurate for flat structures
+    namespace = keys[0];
 
     for (const part of keys) {
       value = (value as Record<string, unknown>)?.[part];
       if (value === undefined) break;
     }
+  }
+
+  if (value === undefined) {
+    missingKeyHandler([language], namespace, key, fallback);
   }
 
   return typeof value === 'string' ? value : fallback || key;
@@ -79,10 +98,12 @@ export function t(key: string, params?: Record<string, string | number> | string
   const replacements = typeof params === 'object' ? params : undefined;
 
   let value: unknown = translations[currentLang];
+  let namespace = 'common';
 
   // Handle namespace:key format (e.g., "success:login")
   if (key.includes(':')) {
-    const [namespace, ...restKeys] = key.split(':');
+    const [ns, ...restKeys] = key.split(':');
+    namespace = ns;
     const actualKey = restKeys.join(':');
     const langTranslations = translations[currentLang] as TranslationContent;
     value = langTranslations?.[namespace];
@@ -93,13 +114,20 @@ export function t(key: string, params?: Record<string, string | number> | string
         value = (value as Record<string, unknown>)?.[nestedKey];
         if (value === undefined) break;
       }
+    } else {
+        value = undefined;
     }
   } else {
     // Handle dot notation (e.g., "auth.login.title")
+    namespace = keys[0];
     for (const k of keys) {
       value = (value as Record<string, unknown>)?.[k];
       if (value === undefined) break;
     }
+  }
+
+  if (value === undefined) {
+    missingKeyHandler([currentLang], namespace, key, fallback);
   }
 
   let result = typeof value === 'string' ? value : fallback || key;
@@ -114,14 +142,29 @@ export function t(key: string, params?: Record<string, string | number> | string
   return result;
 }
 
-// Hook to subscribe to language changes
+// FIXED: Hook to subscribe to language changes
+// Always returns a language, never conditionally
 export function useLanguage(): Language {
-  const language = LanguageStore(state => state.language);
-  return language || defaultLocale;
+  // Use useShallow to combine both selectors
+  const { language, hasHydrated } = LanguageStore(
+    useShallow(state => ({
+      language: state.language,
+      hasHydrated: state._hasHydrated,
+    })),
+  );
+
+  // Always return a language - no conditional returns
+  // If not hydrated or no language, use default
+  if (!hasHydrated || !language) {
+    return defaultLocale;
+  }
+
+  return language;
 }
 
-// Hook for reactive translations (use this in components)
+// FIXED: Hook for reactive translations
 export function useTranslation() {
+  // This always calls the same number of hooks
   const language = useLanguage();
 
   const translate = (key: string, fallback?: string): string => {
@@ -131,6 +174,11 @@ export function useTranslation() {
   return { t: translate, language };
 }
 
+// Export selective hooks for better performance
+export const useLanguageHydrated = () => LanguageStore(state => state._hasHydrated);
+
+export const useSetLanguage = () => LanguageStore(state => state.setLanguage);
+
 export {
   DEFAULT_LANGUAGE,
   getLanguageDirection,
@@ -138,5 +186,6 @@ export {
   isRTLLanguage,
   isValidLanguage,
   VALID_LANGUAGES,
-  validateLanguage,
+  validateLanguage
 } from '@/translation/language';
+

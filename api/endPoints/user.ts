@@ -1,10 +1,9 @@
 import { Language } from '@/stores/language.store';
 import axiosInstance from '../client';
 import type {
+  DeleteUserResponse,
   GetAllUsersResponse,
   GetMeResponse,
-  UpdateUserPayload,
-  adminOverviewResponse,
   changePasswordResponse,
   fullUserObjectResponse,
 } from '../generated';
@@ -56,6 +55,7 @@ export const changePassword = async (
     confirmNewPassword: string;
   },
   lang: Language,
+  authSession: string,
 ) => {
   try {
     const response = await axiosInstance.post<changePasswordResponse>(
@@ -65,6 +65,7 @@ export const changePassword = async (
         withCredentials: true,
         headers: {
           'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
         },
       },
     );
@@ -81,80 +82,6 @@ export const changePassword = async (
     };
     const errorMessage =
       err.response?.data?.body?.message || err.response?.data?.message || 'Change password failed';
-    const errorDetail = err.response?.data?.body?.error || err.response?.data?.error;
-
-    throw { message: errorMessage, error: errorDetail };
-  }
-};
-
-export const deleteUserByAdmin = async (id: string, lang: Language) => {
-  try {
-    const response = await axiosInstance.delete(`/admin/users/delete`, {
-      withCredentials: true,
-      headers: {
-        'X-Language': lang,
-      },
-      data: { id },
-    });
-    return response.data;
-  } catch (error: unknown) {
-    const err = error as {
-      response?: {
-        data?: {
-          body?: { message?: string; error?: string };
-          message?: string;
-          error?: string;
-        };
-      };
-    };
-    const errorMessage =
-      err.response?.data?.body?.message || err.response?.data?.message || 'Delete user failed';
-    const errorDetail = err.response?.data?.body?.error || err.response?.data?.error;
-
-    throw { message: errorMessage, error: errorDetail };
-  }
-};
-
-export const adminOverview = async (lang: Language) => {
-  try {
-    const response = await axiosInstance.get<adminOverviewResponse>(`/admin/overview`, {
-      withCredentials: true,
-      headers: {
-        'X-Language': lang,
-      },
-    });
-    return response.data;
-  } catch (error: unknown) {
-    const err = error as {
-      response?: { data?: { body?: { message?: string }; message?: string } };
-    };
-    const errorMessage =
-      err.response?.data?.body?.message || err.response?.data?.message || 'Admin Overview failed';
-    throw new Error(errorMessage);
-  }
-};
-
-export const adminUserGrowth = async (lang: Language, range: 'day' | 'week' | 'month') => {
-  try {
-    const response = await axiosInstance.get(`/admin/user-growth?range=${range}`, {
-      withCredentials: true,
-      headers: {
-        'X-Language': lang,
-      },
-    });
-    return response.data;
-  } catch (error: unknown) {
-    const err = error as {
-      response?: {
-        data?: {
-          body?: { message?: string; error?: string };
-          message?: string;
-          error?: string;
-        };
-      };
-    };
-    const errorMessage =
-      err.response?.data?.body?.message || err.response?.data?.message || 'Delete user failed';
     const errorDetail = err.response?.data?.body?.error || err.response?.data?.error;
 
     throw { message: errorMessage, error: errorDetail };
@@ -181,27 +108,47 @@ export const getUserById = async (lang: Language, userId: string) => {
   }
 };
 
-// Update user
-export const updateUser = async (lang: Language, userId: string, data: UpdateUserPayload) => {
+export const deleteUser = async (lang: Language, authSession: string) => {
   try {
-    const response = await axiosInstance.patch<fullUserObjectResponse>(
-      `/admin/users/${userId}`,
-      data,
-      {
-        withCredentials: true,
-        headers: {
-          'X-Language': lang,
-          'Content-Type': 'application/json',
-        },
+    const response = await axiosInstance.delete<DeleteUserResponse>(`/auth/deleteAccount`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
       },
-    );
+    });
     return response.data;
   } catch (error: unknown) {
     const err = error as {
       response?: { data?: { body?: { message?: string }; message?: string } };
     };
     const errorMessage =
-      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to update user';
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to delete user';
+    throw new Error(errorMessage);
+  }
+};
+
+export const editProfile = async (
+  data: { username: string },
+  lang: Language,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.patch<DeleteUserResponse>(`/auth/editProfile`, data, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
+      },
+    });
+    console.log('edit profile ', response.data);
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to delete user';
     throw new Error(errorMessage);
   }
 };

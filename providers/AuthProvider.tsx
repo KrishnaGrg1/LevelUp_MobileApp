@@ -2,6 +2,7 @@ import { useGetMe } from '@/hooks/useUser';
 import authStore from '@/stores/auth.store';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import { useShallow } from 'zustand/react/shallow';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -13,12 +14,21 @@ interface AuthProviderProps {
  * Ensures user data is available before rendering children
  */
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  // ✅ ALL HOOKS FIRST
   const [isLoading, setIsLoading] = useState(true);
   const { refetch: refetchMe } = useGetMe();
-  const setUser = authStore(state => state.setUser);
-  const hasHydrated = authStore(state => state._hasHydrated);
+
+  // Use useShallow to prevent unnecessary re-renders
+  const { setUser, hasHydrated } = authStore(
+    useShallow(state => ({
+      setUser: state.setUser,
+      hasHydrated: state._hasHydrated,
+    })),
+  );
 
   useEffect(() => {
+    console.log('🔍 AuthProvider: hasHydrated =', hasHydrated);
+
     // Wait for auth state to hydrate from AsyncStorage
     if (!hasHydrated) {
       return;
@@ -26,13 +36,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const fetchUserData = async () => {
       try {
+        console.log('📡 AuthProvider: Fetching user data...');
         const result = await refetchMe();
         if (result.data?.body.data) {
+          console.log('✅ AuthProvider: User data loaded:', result.data.body.data.id);
           setUser(result.data.body.data);
-          console.log('✅ User data loaded:', result.data.body.data.id);
+        } else {
+          console.log('⚠️ AuthProvider: No user data in response');
         }
       } catch (error) {
-        console.error('❌ Error fetching user data:', error);
+        console.error('❌ AuthProvider: Error fetching user data:', error);
       } finally {
         setIsLoading(false);
       }
