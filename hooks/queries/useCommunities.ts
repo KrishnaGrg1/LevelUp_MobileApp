@@ -1,5 +1,6 @@
 import {
   createCommunity,
+  getAllCommunities,
   getAllMembersOfCommunity,
   getInviteCode,
   getMyCommunities,
@@ -9,7 +10,7 @@ import {
   regenerateInviteCode,
   searchCommunities,
   transferOwnership,
-  updatecommunityById,
+  updatecommunityById
 } from '@/api/endPoints/communities';
 
 import { CreateCommunityDto } from '@/api/generated';
@@ -28,6 +29,19 @@ export const useMyCommunities = () => {
 
     queryFn: () => getMyCommunities(language, authSession),
 
+    staleTime: 3 * 60 * 1000, // 3 minutes
+  });
+};
+
+/**
+ * Get all communities
+ */
+export const useAllCommunities = () => {
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+  return useQuery({
+    queryKey: ['allCommunities'],
+    queryFn: () => getAllCommunities(language, authSession),
     staleTime: 3 * 60 * 1000, // 3 minutes
   });
 };

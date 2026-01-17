@@ -1,0 +1,24 @@
+{
+  "greeting": "Hola",
+  "tagline": "¡Subamos de nivel hoy!",
+  "stats": {
+    "level": "Nivel",
+    "xp": "XP",
+    "tokens": "Fichas"
+  },
+  "communities": {
+    "title": "Mis Comunidades",
+    "subtitle": "Gestiona y explora tus comunidades profesionales",
+    "allCommunities": "Todas las Comunidades",
+    "privateCommunity": "Comunidad Privada",
+    "members": "miembros",
+    "discover": "Descubrir",
+    "createNew": "+ Crear Nueva Comunidad",
+    "empty": {
+      "title": "Aún No Hay Comunidades",
+      "subtitle": "¡Únete o crea una comunidad para comenzar!",
+      "allEmpty": "No Hay Comunidades Disponibles",
+      "allEmptySubtitle": "¡Vuelve más tarde para nuevas comunidades!"
+    }
+  }
+}

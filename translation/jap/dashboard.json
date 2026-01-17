@@ -1,0 +1,24 @@
+{
+  "greeting": "こんにちは",
+  "tagline": "今日レベルアップしましょう！",
+  "stats": {
+    "level": "レベル",
+    "xp": "経験値",
+    "tokens": "トークン"
+  },
+  "communities": {
+    "title": "マイコミュニティ",
+    "subtitle": "プロフェッショナルコミュニティを管理・探索",
+    "allCommunities": "すべてのコミュニティ",
+    "privateCommunity": "プライベートコミュニティ",
+    "members": "メンバー",
+    "discover": "発見",
+    "createNew": "+ 新しいコミュニティを作成",
+    "empty": {
+      "title": "まだコミュニティがありません",
+      "subtitle": "コミュニティに参加または作成して始めましょう！",
+      "allEmpty": "利用可能なコミュニティがありません",
+      "allEmptySubtitle": "新しいコミュニティのために後で確認してください！"
+    }
+  }
+}

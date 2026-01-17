@@ -40,6 +40,7 @@ export const getAllCommunities = async (lang: Language, authSession: string) => 
   try {
     const response = await axiosInstance.get<GetMyCommunities>(`/community`, {
       withCredentials: true,
+      params: { page: 1 },
       headers: {
         'X-Language': lang,
         Authorization: `Bearer ${authSession}`,
@@ -47,9 +48,14 @@ export const getAllCommunities = async (lang: Language, authSession: string) => 
     });
     return response.data;
   } catch (error: unknown) {
+    console.log('getAllCommunities Error:', error);
     const err = error as {
-      response?: { data?: { body?: { message?: string }; message?: string } };
+      response?: { data?: { body?: { message?: string }; message?: string }; status?: number };
     };
+    if (err.response) {
+       console.log('getAllCommunities Error Response Status:', err.response.status);
+       console.log('getAllCommunities Error Response Data:', JSON.stringify(err.response.data));
+    }
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||

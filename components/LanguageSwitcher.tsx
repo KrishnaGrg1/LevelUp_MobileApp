@@ -5,7 +5,7 @@ import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
 import LanguageStore, { Language } from '@/stores/language.store';
 import { useTranslation } from '@/translation';
-import { Check, ChevronRight, Languages } from 'lucide-react-native';
+import { Check, Languages } from 'lucide-react-native';
 import React from 'react';
 import { useShallow } from 'zustand/react/shallow';
 const languages = [
@@ -42,20 +42,14 @@ export function LanguageSwitcher() {
         return (
           <Pressable
             {...triggerProps}
-            className="flex-row items-center justify-between rounded-full border border-outline-200 bg-background-50 px-6 py-4"
+            className="flex-row items-center justify-center rounded-full border border-outline-200 bg-background-50 px-3 py-2"
           >
-            <Box className="flex-row items-center gap-2">
-              <Icon as={Languages} size="md" className="text-typography-900" />
-              <Text size="lg" className="text-typography-900">
-                {t('settings.language')}
+            <Box className="flex-row items-center gap-1">
+              <Icon as={Languages} size="sm" className="text-typography-600" />
+              <Text size="sm">{currentLanguage.flag}</Text>
+              <Text size="xs" className="ml-1 font-medium text-typography-600">
+                {currentLanguage.code.toUpperCase()}
               </Text>
-            </Box>
-            <Box className="flex-row items-center gap-2">
-              <Text size="xl">{currentLanguage.flag}</Text>
-              <Text size="md" className="text-typography-700">
-                {currentLanguage.name}
-              </Text>
-              <Icon as={ChevronRight} size="lg" className="text-typography-700" />
             </Box>
           </Pressable>
         );

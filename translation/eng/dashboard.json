@@ -1,0 +1,24 @@
+{
+  "greeting": "Hi",
+  "tagline": "Let's level up today!",
+  "stats": {
+    "level": "Level",
+    "xp": "XP",
+    "tokens": "Tokens"
+  },
+  "communities": {
+    "title": "My Communities",
+    "subtitle": "Manage and explore your professional communities",
+    "allCommunities": "All Communities",
+    "privateCommunity": "Private Community",
+    "members": "members",
+    "discover": "Discover",
+    "createNew": "+ Create New Community",
+    "empty": {
+      "title": "No Communities Yet",
+      "subtitle": "Join or create a community to get started!",
+      "allEmpty": "No Communities Available",
+      "allEmptySubtitle": "Check back later for new communities!"
+    }
+  }
+}

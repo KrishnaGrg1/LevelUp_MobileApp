@@ -1,0 +1,24 @@
+{
+  "greeting": "你好",
+  "tagline": "今天让我们升级吧！",
+  "stats": {
+    "level": "等级",
+    "xp": "经验值",
+    "tokens": "代币"
+  },
+  "communities": {
+    "title": "我的社区",
+    "subtitle": "管理和探索您的专业社区",
+    "allCommunities": "所有社区",
+    "privateCommunity": "私人社区",
+    "members": "成员",
+    "discover": "发现",
+    "createNew": "+ 创建新社区",
+    "empty": {
+      "title": "还没有社区",
+      "subtitle": "加入或创建一个社区开始吧！",
+      "allEmpty": "没有可用的社区",
+      "allEmptySubtitle": "稍后再来查看新社区！"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "greeting": "Bonjour",
+  "tagline": "Montons de niveau aujourd'hui!",
+  "stats": {
+    "level": "Niveau",
+    "xp": "XP",
+    "tokens": "Jetons"
+  },
+  "communities": {
+    "title": "Mes Communautés",
+    "subtitle": "Gérez et explorez vos communautés professionnelles",
+    "allCommunities": "Toutes les Communautés",
+    "privateCommunity": "Communauté Privée",
+    "members": "membres",
+    "discover": "Découvrir",
+    "createNew": "+ Créer une Nouvelle Communauté",
+    "empty": {
+      "title": "Aucune Communauté Encore",
+      "subtitle": "Rejoignez ou créez une communauté pour commencer!",
+      "allEmpty": "Aucune Communauté Disponible",
+      "allEmptySubtitle": "Revenez plus tard pour de nouvelles communautés!"
+    }
+  }
+}

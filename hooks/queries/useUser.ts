@@ -1,13 +1,16 @@
-/**
- * Get current user's profile
- */
-// export const useUserProfile = () => {
-//   return useQuery({
-//     queryKey: ["userProfile"],
-//     queryFn: () => getProfile(),
-//     staleTime: 5 * 60 * 1000, // 5 minutes
-//   });
-// };
+import { getMe } from '@/api/endPoints/user';
+import authStore from '@/stores/auth.store';
+import LanguageStore from '@/stores/language.store';
+import { useQuery } from '@tanstack/react-query';
+export const useUserProfile = () => {
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+  return useQuery({
+    queryKey: ['userProfile'],
+    queryFn: () => getMe(language, authSession),
+    staleTime: 5 * 60 * 1000, 
+  });
+};
 
 /**
  * Update user profile mutation
