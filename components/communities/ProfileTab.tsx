@@ -1,11 +1,15 @@
 import { Box } from '@/components/ui/box';
+import { Button, ButtonText } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
-import { Shield, Users } from 'lucide-react-native';
-import React from 'react';
-import { Image, Pressable, ScrollView } from 'react-native';
+import { useDeleteCommunity } from '@/hooks/queries/useCommunities';
+import authStore from '@/stores/auth.store';
+import { Edit, Shield, Trash2, Users } from 'lucide-react-native';
+import React, { useState } from 'react';
+import { Alert, Image, Pressable, ScrollView } from 'react-native';
+import { EditCommunityModal } from './EditCommunityModal';
 
 interface ProfileTabProps {
   community: {
@@ -43,9 +47,52 @@ interface ProfileTabProps {
     };
   };
   onViewAllClans: () => void;
+  onDelete?: () => void;
 }
 
-export const ProfileTab: React.FC<ProfileTabProps> = ({ community, onViewAllClans }) => {
+export const ProfileTab: React.FC<ProfileTabProps> = ({ community, onViewAllClans, onDelete }) => {
+  const [showEditModal, setShowEditModal] = useState(false);
+  const { mutate: deleteCommunity, isPending: isDeleting } = useDeleteCommunity();
+  const currentUserId = authStore.getState().user?.id;
+  const isOwner = community.ownerId === currentUserId;
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Community',
+      `Are you sure you want to permanently delete "${community.name}"? This action cannot be undone and will remove all members, clans, and data associated with this community.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            deleteCommunity(community.id, {
+              onSuccess: () => {
+                Alert.alert('Success', 'Community deleted successfully', [
+                  {
+                    text: 'OK',
+                    onPress: () => {
+                      if (onDelete) {
+                        onDelete();
+                      }
+                    },
+                  },
+                ]);
+              },
+              onError: (error: any) => {
+                const errorMessage =
+                  error?.message || 'Failed to delete community. Please try again.';
+                Alert.alert('Error', errorMessage);
+              },
+            });
+          },
+        },
+      ],
+    );
+  };
   return (
     <ScrollView className="flex-1 bg-background-0" showsVerticalScrollIndicator={false}>
       <VStack className="p-4" space="lg">
@@ -80,6 +127,36 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ community, onViewAllClan
             </HStack>
           </VStack>
         </VStack>
+
+        {/* Owner Actions */}
+        {isOwner && (
+          <VStack space="md">
+            <HStack space="md">
+              <Button
+                onPress={() => setShowEditModal(true)}
+                className="flex-1 rounded-xl border-2 border-primary-500 bg-primary-50"
+              >
+                <HStack space="xs" className="items-center">
+                  <Edit size={18} color="#8b5cf6" />
+                  <ButtonText className="font-semibold text-primary-600">Edit Community</ButtonText>
+                </HStack>
+              </Button>
+            </HStack>
+
+            <Button
+              onPress={handleDelete}
+              disabled={isDeleting}
+              className="rounded-xl border-2 border-error-500 bg-error-50"
+            >
+              <HStack space="xs" className="items-center">
+                <Trash2 size={18} color="#ef4444" />
+                <ButtonText className="font-semibold text-error-600">
+                  {isDeleting ? 'Deleting...' : 'Delete Community'}
+                </ButtonText>
+              </HStack>
+            </Button>
+          </VStack>
+        )}
 
         {/* Description */}
         {community.description && (
@@ -214,6 +291,13 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ community, onViewAllClan
           </Box>
         )}
       </VStack>
+
+      {/* Edit Community Modal */}
+      <EditCommunityModal
+        visible={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        community={community}
+      />
     </ScrollView>
   );
 };
