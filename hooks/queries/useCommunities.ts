@@ -1,5 +1,6 @@
 import {
   createCommunity,
+  deleteCommunity,
   getAllMembersOfCommunity,
   getInviteCode,
   getMyCommunities,
@@ -156,15 +157,31 @@ export const useUpdateCommunity = () => {
     mutationFn: ({ id, payload }: { id: string; payload: Partial<CreateCommunityDto> }) =>
       updatecommunityById(lang, payload, id, authSession),
     onSuccess: (data, { id }) => {
-      queryClient.setQueryData(['communities', id], data);
+      queryClient.invalidateQueries({ queryKey: ['community', id] });
       queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
     },
   });
 };
 
 /**
- * Delete community mutation (admin only)
+ * Delete community mutation (owner only)
  */
+export const useDeleteCommunity = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+
+  return useMutation({
+    mutationFn: (communityId: string) => deleteCommunity(communityId, language, authSession),
+    onSuccess: (data, communityId) => {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['community', communityId] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+    },
+  });
+};
 
 /**
  * Transfer ownership mutation (owner only)

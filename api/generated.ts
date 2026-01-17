@@ -598,7 +598,7 @@ export interface CreateCommunityDto {
   description?: string;
   photo?: string;
   memberLimit?: number;
-  isPrivate: boolean;
+  isPrivate?: boolean;
 }
 
 export interface CommunityMemberDTO {

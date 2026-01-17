@@ -314,6 +314,7 @@ export const updatecommunityById = async (
   try {
     const response = await axiosInstance.patch<communityDetailByIdResponse>(
       `/community/${communityId}`,
+      payload,
       {
         withCredentials: true,
         headers: {
@@ -330,7 +331,7 @@ export const updatecommunityById = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      'Failed to search community';
+      'Failed to update community';
     throw new Error(errorMessage);
   }
 };
@@ -358,6 +359,29 @@ export const leaveCommunity = async (communityId: string, lang: Language, authSe
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
       'Failed to leave community';
+    throw new Error(errorMessage);
+  }
+};
+
+// Delete a community (owner only)
+export const deleteCommunity = async (communityId: string, lang: Language, authSession: string) => {
+  try {
+    const response = await axiosInstance.delete(`/community/${communityId}`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to delete community';
     throw new Error(errorMessage);
   }
 };

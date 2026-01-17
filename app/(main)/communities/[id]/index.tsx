@@ -16,7 +16,7 @@ import { useMessages } from '@/hooks/useMessages';
 import authStore from '@/stores/auth.store';
 import LanguageStore from '@/stores/language.store';
 import { useQuery } from '@tanstack/react-query';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MessageCircle, MoreVertical, Paperclip, Send, Shield, Users } from 'lucide-react-native';
 import React, { useRef, useState } from 'react';
 import {
@@ -32,6 +32,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CommunityDetailScreen() {
   const { id } = useLocalSearchParams();
+  const router = useRouter();
   const language = LanguageStore.getState().language;
   const [inputMessage, setInputMessage] = useState('');
   const [activeTab, setActiveTab] = useState<
@@ -325,7 +326,14 @@ export default function CommunityDetailScreen() {
           )}
 
           {activeTab === 'profile' && (
-            <ProfileTab community={community} onViewAllClans={() => setActiveTab('clans')} />
+            <ProfileTab
+              community={community}
+              onViewAllClans={() => setActiveTab('clans')}
+              onDelete={() => {
+                // Navigate back to dashboard after successful deletion
+                router.push('/(main)/(tabs)/dashboard');
+              }}
+            />
           )}
 
           {activeTab !== 'chat' && activeTab !== 'clans' && activeTab !== 'profile' && (
