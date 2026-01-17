@@ -1,10 +1,15 @@
 import {
   createCommunity,
+  deleteCommunity,
   getAllMembersOfCommunity,
+  getInviteCode,
   getMyCommunities,
   joinCommunity,
-  joinPrivateCommunity,
+  joinWithCodeCommunity,
+  leaveCommunity,
+  regenerateInviteCode,
   searchCommunities,
+  transferOwnership,
   updatecommunityById,
 } from '@/api/endPoints/communities';
 
@@ -88,14 +93,14 @@ export const useCreateCommunity = () => {
 };
 
 /**
- * Join Private community mutation
+ * Join With Code community mutation
  */
-export const useJoinPrivateCommunity = () => {
+export const useJoinWithCodeCommunity = () => {
   const queryClient = useQueryClient();
   const language = LanguageStore.getState().language;
   const authSession = authStore.getState().authSession as string;
   return useMutation({
-    mutationFn: (joinCode: string) => joinPrivateCommunity(language, joinCode, authSession),
+    mutationFn: (joinCode: string) => joinWithCodeCommunity(language, joinCode, authSession),
     onSuccess: () => {
       // Refresh the user's community list so the new one shows up
       queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
@@ -125,43 +130,21 @@ export const useJoinCommunity = () => {
 /**
  * Leave community mutation
  */
-// export const useLeaveCommunity = () => {
-//   const queryClient = useQueryClient();
+export const useLeaveCommunity = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
 
-//   return useMutation({
-//     mutationFn: (id: string) => communitiesService.leave(id),
-//     onMutate: async (id) => {
-//       await queryClient.cancelQueries({ queryKey: ["communities", id] });
-
-//       const previousCommunity = queryClient.getQueryData<Community>([
-//         "communities",
-//         id,
-//       ]);
-
-//       if (previousCommunity) {
-//         queryClient.setQueryData<Community>(["communities", id], {
-//           ...previousCommunity,
-//           currentMembers: previousCommunity.currentMembers - 1,
-//         });
-//       }
-
-//       return { previousCommunity };
-//     },
-//     onError: (err, id, context) => {
-//       if (context?.previousCommunity) {
-//         queryClient.setQueryData(
-//           ["communities", id],
-//           context.previousCommunity
-//         );
-//       }
-//     },
-//     onSettled: (data, error, id) => {
-//       queryClient.invalidateQueries({ queryKey: ["communities", id] });
-//       queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
-//       queryClient.invalidateQueries({ queryKey: ["userStats"] });
-//     },
-//   });
-// };
+  return useMutation({
+    mutationFn: (communityId: string) => leaveCommunity(communityId, language, authSession),
+    onSuccess: (data, communityId) => {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['communities', communityId] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
+      queryClient.invalidateQueries({ queryKey: ['userStats'] });
+    },
+  });
+};
 
 /**
  * Update community mutation (admin only)
@@ -174,12 +157,80 @@ export const useUpdateCommunity = () => {
     mutationFn: ({ id, payload }: { id: string; payload: Partial<CreateCommunityDto> }) =>
       updatecommunityById(lang, payload, id, authSession),
     onSuccess: (data, { id }) => {
-      queryClient.setQueryData(['communities', id], data);
+      queryClient.invalidateQueries({ queryKey: ['community', id] });
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
+    },
+  });
+};
+
+/**
+ * Delete community mutation (owner only)
+ */
+export const useDeleteCommunity = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+
+  return useMutation({
+    mutationFn: (communityId: string) => deleteCommunity(communityId, language, authSession),
+    onSuccess: (data, communityId) => {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['community', communityId] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
       queryClient.invalidateQueries({ queryKey: ['communities'] });
     },
   });
 };
 
 /**
- * Delete community mutation (admin only)
+ * Transfer ownership mutation (owner only)
  */
+export const useTransferOwnership = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+
+  return useMutation({
+    mutationFn: ({ communityId, newOwnerId }: { communityId: string; newOwnerId: string }) =>
+      transferOwnership(communityId, newOwnerId, language, authSession),
+    onSuccess: (data, { communityId }) => {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['communities', communityId] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
+      queryClient.invalidateQueries({ queryKey: ['communities', communityId, 'members'] });
+    },
+  });
+};
+
+/**
+ * Get invite code for a community
+ */
+export const useGetInviteCode = (communityId: string, enabled: boolean = false) => {
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+
+  return useQuery({
+    queryKey: ['community', communityId, 'invite-code'],
+    queryFn: () => getInviteCode(communityId, language, authSession),
+    enabled: enabled && !!communityId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+/**
+ * Regenerate invite code for a community (owner only)
+ */
+export const useRegenerateInviteCode = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+
+  return useMutation({
+    mutationFn: (communityId: string) => regenerateInviteCode(communityId, language, authSession),
+    onSuccess: (data, communityId) => {
+      // Invalidate the invite code query to refresh with new code
+      queryClient.invalidateQueries({ queryKey: ['community', communityId, 'invite-code'] });
+    },
+  });
+};

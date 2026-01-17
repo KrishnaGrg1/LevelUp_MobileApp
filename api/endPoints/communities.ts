@@ -6,6 +6,7 @@ import {
   CreateCommunityResponse,
   getCategoriesResponse,
   GetCommunityMembersSuccessResponse,
+  GetInviteCodeResponse,
   GetMyCommunities,
   searchCommunitiesResponse,
   TogglePinResponse,
@@ -163,8 +164,8 @@ export const joinCommunity = async (lang: Language, communityId: string, authSes
   }
 };
 
-// Join a community
-export const joinPrivateCommunity = async (
+// Join a community with invite code
+export const joinWithCodeCommunity = async (
   lang: Language,
   joinCode: string,
   authSession: string,
@@ -250,7 +251,31 @@ export const getCategories = async (lang: Language, authSession: string) => {
     throw new Error(errorMessage);
   }
 };
-
+// Get invite code for a community
+export const getInviteCode = async (communityId: string, lang: Language, authSession: string) => {
+  try {
+    const response = await axiosInstance.get<GetInviteCodeResponse>(
+      `/community/${communityId}/invite-code`,
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to get invite code';
+    throw new Error(errorMessage);
+  }
+};
 export const getAllMembersOfCommunity = async (
   communityId: string,
   lang: Language,
@@ -289,6 +314,7 @@ export const updatecommunityById = async (
   try {
     const response = await axiosInstance.patch<communityDetailByIdResponse>(
       `/community/${communityId}`,
+      payload,
       {
         withCredentials: true,
         headers: {
@@ -305,7 +331,121 @@ export const updatecommunityById = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      'Failed to search community';
+      'Failed to update community';
+    throw new Error(errorMessage);
+  }
+};
+
+// Leave a community
+export const leaveCommunity = async (communityId: string, lang: Language, authSession: string) => {
+  try {
+    const response = await axiosInstance.post(
+      `/community/${communityId}/leave`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to leave community';
+    throw new Error(errorMessage);
+  }
+};
+
+// Delete a community (owner only)
+export const deleteCommunity = async (communityId: string, lang: Language, authSession: string) => {
+  try {
+    const response = await axiosInstance.delete(`/community/${communityId}`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to delete community';
+    throw new Error(errorMessage);
+  }
+};
+
+//Tranfer Ownership of a community
+
+export const transferOwnership = async (
+  communityId: string,
+  newOwnerId: string,
+  lang: Language,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/community/${communityId}/transfer-ownership`,
+      { newOwnerId },
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to leave community';
+    throw new Error(errorMessage);
+  }
+};
+
+// Regenerate invite code for a community
+export const regenerateInviteCode = async (
+  communityId: string,
+  lang: Language,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.post(
+      `/community/${communityId}/regenerate-invite-code`,
+      {},
+      {
+        withCredentials: true,
+        headers: {
+          'X-Language': lang,
+          Authorization: `Bearer ${authSession}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to regenerate invite code';
     throw new Error(errorMessage);
   }
 };

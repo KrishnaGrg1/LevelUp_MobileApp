@@ -296,6 +296,7 @@ export interface CommunityDTO {
   currentMembers: number; // number of members
   maxMembers: number; // member limit
   isPrivate: boolean;
+  photo?: string;
   userRole: 'ADMIN' | 'MEMBER';
   isPinned?: boolean;
   totalXP?: number;
@@ -342,6 +343,18 @@ export interface TogglePinResponse {
   };
 }
 
+export interface GetInviteCodeResponse {
+  statusCode: number;
+  body: {
+    message: string;
+    data: {
+      inviteCode: string;
+      communityName: string;
+      description?: string;
+    };
+  };
+}
+
 export interface searchCommunitiesResponse {
   statusCode: number;
   body: {
@@ -363,9 +376,32 @@ export interface fullUserObjectResponse {
 interface communityDetailById {
   id: string;
   name: string;
+  ownerId: string;
   description: string;
   memberLimit: number;
   photo?: string;
+  isPrivate: boolean;
+  owner: {
+    UserName: string;
+  };
+  members: Array<{
+    user: {
+      UserName: string;
+    };
+    joinedAt: string;
+  }>;
+  clans: Array<{
+    id: string;
+    name: string;
+    isPrivate: boolean;
+    createdAt: string;
+    owner: {
+      UserName: string;
+    };
+    _count: {
+      members: number;
+    };
+  }>;
   _count: {
     members: number;
     clans: number;
@@ -562,7 +598,7 @@ export interface CreateCommunityDto {
   description?: string;
   photo?: string;
   memberLimit?: number;
-  isPrivate: boolean;
+  isPrivate?: boolean;
 }
 
 export interface CommunityMemberDTO {

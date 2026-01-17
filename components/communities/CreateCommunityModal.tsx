@@ -1,9 +1,18 @@
 import { useCreateCommunity } from '@/hooks/queries/useCommunities';
 import { CreateCommunityInput, createCommunitySchema } from '@/schemas/community/createCommunity';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react';
+import * as ImagePicker from 'expo-image-picker';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView } from 'react-native';
+import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+} from 'react-native';
 
 // gluestack-ui components
 import { Box } from '@/components/ui/box';
@@ -24,12 +33,14 @@ interface CreateCommunityModalProps {
 
 export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalProps) {
   const { mutate: createCommunity, isPending } = useCreateCommunity();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const {
     control,
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<CreateCommunityInput>({
     resolver: zodResolver(createCommunitySchema),
@@ -43,17 +54,51 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
 
   const isPrivate = watch('isPrivate');
 
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== 'granted') {
+      Alert.alert('Permission required', 'Please allow access to your photo library');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      const imageUri = result.assets[0].uri;
+      setSelectedImage(imageUri);
+      setValue('photo', imageUri);
+    }
+  };
+
   const onSubmit = (data: CreateCommunityInput) => {
     const formData = new FormData();
     formData.append('communityName', data.communityName);
     if (data.description) formData.append('description', data.description);
     if (data.memberLimit) formData.append('memberLimit', String(data.memberLimit));
     formData.append('isPrivate', String(data.isPrivate));
-    if (data.photo) formData.append('photo', data.photo);
+
+    if (data.photo) {
+      const filename = data.photo.split('/').pop() || 'photo.jpg';
+      const match = /\.([\w]+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+      formData.append('photo', {
+        uri: data.photo,
+        name: filename,
+        type,
+      } as any);
+    }
 
     createCommunity(formData, {
       onSuccess: () => {
         reset();
+        setSelectedImage(null);
         onClose();
       },
       onError: error => {
@@ -64,12 +109,9 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
 
   return (
     <Modal visible={visible} animationType="fade" transparent={true} onRequestClose={onClose}>
-      <Box
-        className="flex-1 justify-center p-4"
-        style={{ backgroundColor: 'rgba(10, 15, 24, 0.7)' }}
-      >
+      <Box className="flex-1 justify-center bg-background-900/70 p-4">
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <Box className="overflow-hidden rounded-[24px] border border-slate-700 bg-[#1e293b] shadow-2xl">
+          <Box className="overflow-hidden rounded-[24px] border border-outline-300 bg-background-50 shadow-2xl">
             <ScrollView
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ padding: 20 }}
@@ -78,31 +120,42 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
                 {/* Header */}
                 <HStack className="items-start justify-between">
                   <VStack space="xs">
-                    <Heading className="text-xl font-bold text-[#38bdf8]">
+                    <Heading className="text-xl font-bold text-primary-600">
                       Create New Community
                     </Heading>
-                    <Text className="text-xs text-slate-300">
+                    <Text className="text-xs text-typography-500">
                       Fill in the details to create your community
                     </Text>
                   </VStack>
                   <Pressable onPress={onClose}>
-                    <X size={20} color="#94a3b8" />
+                    <X size={20} color="#6b7280" />
                   </Pressable>
                 </HStack>
 
                 <HStack space="md" className="items-start">
                   {/* Left Column: Image */}
                   <VStack space="xs" className="items-center">
-                    <Text className="self-start text-xs font-medium text-slate-100">
+                    <Text className="self-start text-xs font-medium text-typography-900">
                       Community Image
                     </Text>
-                    <Pressable className="h-24 w-24 items-center justify-center rounded-full border-2 border-dashed border-slate-600 bg-[#0f172a]">
-                      <VStack space="xs" className="items-center">
-                        <Upload size={20} color="#0ea5e9" />
-                        <Text className="text-center text-[9px] font-bold uppercase text-[#0ea5e9]">
-                          Upload{'\n'}Image
-                        </Text>
-                      </VStack>
+                    <Pressable
+                      onPress={pickImage}
+                      className="h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-outline-300 bg-background-100"
+                    >
+                      {selectedImage ? (
+                        <Image
+                          source={{ uri: selectedImage }}
+                          style={{ width: '100%', height: '100%' }}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <VStack space="xs" className="items-center">
+                          <Upload size={20} color="#8b5cf6" />
+                          <Text className="text-center text-[9px] font-bold uppercase text-primary-600">
+                            Upload{'\n'}Image
+                          </Text>
+                        </VStack>
+                      )}
                     </Pressable>
                   </VStack>
 
@@ -110,7 +163,7 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
                   <VStack space="md" className="flex-1">
                     {/* Community Name */}
                     <VStack space="xs">
-                      <Text className="text-xs font-medium text-slate-100">
+                      <Text className="text-xs font-medium text-typography-900">
                         Community Name <Text className="text-red-500">*</Text>
                       </Text>
                       <Controller
@@ -119,14 +172,14 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
                         render={({ field: { onChange, value } }) => (
                           <Input
                             isInvalid={!!errors.communityName}
-                            className="h-10 rounded-lg border-slate-600 bg-[#0a0f18]"
+                            className="h-10 rounded-lg border-outline-200 bg-background-0"
                           >
                             <InputField
                               placeholder="Enter community name"
                               value={value}
                               onChangeText={onChange}
-                              className="text-xs text-white"
-                              placeholderTextColor="#64748b"
+                              className="text-xs text-typography-900"
+                              placeholderTextColor="#9ca3af"
                             />
                           </Input>
                         )}
@@ -140,7 +193,7 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
 
                     {/* Description */}
                     <VStack space="xs">
-                      <Text className="text-xs font-medium text-slate-100">
+                      <Text className="text-xs font-medium text-typography-900">
                         Description <Text className="text-red-500">*</Text>
                       </Text>
                       <Controller
@@ -149,14 +202,14 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
                         render={({ field: { onChange, value } }) => (
                           <Textarea
                             isInvalid={!!errors.description}
-                            className="min-h-[80px] rounded-lg border-slate-600 bg-[#0a0f18]"
+                            className="min-h-[80px] rounded-lg border-outline-200 bg-background-0"
                           >
                             <TextareaInput
                               placeholder="Describe your community..."
                               value={value}
                               onChangeText={onChange}
-                              className="text-xs text-white"
-                              placeholderTextColor="#64748b"
+                              className="text-xs text-typography-900"
+                              placeholderTextColor="#9ca3af"
                             />
                           </Textarea>
                         )}
@@ -172,8 +225,8 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
 
                 {/* Member Limit */}
                 <VStack space="xs">
-                  <Text className="text-xs font-medium text-slate-100">
-                    Member Limit <Text className="font-normal text-slate-400">(1-1000)</Text>
+                  <Text className="text-xs font-medium text-typography-900">
+                    Member Limit <Text className="font-normal text-typography-500">(1-1000)</Text>
                   </Text>
                   <Controller
                     control={control}
@@ -181,13 +234,13 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
                     render={({ field: { onChange, value } }) => (
                       <Input
                         isInvalid={!!errors.memberLimit}
-                        className="h-10 rounded-lg border-slate-600 bg-[#0a0f18]"
+                        className="h-10 rounded-lg border-outline-200 bg-background-0"
                       >
                         <InputField
                           value={String(value)}
                           onChangeText={v => onChange(v ? Number(v) : 0)}
                           keyboardType="numeric"
-                          className="text-xs text-white"
+                          className="text-xs text-typography-900"
                         />
                       </Input>
                     )}
@@ -199,8 +252,8 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
 
                 {/* Private Toggle */}
                 <VStack space="xs">
-                  <Text className="text-xs font-medium text-slate-100">Privacy Settings</Text>
-                  <HStack className="items-center justify-between rounded-xl border border-slate-600 bg-[#334155]/50 px-4 py-3">
+                  <Text className="text-xs font-medium text-typography-900">Privacy Settings</Text>
+                  <HStack className="items-center justify-between rounded-xl border border-outline-200 bg-background-100 px-4 py-3">
                     <HStack space="md" className="flex-1 items-center">
                       <HStack space="xs" className="items-center">
                         {isPrivate ? (
@@ -208,7 +261,7 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
                         ) : (
                           <Globe size={16} color="#10b981" />
                         )}
-                        <Text className="text-xs font-bold text-white">
+                        <Text className="text-xs font-bold text-typography-900">
                           {isPrivate ? 'Private' : 'Public'}
                         </Text>
                       </HStack>
@@ -227,7 +280,7 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
                         <Switch
                           value={value}
                           onValueChange={onChange}
-                          trackColor={{ false: '#475569', true: '#0ea5e9' }}
+                          trackColor={{ false: '#9ca3af', true: '#8b5cf6' }}
                         />
                       )}
                     />
@@ -238,14 +291,14 @@ export function CreateCommunityModal({ visible, onClose }: CreateCommunityModalP
                 <HStack space="md" className="mt-2 justify-end">
                   <Pressable
                     onPress={onClose}
-                    className="rounded-lg bg-white/90 px-6 py-2 active:bg-white"
+                    className="rounded-lg bg-background-200 px-6 py-2 active:bg-background-300"
                   >
-                    <Text className="text-sm font-bold text-slate-700">Cancel</Text>
+                    <Text className="text-sm font-bold text-typography-700">Cancel</Text>
                   </Pressable>
                   <Button
                     onPress={handleSubmit(onSubmit)}
                     isDisabled={isPending}
-                    className="rounded-lg bg-[#00adef] px-6 py-2 shadow-md"
+                    className="rounded-lg bg-primary-600 px-6 py-2 shadow-md"
                   >
                     {isPending && <ButtonSpinner className="mr-2" />}
                     <ButtonText className="text-sm font-bold text-white">

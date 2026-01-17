@@ -2,44 +2,99 @@ import { Box } from '@/components/ui/box';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
-import { Bell, Info, LogOut, Settings, UserPlus, VolumeX } from 'lucide-react-native';
+import { useLeaveCommunity } from '@/hooks/queries/useCommunities';
+import { Crown, Info, LogOut, UserPlus } from 'lucide-react-native';
 import React from 'react';
-import { Modal, Pressable } from 'react-native';
+import { Alert, Modal, Pressable } from 'react-native';
 
 interface CommunityOptionsModalProps {
   visible: boolean;
   onClose: () => void;
+  onTransferOwnership?: () => void;
+  onInviteMembers?: () => void;
+  onCommunityInfo?: () => void;
+  isOwner?: boolean;
   communityName?: string;
+  communityId?: string;
 }
 
 export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
   visible,
   onClose,
+  onTransferOwnership,
+  onInviteMembers,
+  onCommunityInfo,
+  isOwner = false,
   communityName,
+  communityId,
 }) => {
+  const { mutate: leaveCommunity, isPending: isLeaving } = useLeaveCommunity();
+
   const options = [
     { id: 'info', label: 'Community Info', icon: Info, color: '#6b7280' },
-    { id: 'settings', label: 'Settings', icon: Settings, color: '#6b7280' },
+
     {
       id: 'invite',
       label: 'Invite Members',
       icon: UserPlus,
       color: '#6b7280',
     },
-    {
-      id: 'notifications',
-      label: 'Notifications',
-      icon: Bell,
-      color: '#6b7280',
-    },
-    { id: 'mute', label: 'Mute', icon: VolumeX, color: '#6b7280' },
+    ...(isOwner
+      ? [{ id: 'transfer', label: 'Transfer Ownership', icon: Crown, color: '#f59e0b' }]
+      : []),
     { id: 'leave', label: 'Leave Community', icon: LogOut, color: '#ef4444' },
   ];
 
   const handleOptionPress = (optionId: string) => {
-    // Handle option selection here
-    console.log('Selected option:', optionId);
-    onClose();
+    if (optionId === 'info' && onCommunityInfo) {
+      onClose();
+      setTimeout(() => {
+        onCommunityInfo();
+      }, 300);
+    } else if (optionId === 'transfer' && communityId && onTransferOwnership) {
+      onTransferOwnership();
+    } else if (optionId === 'invite' && communityId && onInviteMembers) {
+      onClose();
+      // Delay to ensure modal closes before opening the new one
+      setTimeout(() => {
+        onInviteMembers();
+      }, 300);
+    } else if (optionId === 'leave' && communityId) {
+      // Show confirmation dialog
+      Alert.alert(
+        'Leave Community',
+        `Are you sure you want to leave ${communityName || 'this community'}?`,
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Leave',
+            style: 'destructive',
+            onPress: () => {
+              leaveCommunity(communityId, {
+                onSuccess: () => {
+                  console.log('Successfully left community');
+                  onClose();
+                },
+                onError: (error: any) => {
+                  console.error('Failed to leave community:', error);
+                  // Extract error message from backend response
+                  const errorMessage =
+                    error?.message || 'Failed to leave community. Please try again.';
+                  Alert.alert('Error', errorMessage);
+                },
+              });
+            },
+          },
+        ],
+      );
+    } else {
+      // Handle other options here
+      console.log('Selected option:', optionId);
+      onClose();
+    }
   };
 
   return (
@@ -54,6 +109,7 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
               <Pressable
                 key={option.id}
                 onPress={() => handleOptionPress(option.id)}
+                disabled={option.id === 'leave' && isLeaving}
                 className="px-4 py-3 active:bg-gray-50"
               >
                 <HStack space="md" className="items-center">
@@ -62,10 +118,14 @@ export const CommunityOptionsModal: React.FC<CommunityOptionsModalProps> = ({
                   </Box>
                   <Text
                     className={`text-base ${
-                      option.id === 'leave' ? 'font-semibold text-error-500' : 'text-typography-900'
+                      option.id === 'leave'
+                        ? 'font-semibold text-error-500'
+                        : option.id === 'transfer'
+                          ? 'font-semibold text-amber-600'
+                          : 'text-typography-900'
                     }`}
                   >
-                    {option.label}
+                    {option.id === 'leave' && isLeaving ? 'Leaving...' : option.label}
                   </Text>
                 </HStack>
               </Pressable>

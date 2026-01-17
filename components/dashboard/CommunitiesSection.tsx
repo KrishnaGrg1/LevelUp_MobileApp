@@ -1,7 +1,7 @@
 import { CommunityDTO } from '@/api/generated';
 import { CreateCommunityModal } from '@/components/communities/CreateCommunityModal';
 import { DiscoverCommunitiesModal } from '@/components/communities/DiscoverCommunitiesModal';
-import { JoinPrivateCommunityModal } from '@/components/communities/JoinPrivateCommunityModal';
+import { JoinWithCodeModal } from '@/components/communities/JoinWithCodeModal';
 import { Avatar, AvatarFallbackText } from '@/components/ui/avatar';
 import { Badge, BadgeText } from '@/components/ui/badge';
 import { Box } from '@/components/ui/box';
@@ -16,7 +16,7 @@ import { useThemeStore } from '@/stores/theme.store';
 import { useRouter } from 'expo-router';
 import { ChevronRight, Lock, Users } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Dimensions, FlatList, Pressable } from 'react-native';
+import { Dimensions, FlatList, Image, Pressable } from 'react-native';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.85;
@@ -39,9 +39,19 @@ function CommunityCard({ community, onPress }: CommunityCardProps) {
         <VStack space="md">
           {/* Top Section: Avatar and Name */}
           <HStack space="md" className="items-center">
-            <Avatar size="lg" className="bg-primary-100">
-              <AvatarFallbackText>{community.name}</AvatarFallbackText>
-            </Avatar>
+            {community.photo ? (
+              <Box className="h-16 w-16 overflow-hidden rounded-full bg-primary-100">
+                <Image
+                  source={{ uri: community.photo }}
+                  style={{ width: 64, height: 64 }}
+                  resizeMode="cover"
+                />
+              </Box>
+            ) : (
+              <Avatar size="lg" className="bg-primary-100">
+                <AvatarFallbackText>{community.name}</AvatarFallbackText>
+              </Avatar>
+            )}
 
             <VStack className="flex-1">
               <Heading size="md" className="text-typography-900" numberOfLines={1}>
@@ -111,7 +121,7 @@ export function CommunitiesSection() {
 
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [discoverModalVisible, setDiscoverModalVisible] = useState(false);
-  const [joinPrivateModalVisible, setJoinPrivateModalVisible] = useState(false);
+  const [joinWithCodeModalVisible, setJoinWithCodeModalVisible] = useState(false);
 
   React.useEffect(() => {
     console.log('Communities data:', communities);
@@ -163,19 +173,6 @@ export function CommunitiesSection() {
   }
 
   const communitiesData = communities?.body?.data || [];
-
-  if (!communitiesData || communitiesData.length === 0) {
-    return (
-      <VStack space="md" className="py-4">
-        <HStack className="items-center justify-between px-4">
-          <Heading size="lg" className="text-typography-900">
-            My Communities
-          </Heading>
-        </HStack>
-        <EmptyState />
-      </VStack>
-    );
-  }
 
   return (
     <VStack space="md" className="py-6">
@@ -235,12 +232,12 @@ export function CommunitiesSection() {
         onClose={() => setDiscoverModalVisible(false)}
         onJoinPrivate={() => {
           setDiscoverModalVisible(false);
-          setJoinPrivateModalVisible(true);
+          setJoinWithCodeModalVisible(true);
         }}
       />
-      <JoinPrivateCommunityModal
-        visible={joinPrivateModalVisible}
-        onClose={() => setJoinPrivateModalVisible(false)}
+      <JoinWithCodeModal
+        visible={joinWithCodeModalVisible}
+        onClose={() => setJoinWithCodeModalVisible(false)}
       />
     </VStack>
   );

@@ -98,9 +98,7 @@ export function DiscoverCommunitiesModal({
               >
                 <HStack space="xs" className="items-center">
                   <Key size={18} color="#6b7280" />
-                  <Text className="text-sm font-semibold text-typography-600">
-                    Join Private Community
-                  </Text>
+                  <Text className="text-sm font-semibold text-typography-600">Join With Code</Text>
                 </HStack>
               </Pressable>
             </HStack>
@@ -294,7 +292,7 @@ function CommunityItem({ community, onJoin, isJoining }: CommunityItemProps) {
         </VStack>
 
         <Button
-          // onPress={() => onJoin(community.id)}
+          onPress={() => onJoin(community.id)}
           isDisabled={isJoining}
           size="sm"
           className={`${isPrivate ? 'bg-warning-500' : 'bg-success-500'} px-4`}

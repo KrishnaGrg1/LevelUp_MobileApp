@@ -1,6 +1,9 @@
 import { communityDetailById } from '@/api/endPoints/communities';
+import { ClansTab } from '@/components/communities/ClansTab';
 import { CommunityOptionsModal } from '@/components/communities/CommunityOptionsModal';
-import { CreateClanModal } from '@/components/communities/CreateClanModal';
+import { InviteMembersModal } from '@/components/communities/InviteMembersModal';
+import { ProfileTab } from '@/components/communities/ProfileTab';
+import { TransferOwnershipModal } from '@/components/communities/TransferOwnershipModal';
 import { Box } from '@/components/ui/box';
 import { Center } from '@/components/ui/center';
 import { Heading } from '@/components/ui/heading';
@@ -8,26 +11,18 @@ import { HStack } from '@/components/ui/hstack';
 import { Spinner } from '@/components/ui/spinner';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
-import { useClansByCommunity } from '@/hooks/queries/useClan';
+
 import { useMessages } from '@/hooks/useMessages';
 import authStore from '@/stores/auth.store';
 import LanguageStore from '@/stores/language.store';
 import { useQuery } from '@tanstack/react-query';
-import { useLocalSearchParams } from 'expo-router';
-import {
-  MessageCircle,
-  MoreVertical,
-  Paperclip,
-  Plus,
-  Search,
-  Send,
-  Shield,
-  Users,
-} from 'lucide-react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { MessageCircle, MoreVertical, Paperclip, Send, Shield, Users } from 'lucide-react-native';
 import React, { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -37,17 +32,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CommunityDetailScreen() {
   const { id } = useLocalSearchParams();
+  const router = useRouter();
   const language = LanguageStore.getState().language;
   const [inputMessage, setInputMessage] = useState('');
   const [activeTab, setActiveTab] = useState<
     'chat' | 'quests' | 'profile' | 'clans' | 'leaderboard'
   >('chat');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedClan, setSelectedClan] = useState<string | null>(null);
-  const [showCreateClanModal, setShowCreateClanModal] = useState(false);
   const [showCommunityOptions, setShowCommunityOptions] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const authSession = authStore.getState().authSession as string;
+  const currentUserId = authStore.getState().user?.id;
   const { data, isLoading, error } = useQuery({
     queryKey: ['community', id, language],
     queryFn: () => communityDetailById(language as any, id as string, authSession),
@@ -68,21 +64,6 @@ export default function CommunityDetailScreen() {
   });
 
   const community = data?.body?.data;
-
-  // Fetch clans from API
-  const {
-    data: clansData,
-    isLoading: clansLoading,
-    error: clansError,
-  } = useClansByCommunity(id as string);
-
-  const clans = clansData?.body?.data || [];
-  const myClans = clans.filter(clan => clan.isMember);
-  const availableClans = clans.filter(clan => !clan.isMember);
-
-  const filteredClans = clans.filter(clan =>
-    clan.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
 
   const tabs = [
     { id: 'chat', label: 'Chat', icon: MessageCircle },
@@ -156,9 +137,19 @@ export default function CommunityDetailScreen() {
           {/* Community Header - Using Backend Data */}
           <HStack className="items-center justify-between border-b border-outline-200 bg-background-0 px-4 py-3">
             <HStack space="md" className="flex-1 items-center">
-              <Box className="h-12 w-12 items-center justify-center rounded-lg bg-primary-500">
-                <Text className="text-2xl">{community.photo || '🛡️'}</Text>
-              </Box>
+              {community.photo ? (
+                <Box className="h-12 w-12 overflow-hidden rounded-lg bg-primary-500">
+                  <Image
+                    source={{ uri: community.photo }}
+                    style={{ width: 48, height: 48 }}
+                    resizeMode="cover"
+                  />
+                </Box>
+              ) : (
+                <Box className="h-12 w-12 items-center justify-center rounded-lg bg-primary-500">
+                  <Text className="text-2xl">🛡️</Text>
+                </Box>
+              )}
               <VStack className="flex-1">
                 <Heading size="sm" className="leading-tight text-typography-900">
                   {community.name}
@@ -331,127 +322,21 @@ export default function CommunityDetailScreen() {
           )}
 
           {activeTab === 'clans' && (
-            <VStack className="flex-1">
-              {/* Header with Create Clan Button */}
-              <HStack className="items-center justify-between border-b border-outline-200 bg-background-50 px-4 py-3">
-                <Pressable
-                  className="flex-row items-center gap-2 rounded-lg bg-primary-600 px-4 py-2"
-                  onPress={() => setShowCreateClanModal(true)}
-                >
-                  <Plus size={16} color="#ffffff" />
-                  <Text className="text-sm font-semibold text-white">Create Clan</Text>
-                </Pressable>
-              </HStack>
-
-              {/* Search Bar */}
-              <Box className="border-b border-outline-200 bg-background-0 px-4 py-3">
-                <HStack
-                  space="md"
-                  className="items-center rounded-lg border border-outline-200 bg-background-50 px-3 py-2"
-                >
-                  <Search size={18} color="#9ca3af" />
-                  <TextInput
-                    placeholder="Search clans..."
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    placeholderTextColor="#9ca3af"
-                    className="flex-1 text-sm text-typography-900"
-                  />
-                </HStack>
-              </Box>
-
-              {/* Loading State */}
-              {clansLoading ? (
-                <Center className="flex-1">
-                  <Spinner size="large" />
-                  <Text className="mt-4 text-sm text-typography-500">Loading clans...</Text>
-                </Center>
-              ) : clansError ? (
-                <Center className="flex-1 px-4">
-                  <Text className="text-center text-error-500">Failed to load clans</Text>
-                </Center>
-              ) : (
-                /* Clans List */
-                <FlatList
-                  data={filteredClans}
-                  keyExtractor={item => item.id}
-                  contentContainerStyle={{ paddingBottom: 20 }}
-                  ListHeaderComponent={
-                    <>
-                      {/* My Clans Section */}
-                      {myClans.length > 0 && (
-                        <VStack className="px-4 py-3">
-                          <Text className="mb-2 text-xs font-semibold uppercase text-typography-500">
-                            My Clans
-                          </Text>
-                        </VStack>
-                      )}
-                    </>
-                  }
-                  renderItem={({ item, index }) => {
-                    const isMyClans = item.isMember;
-                    const isSelected = selectedClan === item.id;
-                    const showAvailableHeader =
-                      index === myClans.length && availableClans.length > 0;
-
-                    return (
-                      <>
-                        {showAvailableHeader && (
-                          <VStack className="px-4 py-3 pt-4">
-                            <Text className="mb-2 text-xs font-semibold uppercase text-typography-500">
-                              Available Clans
-                            </Text>
-                          </VStack>
-                        )}
-                        <Pressable
-                          onPress={() => setSelectedClan(item.id)}
-                          className={`mx-4 mb-2 rounded-lg border ${
-                            isSelected
-                              ? 'border-primary-500 bg-primary-50'
-                              : 'border-outline-200 bg-background-0'
-                          }`}
-                        >
-                          <HStack space="md" className="items-center px-4 py-3">
-                            <Box
-                              className={`h-12 w-12 items-center justify-center rounded-lg ${
-                                isSelected ? 'bg-primary-500' : 'bg-primary-100'
-                              }`}
-                            >
-                              <Text className="text-2xl">{item.isPrivate ? '🔒' : '⚔️'}</Text>
-                            </Box>
-                            <VStack className="flex-1">
-                              <Text className="text-sm font-semibold text-typography-900">
-                                {item.name}
-                              </Text>
-                              <HStack space="xs" className="mt-1 items-center">
-                                <Users size={12} color="#6b7280" />
-                                <Text className="text-xs text-typography-500">
-                                  {item.stats?.memberCount || 0} / {item.limit} members
-                                </Text>
-                              </HStack>
-                            </VStack>
-                            {isMyClans && (
-                              <Box className="rounded bg-primary-100 px-2 py-1">
-                                <Text className="text-xs font-medium text-primary-700">Joined</Text>
-                              </Box>
-                            )}
-                          </HStack>
-                        </Pressable>
-                      </>
-                    );
-                  }}
-                  ListEmptyComponent={
-                    <Center className="py-20">
-                      <Shield size={48} color="#d1d5db" />
-                      <Text className="mt-4 text-typography-500">No clans found</Text>
-                    </Center>
-                  }
-                />
-              )}
-            </VStack>
+            <ClansTab communityId={id as string} communityName={community?.name} />
           )}
 
-          {activeTab !== 'chat' && activeTab !== 'clans' && (
+          {activeTab === 'profile' && (
+            <ProfileTab
+              community={community}
+              onViewAllClans={() => setActiveTab('clans')}
+              onDelete={() => {
+                // Navigate back to dashboard after successful deletion
+                router.push('/(main)/(tabs)/dashboard');
+              }}
+            />
+          )}
+
+          {activeTab !== 'chat' && activeTab !== 'clans' && activeTab !== 'profile' && (
             <Center className="flex-1">
               <Text className="capitalize text-typography-500">
                 {activeTab} for {community.name} coming soon
@@ -461,17 +346,35 @@ export default function CommunityDetailScreen() {
         </VStack>
       </KeyboardAvoidingView>
 
-      {/* Create Clan Modal */}
-      <CreateClanModal
-        visible={showCreateClanModal}
-        onClose={() => setShowCreateClanModal(false)}
-        communityId={id as string}
-      />
-
       {/* Community Options Modal */}
       <CommunityOptionsModal
         visible={showCommunityOptions}
         onClose={() => setShowCommunityOptions(false)}
+        onTransferOwnership={() => {
+          setShowCommunityOptions(false);
+          setShowTransferModal(true);
+        }}
+        onInviteMembers={() => setShowInviteModal(true)}
+        onCommunityInfo={() => setActiveTab('profile')}
+        isOwner={community?.ownerId === currentUserId}
+        communityName={community?.name}
+        communityId={id as string}
+      />
+
+      {/* Invite Members Modal */}
+      <InviteMembersModal
+        visible={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        communityId={id as string}
+        communityName={community?.name}
+        isOwner={community?.ownerId === currentUserId}
+      />
+
+      {/* Transfer Ownership Modal */}
+      <TransferOwnershipModal
+        visible={showTransferModal}
+        onClose={() => setShowTransferModal(false)}
+        communityId={id as string}
         communityName={community?.name}
       />
     </SafeAreaView>
