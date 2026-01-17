@@ -32,10 +32,10 @@ function DashboardPage() {
 
       {/* Scrollable Content */}
       <ScrollView
-        className="flex-1"
+        className="flex-1 dark:bg-background-0"
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        <VStack space="md" className="pb-6">
+        <VStack space="md" className="pb-6 dark">
           {/* Communities Section - Horizontal Scroll */}
           <CommunitiesSection />
 

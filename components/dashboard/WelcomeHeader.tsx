@@ -5,6 +5,7 @@ import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import authStore from '@/stores/auth.store';
+import { useTranslation } from '@/translation';
 import { useRouter } from 'expo-router';
 import { Coins, TrendingUp, Zap } from 'lucide-react-native';
 import React from 'react';
@@ -13,6 +14,7 @@ import { Pressable } from 'react-native';
 export function WelcomeHeader() {
   const router = useRouter();
   const user = authStore(state => state.user);
+  const { t } = useTranslation();
 
   const handleProfilePress = () => {
     router.push('/(main)/profile' as any);
@@ -42,9 +44,9 @@ export function WelcomeHeader() {
             </Avatar>
             <VStack>
               <Text className="font-bold text-typography-900 dark:text-white">
-                Hi, {displayUser?.UserName || 'User'} 👋
+                {t('dashboard.greeting')}, {displayUser?.UserName || 'User'} 👋
               </Text>
-              <Text className="text-xs text-typography-500 dark:text-typography-400">Let's level up today!</Text>
+              <Text className="text-xs text-typography-500 dark:text-typography-400">{t('dashboard.tagline')}</Text>
             </VStack>
           </HStack>
         </Pressable>
@@ -62,8 +64,8 @@ export function WelcomeHeader() {
               <TrendingUp size={14} color="#fff" />
             </Box>
             <VStack className="flex-1">
-              <Text className="text-[10px] font-medium text-white/80">Level</Text>
-              <Text className="text-lg font-bold text-white">{displayUser?.level || 0}</Text>
+              <Text className="text-[10px] font-medium text-black/80">{t('dashboard.stats.level')}</Text>
+              <Text className="text-lg font-bold text-black">{displayUser?.level || 0}</Text>
             </VStack>
           </HStack>
         </Box>
@@ -75,8 +77,8 @@ export function WelcomeHeader() {
               <Zap size={14} color="#fff" />
             </Box>
             <VStack className="flex-1">
-              <Text className="text-[10px] font-medium text-white/80">XP</Text>
-              <Text className="text-lg font-bold text-white">{displayUser?.xp || 0}</Text>
+              <Text className="text-[10px] font-medium text-black/80">{t('dashboard.stats.xp')}</Text>
+              <Text className="text-lg font-bold text-black">{displayUser?.xp || 0}</Text>
             </VStack>
           </HStack>
         </Box>
@@ -88,8 +90,8 @@ export function WelcomeHeader() {
               <Coins size={14} color="#fff" />
             </Box>
             <VStack className="flex-1">
-              <Text className="text-[10px] font-medium text-white/80">Tokens</Text>
-              <Text className="text-lg font-bold text-white">{displayUser?.tokens || 0}</Text>
+              <Text className="text-[10px] font-medium text-black/80">{t('dashboard.stats.tokens')}</Text>
+              <Text className="text-lg font-bold text-black">{displayUser?.tokens || 0}</Text>
             </VStack>
           </HStack>
         </Box>

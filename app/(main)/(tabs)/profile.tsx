@@ -124,13 +124,13 @@ function ProfilePage() {
 
   // Main render
   return (
-    <ScrollView className="flex-1 bg-background-0">
+    <ScrollView className="flex-1 bg-background-50">
       {/* Header with Profile Info */}
-      <Box className="bg-primary-500 px-6 pb-8 pt-12">
+      <Box className="bg-primary-500 px-6 pb-8 pt-12 dark:bg-background-50">
         <VStack className="items-center">
           {/* Avatar */}
           <Box className="relative">
-            <Avatar size="2xl" className="border-4 border-white">
+            <Avatar size="2xl" className="border-4 border-white dark:border-background-0">
               <AvatarFallbackText className="text-white">
                 {user?.UserName || 'User'}
               </AvatarFallbackText>
@@ -148,26 +148,26 @@ function ProfilePage() {
           </Box>
 
           {/* User Info */}
-          <Heading size="2xl" className="mt-4 text-white">
+          <Heading size="2xl" className="mt-4 text-white dark:text-background-50">
             {user?.UserName || 'User'}
           </Heading>
-          <Text className="mt-1 text-typography-300">{user?.email || 'user@example.com'}</Text>
+          <Text className="mt-1 text-white/80 dark:text-background-50">{user?.email || 'user@example.com'}</Text>
 
           {/* Level Badge */}
           <Badge
             size="lg"
             variant="solid"
-            className="mt-3 border-0 bg-white dark:bg-background-900"
+            className="mt-3 border-0 bg-white dark:bg-black"
           >
             <Icon as={TrendingUp} size="sm" className="text-primary-500" />
-            <BadgeText className="ml-1 text-typography-900">
+            <BadgeText className="ml-1 text-typography-50">
               {t('profile.level', 'Level')} {userStats.level}
             </BadgeText>
           </Badge>
 
           {/* Stats */}
           <HStack className="mt-6 w-full" space="md">
-            <Card className="flex-1 items-center border-0 bg-white p-3 shadow-sm dark:bg-background-900">
+            <Card className="flex-1 items-center border-0 bg-background-0 p-3 shadow-sm">
               <Text className="text-2xl font-bold text-typography-900">
                 {userStats.completedChallenges}
               </Text>
@@ -175,11 +175,11 @@ function ProfilePage() {
                 {t('profile.challenges', 'Challenges')}
               </Text>
             </Card>
-            <Card className="flex-1 items-center border-0 bg-white p-3 shadow-sm dark:bg-background-900">
+            <Card className="flex-1 items-center border-0 bg-background-0 p-3 shadow-sm">
               <Text className="text-2xl font-bold text-typography-900">#{userStats.rank}</Text>
               <Text className="mt-1 text-xs text-typography-500">{t('profile.rank', 'Rank')}</Text>
             </Card>
-            <Card className="flex-1 items-center border-0 bg-white p-3 shadow-sm dark:bg-background-900">
+            <Card className="flex-1 items-center border-0 bg-background-0 p-3 shadow-sm">
               <Text className="text-2xl font-bold text-typography-900">{userStats.badges}</Text>
               <Text className="mt-1 text-xs text-typography-500">
                 {t('profile.badges', 'Badges')}
@@ -191,10 +191,10 @@ function ProfilePage() {
 
       <Box className="px-6 py-6">
         {/* Progress Card */}
-        <Card className="mb-6 border-0 bg-white p-4 shadow-sm dark:bg-background-900">
+        <Card className="mb-6 border-0 bg-background-0 p-4 shadow-sm dark:border-2 dark:border-white">
           <HStack className="items-center justify-between">
             <VStack className="flex-1">
-              <Text className="text-sm font-medium text-typography-500">
+              <Text className="text-sm font-medium text-typography-500 dark:text-white">
                 {t('profile.nextLevel', 'Next Level')}
               </Text>
               <Text className="mt-1 text-lg font-bold text-typography-900">
@@ -222,7 +222,7 @@ function ProfilePage() {
               {t('profile.achievements', 'Achievements')}
             </Heading>
             <Pressable>
-              <Text className="text-sm font-medium text-typography-900">
+              <Text className="text-sm font-medium text-primary-600 dark:text-primary-400">
                 {t('profile.viewAll', 'View All')}
               </Text>
             </Pressable>
@@ -232,11 +232,13 @@ function ProfilePage() {
               <Card
                 key={achievement.id}
                 className={`mb-3 w-[48%] border ${
-                  achievement.earned ? 'border-outline-100' : 'border-outline-50'
-                } p-4 ${!achievement.earned && 'opacity-50'}`}
+                  achievement.earned ? 'border-gray-200 dark:border-white' : 'border-gray-100 dark:border-white'
+                } bg-background-0 p-4 ${
+                  !achievement.earned && 'opacity-50'
+                }`}
               >
                 <Box
-                  className={`h-12 w-12 items-center justify-center rounded-full ${achievement.bgColor}`}
+                  className={`h-12 w-12 items-center justify-center rounded-full ${achievement.bgColor} dark:bg-opacity-20`}
                 >
                   <Icon as={achievement.icon} size="lg" className={achievement.color} />
                 </Box>
@@ -251,7 +253,7 @@ function ProfilePage() {
         <VStack space="sm" className="mb-6">
           {menuItems.map(item => (
             <Pressable key={item.id} onPress={item.onPress}>
-              <Card className="border-0 bg-white p-4 shadow-sm dark:bg-background-900">
+              <Card className="border-0 bg-background-0 p-4 shadow-sm">
                 <HStack className="items-center justify-between">
                   <HStack className="items-center" space="md">
                     <Box className="h-10 w-10 items-center justify-center rounded-full bg-background-100">
@@ -270,7 +272,7 @@ function ProfilePage() {
         <LogOutButton />
 
         {/* Account Info */}
-        <Card className="mt-6 border-0 bg-white p-4 shadow-sm dark:bg-background-900">
+        <Card className="mt-6 border-0 bg-background-0 p-4 shadow-sm">
           <Text className="text-sm font-medium text-typography-500">
             {t('profile.accountInfo', 'Account Information')}
           </Text>

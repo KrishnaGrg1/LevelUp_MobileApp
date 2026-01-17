@@ -12,6 +12,7 @@ import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { useAllCommunities, useJoinCommunity, useMyCommunities } from '@/hooks/queries/useCommunities';
 import { useThemeStore } from '@/stores/theme.store';
+import { useTranslation } from '@/translation';
 import { useRouter } from 'expo-router';
 import { ChevronRight, Lock, Users } from 'lucide-react-native';
 import React, { useState } from 'react';
@@ -29,6 +30,7 @@ interface CommunityCardProps {
 
 function CommunityCard({ community, onPress, onJoin, isJoining }: CommunityCardProps) {
   const { theme } = useThemeStore();
+  const { t } = useTranslation();
   const isDark = theme === 'dark' || (theme === 'system' && false);
   const isMember = !!community.userRole;
 
@@ -62,7 +64,7 @@ function CommunityCard({ community, onPress, onJoin, isJoining }: CommunityCardP
               {community.isPrivate && (
                 <HStack space="xs" className="mt-1 items-center">
                   <Lock size={12} color="#8b5cf6" />
-                  <Text className="text-xs text-primary-600 dark:text-primary-400">Private Community</Text>
+                  <Text className="text-xs text-primary-600 dark:text-primary-500">{t('dashboard.communities.privateCommunity')}</Text>
                 </HStack>
               )}
             </VStack>
@@ -76,7 +78,7 @@ function CommunityCard({ community, onPress, onJoin, isJoining }: CommunityCardP
           <HStack space="xs" className="items-center">
             <Users size={16} color={isDark ? '#9ca3af' : '#6b7280'} />
             <Text className="text-sm text-typography-600 dark:text-typography-400">
-              {community.currentMembers} / {community.maxMembers} members
+              {community.currentMembers} / {community.maxMembers} {t('dashboard.communities.members')}
             </Text>
           </HStack>
 
@@ -158,6 +160,7 @@ function CommunityGrid({
 
 export function CommunitiesSection() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { data: communities, isLoading, isError, error } = useMyCommunities();
   const {
     data: allCommunities,
@@ -209,12 +212,12 @@ export function CommunitiesSection() {
       <VStack space="md" className="py-4">
         <HStack className="items-center justify-between px-4">
           <Heading size="lg" className="text-typography-900 dark:text-white">
-            My Communities
+            {t('dashboard.communities.title')}
           </Heading>
         </HStack>
         <Center className="py-8">
           <Spinner size="large" />
-          <Text className="mt-2 text-sm text-typography-500">Loading communities...</Text>
+          <Text className="mt-2 text-sm text-typography-500">Loading...</Text>
         </Center>
       </VStack>
     );
@@ -245,11 +248,11 @@ export function CommunitiesSection() {
     <VStack space="md" className="py-6">
       {/* Header */}
       <VStack space="xs" className="px-4">
-        <Heading size="2xl" className="text-typography-900 dark:text-typography-50">
-          My Communities
+        <Heading size="2xl" className="text-typography-900 dark:text-typography-900">
+          {t('dashboard.communities.title')}
         </Heading>
         <Text className="text-sm text-typography-500 dark:text-typography-400">
-          Manage and explore your professional communities
+          {t('dashboard.communities.subtitle')}
         </Text>
       </VStack>
 
@@ -261,7 +264,7 @@ export function CommunitiesSection() {
         >
           <HStack space="xs" className="items-center">
             <Users size={18} color="#10b981" />
-            <Text className="text-sm font-semibold text-success-600">Discover</Text>
+            <Text className="text-sm font-semibold text-success-600">{t('dashboard.communities.discover')}</Text>
           </HStack>
         </Pressable>
 
@@ -269,19 +272,19 @@ export function CommunitiesSection() {
           onPress={() => setCreateModalVisible(true)}
           className="flex-1 items-center justify-center rounded-lg bg-background-0 px-4 py-3"
         >
-          <Text className="text-sm font-semibold text-typography-900">+ Create New Community</Text>
+          <Text className="text-sm font-semibold text-typography-900">{t('dashboard.communities.createNew')}</Text>
         </Pressable>
       </HStack>
 
       {/* My Communities List */}
       <VStack space="sm">
         <Heading size="md" className="px-4 text-typography-800">
-          My Communities
+          {t('dashboard.communities.title')}
         </Heading>
         {!communitiesData || communitiesData.length === 0 ? (
           <EmptyState
-            message="No communities yet"
-            subMessage="Join or create a community to get started!"
+            message={t('dashboard.communities.empty.title')}
+            subMessage={t('dashboard.communities.empty.subtitle')}
           />
         ) : (
           <CommunityGrid
@@ -296,7 +299,7 @@ export function CommunitiesSection() {
       {/* All Communities List */}
       <VStack space="sm" className="mt-4">
         <Heading size="md" className="px-4 text-typography-800 dark:text-white">
-          All Communities
+          {t('dashboard.communities.allCommunities')}
         </Heading>
         {isAllLoading ? (
             <Center className="py-8">
@@ -305,8 +308,8 @@ export function CommunitiesSection() {
             </Center>
         ) : !allCommunitiesData || allCommunitiesData.length === 0 ? (
           <EmptyState
-             message="No communities found"
-             subMessage="Check back later for new communities!"
+             message={t('dashboard.communities.empty.allEmpty')}
+             subMessage={t('dashboard.communities.empty.allEmptySubtitle')}
           />
         ) : (
           <CommunityGrid
