@@ -1,3 +1,6 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { MessageCircle, MoreVertical, Paperclip, Send, Shield, Users } from 'lucide-react-native';
 import React, { useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -10,9 +13,6 @@ import {
   TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
-import { MessageCircle, MoreVertical, Paperclip, Send, Shield, Users } from 'lucide-react-native';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   completeQuest,
@@ -42,15 +42,17 @@ import LanguageStore from '@/stores/language.store';
 
 export default function CommunityDetailScreen() {
   const { id } = useLocalSearchParams();
+  const router = useRouter();
   const communityId = Array.isArray(id) ? id[0] : id;
   const language = LanguageStore.getState().language;
   const [inputMessage, setInputMessage] = useState('');
-  const [activeTab, setActiveTab] = useState<'chat' | 'quests' | 'profile' | 'clans' | 'leaderboard'>(
-    'chat',
-  );
+  const [activeTab, setActiveTab] = useState<
+    'chat' | 'quests' | 'profile' | 'clans' | 'leaderboard'
+  >('chat');
   const [activeQuestTab, setActiveQuestTab] = useState<'daily' | 'weekly'>('daily');
-  const [activeCommunityLeaderboard, setActiveCommunityLeaderboard] =
-    useState<'members' | 'clans'>('members');
+  const [activeCommunityLeaderboard, setActiveCommunityLeaderboard] = useState<'members' | 'clans'>(
+    'members',
+  );
   const [showCommunityOptions, setShowCommunityOptions] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -458,7 +460,14 @@ export default function CommunityDetailScreen() {
           )}
 
           {activeTab === 'profile' && (
-            <ProfileTab community={community} onViewAllClans={() => setActiveTab('clans')} />
+            <ProfileTab
+              community={community}
+              onViewAllClans={() => setActiveTab('clans')}
+              onDelete={() => {
+                // Navigate back to dashboard after successful deletion
+                router.push('/(main)/(tabs)/dashboard');
+              }}
+            />
           )}
 
           {activeTab === 'leaderboard' && (
@@ -476,7 +485,7 @@ export default function CommunityDetailScreen() {
                 />
               }
             >
-              <HStack className="items-center justify-between mb-4">
+              <HStack className="mb-4 items-center justify-between">
                 <Heading size="md" className="text-typography-900">
                   Community Leaderboard
                 </Heading>
@@ -518,8 +527,8 @@ export default function CommunityDetailScreen() {
                 const loading = showingClans ? isLoadingClanLb : isLoadingLeaderboard;
                 const err = showingClans ? clanLbError : leaderboardError;
                 const results = showingClans
-                  ? communityClans?.results ?? []
-                  : communityLeaderboard?.results ?? [];
+                  ? (communityClans?.results ?? [])
+                  : (communityLeaderboard?.results ?? []);
 
                 if (loading) {
                   return (
@@ -561,7 +570,9 @@ export default function CommunityDetailScreen() {
                         >
                           <HStack space="md" className="items-center">
                             <Box className="h-9 w-9 items-center justify-center rounded-full bg-primary-100">
-                              <Text className="text-sm font-semibold text-primary-700">{index + 1}</Text>
+                              <Text className="text-sm font-semibold text-primary-700">
+                                {index + 1}
+                              </Text>
                             </Box>
                             <VStack>
                               <Text className="text-base font-semibold text-typography-900">
@@ -593,13 +604,17 @@ export default function CommunityDetailScreen() {
                       >
                         <HStack space="md" className="items-center">
                           <Box className="h-9 w-9 items-center justify-center rounded-full bg-primary-100">
-                            <Text className="text-sm font-semibold text-primary-700">{index + 1}</Text>
+                            <Text className="text-sm font-semibold text-primary-700">
+                              {index + 1}
+                            </Text>
                           </Box>
                           <VStack>
                             <Text className="text-base font-semibold text-typography-900">
                               {member.user?.UserName || 'Unknown'}
                             </Text>
-                            <Text className="text-xs text-typography-500">Level {member.level}</Text>
+                            <Text className="text-xs text-typography-500">
+                              Level {member.level}
+                            </Text>
                           </VStack>
                         </HStack>
                         <VStack className="items-end">
@@ -702,13 +717,17 @@ export default function CommunityDetailScreen() {
                               <Text className="text-xs font-semibold uppercase text-primary-600">
                                 {showingWeekly ? 'Weekly' : 'Daily'} • XP {quest.xpValue}
                               </Text>
-                              <Text className="text-[10px] text-typography-400">Seq {quest.periodSeq}</Text>
+                              <Text className="text-[10px] text-typography-400">
+                                Seq {quest.periodSeq}
+                              </Text>
                             </HStack>
                             <Text className="text-base font-semibold text-typography-900">
                               {quest.description}
                             </Text>
                             {quest.estimatedMinutes ? (
-                              <Text className="text-xs text-typography-500">Est. {quest.estimatedMinutes} min</Text>
+                              <Text className="text-xs text-typography-500">
+                                Est. {quest.estimatedMinutes} min
+                              </Text>
                             ) : null}
 
                             <HStack className="items-center justify-between">

@@ -1,13 +1,27 @@
 import { Box } from '@/components/ui/box';
-import { Button, ButtonText } from '@/components/ui/button';
+import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
 import { useCreateClan } from '@/hooks/queries/useClan';
-import { X } from 'lucide-react-native';
+import { CreateClanInputSchema, createClanSchema } from '@/schemas/clan/createClan';
+import { useTranslation } from '@/translation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle, X } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Alert, Modal, Pressable, ScrollView, Switch, TextInput } from 'react-native';
+import { Controller, useForm } from 'react-hook-form';
+import { Modal, Pressable, ScrollView, Switch } from 'react-native';
+import {
+  FormControl,
+  FormControlError,
+  FormControlErrorIcon,
+  FormControlErrorText,
+  FormControlLabel,
+  FormControlLabelText,
+} from '../ui/form-control';
+import { Input, InputField } from '../ui/input';
+import { Textarea, TextareaInput } from '../ui/textarea';
 
 interface CreateClanModalProps {
   visible: boolean;
@@ -24,37 +38,40 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
   const [description, setDescription] = useState('');
   const [memberLimit, setMemberLimit] = useState('50');
   const [isPrivate, setIsPrivate] = useState(false);
+  const { t } = useTranslation();
+  const { mutate, isError, isPending } = useCreateClan();
 
-  const createClanMutation = useCreateClan();
+  const form = useForm<CreateClanInputSchema>({
+    resolver: zodResolver(createClanSchema),
+    defaultValues: {
+      name: '',
+      communityId: communityId,
+      description: '',
+      limit: 0,
+      isPrivate: false,
+    },
+    mode: 'onChange',
+  });
+  const {
+    handleSubmit,
+    formState: { errors, isValid },
+    setError,
+    reset,
+  } = form;
 
-  const handleCreate = async () => {
-    if (!clanName.trim()) {
-      Alert.alert('Error', 'Please enter a clan name');
-      return;
-    }
-
-    const limit = parseInt(memberLimit);
-    if (isNaN(limit) || limit < 1) {
-      Alert.alert('Error', 'Please enter a valid member limit');
-      return;
-    }
-
+  const onSubmit = async (data: CreateClanInputSchema) => {
     try {
-      await createClanMutation.mutateAsync({
-        name: clanName.trim(),
-        communityId,
-        description: description.trim() || undefined,
-        isPrivate,
-        limit,
-      });
+      await mutate(data);
 
-      Alert.alert('Success', 'Clan created successfully!');
       handleClose();
-    } catch (error) {
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to create clan');
+    } catch (err: any) {
+      const errorMessage = err?.message || t('error.auth.loginFailed');
+      setError('root', {
+        type: 'server',
+        message: errorMessage,
+      });
     }
   };
-
   const handleClose = () => {
     setClanName('');
     setDescription('');
@@ -74,7 +91,7 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
           onPress={e => e.stopPropagation()}
         >
           <ScrollView showsVerticalScrollIndicator={false}>
-            <VStack className="p-6" space="lg">
+            <Box>
               {/* Header */}
               <HStack className="items-center justify-between">
                 <VStack space="xs">
@@ -90,91 +107,164 @@ export const CreateClanModal: React.FC<CreateClanModalProps> = ({
                 </Pressable>
               </HStack>
 
-              {/* Clan Name */}
-              <VStack space="xs">
-                <Text className="text-sm font-medium text-typography-900">
-                  Clan Name <Text className="text-error-500">*</Text>
-                </Text>
-                <Box className="rounded-lg border border-outline-200 bg-background-0">
-                  <TextInput
-                    placeholder="Enter clan name"
-                    value={clanName}
-                    onChangeText={setClanName}
-                    placeholderTextColor="#9ca3af"
-                    className="px-4 py-3 text-typography-900"
-                  />
-                </Box>
-              </VStack>
+              {/* Name Field */}
+              <FormControl isInvalid={!!errors.name} isRequired>
+                <HStack className="mb-1 items-center justify-between">
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-typography-900">
+                      Clan Name
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                </HStack>
+
+                <Controller
+                  control={form.control}
+                  name="name"
+                  render={({ field: { value, onChange } }) => (
+                    <Input className="border-outline-300" size="lg" isInvalid={!!errors.name}>
+                      <InputField
+                        type="text"
+                        placeholder="Enter clan name"
+                        value={value}
+                        onChangeText={txt => {
+                          form.clearErrors('root');
+                          onChange(txt);
+                        }}
+                        autoCapitalize="none"
+                        autoComplete="name"
+                      />
+                    </Input>
+                  )}
+                />
+
+                {errors.name && (
+                  <FormControlError>
+                    <FormControlErrorIcon as={AlertCircle} />
+                    <FormControlErrorText>{errors.name.message}</FormControlErrorText>
+                  </FormControlError>
+                )}
+              </FormControl>
 
               {/* Description */}
-              <VStack space="xs">
-                <Text className="text-sm font-medium text-typography-900">Description</Text>
-                <Box className="rounded-lg border border-outline-200 bg-background-0">
-                  <TextInput
-                    placeholder="Describe your clan..."
-                    value={description}
-                    onChangeText={setDescription}
-                    placeholderTextColor="#9ca3af"
-                    className="px-4 py-3 text-typography-900"
-                    multiline
-                    numberOfLines={4}
-                    textAlignVertical="top"
-                  />
-                </Box>
-              </VStack>
+              <FormControl isInvalid={!!errors.description} isRequired>
+                <HStack className="mb-1 items-center justify-between">
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-typography-900">
+                      Clan Description
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                </HStack>
 
-              {/* Member Limit */}
-              <VStack space="xs">
-                <Text className="text-sm font-medium text-typography-900">Member Limit</Text>
-                <Box className="rounded-lg border border-outline-200 bg-background-0">
-                  <TextInput
-                    placeholder="50"
-                    value={memberLimit}
-                    onChangeText={setMemberLimit}
-                    placeholderTextColor="#9ca3af"
-                    className="px-4 py-3 text-typography-900"
-                    keyboardType="number-pad"
-                  />
-                </Box>
-              </VStack>
+                <Controller
+                  control={form.control}
+                  name="description"
+                  render={({ field: { value, onChange } }) => (
+                    <Textarea
+                      isInvalid={!!errors.description}
+                      className="min-h-[80px] rounded-lg border-outline-200 bg-background-0"
+                    >
+                      <TextareaInput
+                        placeholder="Describe your clan..."
+                        value={value}
+                        onChangeText={onChange}
+                        className="text-xs text-typography-900"
+                        placeholderTextColor="#9ca3af"
+                      />
+                    </Textarea>
+                  )}
+                />
+
+                {errors.description && (
+                  <FormControlError>
+                    <FormControlErrorIcon as={AlertCircle} />
+                    <FormControlErrorText>{errors.description.message}</FormControlErrorText>
+                  </FormControlError>
+                )}
+              </FormControl>
+              {/* limit */}
+              <FormControl isInvalid={!!errors.limit} isRequired>
+                <HStack className="mb-1 items-center justify-between">
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-typography-900">
+                      Member limit
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                </HStack>
+
+                <Controller
+                  control={form.control}
+                  name="limit"
+                  render={({ field: { value, onChange } }) => (
+                    <Input className="border-outline-300" size="lg" isInvalid={!!errors.name}>
+                      <InputField
+                        keyboardType="numeric"
+                        placeholder="Enter clan name"
+                        value={String(value)}
+                        onChangeText={txt => {
+                          form.clearErrors('root');
+                          onChange(txt);
+                        }}
+                      />
+                    </Input>
+                  )}
+                />
+
+                {errors.limit && (
+                  <FormControlError>
+                    <FormControlErrorIcon as={AlertCircle} />
+                    <FormControlErrorText>{errors.limit.message}</FormControlErrorText>
+                  </FormControlError>
+                )}
+              </FormControl>
 
               {/* Private Clan Toggle */}
-              <HStack className="items-center justify-between py-2">
-                <VStack className="flex-1">
-                  <Text className="text-sm font-medium text-typography-900">Private Clan</Text>
-                  <Text className="mt-1 text-xs text-typography-500">
-                    Only invited members can join
-                  </Text>
-                </VStack>
-                <Switch
-                  value={isPrivate}
-                  onValueChange={setIsPrivate}
-                  trackColor={{ false: '#d1d5db', true: '#8b5cf6' }}
-                  thumbColor="#ffffff"
+              <FormControl isInvalid={!!errors.limit} isRequired>
+                <HStack className="mb-1 items-center justify-between">
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-typography-900">
+                      Private Clan
+                    </FormControlLabelText>
+                    <FormControlLabelText className="mt-1 text-xs text-typography-500">
+                      Only invited members can join
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                </HStack>
+                <Controller
+                  control={form.control}
+                  name="isPrivate"
+                  render={({ field: { value, onChange } }) => (
+                    <Switch
+                      value={isPrivate}
+                      onValueChange={setIsPrivate}
+                      trackColor={{ false: '#d1d5db', true: '#8b5cf6' }}
+                      thumbColor="#ffffff"
+                    />
+                  )}
                 />
-              </HStack>
 
+                {errors.isPrivate && (
+                  <FormControlError>
+                    <FormControlErrorIcon as={AlertCircle} />
+                    <FormControlErrorText>{errors.isPrivate.message}</FormControlErrorText>
+                  </FormControlError>
+                )}
+              </FormControl>
               {/* Action Buttons */}
-              <HStack space="md" className="mt-2">
-                <Button
-                  onPress={handleClose}
-                  variant="outline"
-                  className="flex-1 border-outline-300"
-                  disabled={createClanMutation.isPending}
-                >
-                  <ButtonText className="text-typography-700">Cancel</ButtonText>
-                </Button>
-                <Button
-                  onPress={handleCreate}
-                  className="flex-1 bg-primary-600"
-                  disabled={createClanMutation.isPending}
-                >
-                  <ButtonText className="text-white">
-                    {createClanMutation.isPending ? 'Creating...' : 'Create Clan'}
-                  </ButtonText>
-                </Button>
-              </HStack>
-            </VStack>
+              <Button
+                className="mt-4 bg-typography-900"
+                onPress={handleSubmit(onSubmit)}
+                disabled={isPending || !isValid}
+              >
+                {isPending ? (
+                  <>
+                    <ButtonSpinner className="mr-2" />
+                    <ButtonText>{t('profile.form.submitting')}</ButtonText>
+                  </>
+                ) : (
+                  <ButtonText>{t('profile.form.submit')}</ButtonText>
+                )}
+              </Button>
+            </Box>
           </ScrollView>
         </Pressable>
       </Pressable>

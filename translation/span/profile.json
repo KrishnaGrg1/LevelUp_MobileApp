@@ -1,0 +1,20 @@
+{
+  "editProfile": "Editar perfil",
+  "settings": "Configuración",
+  "joined": "Se unió",
+  "accountInfo": "Información de la cuenta",
+  "changePassword": "Cambiar contraseña",
+  "form": {
+    "submit": "Actualizar perfil",
+    "submitting": "Actualizando..."
+  },
+  "deleteUser": {
+    "button": "Eliminar mi cuenta",
+    "deleting": "Eliminando...",
+    "confirmTitle": "Eliminar cuenta",
+    "confirmMessage": "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.",
+    "confirmButton": "Eliminar",
+    "success": "Cuenta eliminada exitosamente",
+    "error": "Error al eliminar la cuenta"
+  }
+}

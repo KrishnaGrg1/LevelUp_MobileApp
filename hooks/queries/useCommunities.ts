@@ -1,5 +1,6 @@
 import {
   createCommunity,
+  deleteCommunity,
   getAllMembersOfCommunity,
   getInviteCode,
   getMyCommunities,
@@ -7,9 +8,11 @@ import {
   joinWithCodeCommunity,
   leaveCommunity,
   regenerateInviteCode,
+  removeMember,
   searchCommunities,
   transferOwnership,
   updatecommunityById,
+  uploadCommunityPhoto,
 } from '@/api/endPoints/communities';
 
 import { CreateCommunityDto } from '@/api/generated';
@@ -156,15 +159,31 @@ export const useUpdateCommunity = () => {
     mutationFn: ({ id, payload }: { id: string; payload: Partial<CreateCommunityDto> }) =>
       updatecommunityById(lang, payload, id, authSession),
     onSuccess: (data, { id }) => {
-      queryClient.setQueryData(['communities', id], data);
+      queryClient.invalidateQueries({ queryKey: ['community', id] });
       queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
     },
   });
 };
 
 /**
- * Delete community mutation (admin only)
+ * Delete community mutation (owner only)
  */
+export const useDeleteCommunity = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+
+  return useMutation({
+    mutationFn: (communityId: string) => deleteCommunity(communityId, language, authSession),
+    onSuccess: (data, communityId) => {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['community', communityId] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+    },
+  });
+};
 
 /**
  * Transfer ownership mutation (owner only)
@@ -214,6 +233,46 @@ export const useRegenerateInviteCode = () => {
     onSuccess: (data, communityId) => {
       // Invalidate the invite code query to refresh with new code
       queryClient.invalidateQueries({ queryKey: ['community', communityId, 'invite-code'] });
+    },
+  });
+};
+
+/**
+ * Remove member from community (owner/admin only)
+ */
+export const useRemoveMember = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+
+  return useMutation({
+    mutationFn: ({ communityId, memberId }: { communityId: string; memberId: string }) =>
+      removeMember(communityId, memberId, language, authSession),
+    onSuccess: (data, { communityId }) => {
+      // Invalidate queries to refresh member list
+      queryClient.invalidateQueries({ queryKey: ['community', communityId] });
+      queryClient.invalidateQueries({ queryKey: ['communities', communityId] });
+      queryClient.invalidateQueries({ queryKey: ['communities', communityId, 'members'] });
+    },
+  });
+};
+
+/**
+ * Upload community photo (owner only)
+ */
+export const useUploadCommunityPhoto = () => {
+  const queryClient = useQueryClient();
+  const language = LanguageStore.getState().language;
+  const authSession = authStore.getState().authSession as string;
+
+  return useMutation({
+    mutationFn: ({ communityId, photoFile }: { communityId: string; photoFile: FormData }) =>
+      uploadCommunityPhoto(communityId, photoFile, language, authSession),
+    onSuccess: (data, { communityId }) => {
+      // Invalidate queries to refresh community data with new photo
+      queryClient.invalidateQueries({ queryKey: ['community', communityId] });
+      queryClient.invalidateQueries({ queryKey: ['communities', communityId] });
+      queryClient.invalidateQueries({ queryKey: ['userCommunities'] });
     },
   });
 };

@@ -314,6 +314,7 @@ export const updatecommunityById = async (
   try {
     const response = await axiosInstance.patch<communityDetailByIdResponse>(
       `/community/${communityId}`,
+      payload,
       {
         withCredentials: true,
         headers: {
@@ -330,7 +331,7 @@ export const updatecommunityById = async (
     const errorMessage =
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
-      'Failed to search community';
+      'Failed to update community';
     throw new Error(errorMessage);
   }
 };
@@ -362,8 +363,30 @@ export const leaveCommunity = async (communityId: string, lang: Language, authSe
   }
 };
 
-//Tranfer Ownership of a community
+// Delete a community (owner only)
+export const deleteCommunity = async (communityId: string, lang: Language, authSession: string) => {
+  try {
+    const response = await axiosInstance.delete(`/community/${communityId}`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message ||
+      err.response?.data?.message ||
+      'Failed to delete community';
+    throw new Error(errorMessage);
+  }
+};
 
+//Tranfer Ownership of a community
 export const transferOwnership = async (
   communityId: string,
   newOwnerId: string,
@@ -422,6 +445,59 @@ export const regenerateInviteCode = async (
       err.response?.data?.body?.message ||
       err.response?.data?.message ||
       'Failed to regenerate invite code';
+    throw new Error(errorMessage);
+  }
+};
+
+// Remove member from community
+export const removeMember = async (
+  communityId: string,
+  memberId: string,
+  lang: Language,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.delete(`/community/${communityId}/members/${memberId}`, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to remove member';
+    throw new Error(errorMessage);
+  }
+};
+
+// Upload community photo
+export const uploadCommunityPhoto = async (
+  communityId: string,
+  photoFile: FormData,
+  lang: Language,
+  authSession: string,
+) => {
+  try {
+    const response = await axiosInstance.post(`/community/${communityId}/upload-photo`, photoFile, {
+      withCredentials: true,
+      headers: {
+        'X-Language': lang,
+        Authorization: `Bearer ${authSession}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error: unknown) {
+    const err = error as {
+      response?: { data?: { body?: { message?: string }; message?: string } };
+    };
+    const errorMessage =
+      err.response?.data?.body?.message || err.response?.data?.message || 'Failed to upload photo';
     throw new Error(errorMessage);
   }
 };

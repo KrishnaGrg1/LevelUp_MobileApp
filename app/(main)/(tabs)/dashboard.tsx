@@ -6,7 +6,6 @@ import { ScrollView } from '@/components/ui/scroll-view';
 import { VStack } from '@/components/ui/vstack';
 
 import { CommunitiesSection } from '@/components/dashboard/CommunitiesSection';
-import { WelcomeHeader } from '@/components/dashboard/WelcomeHeader';
 
 import { useMyCommunities } from '@/hooks/queries/useCommunities';
 
@@ -28,7 +27,7 @@ function DashboardPage() {
   return (
     <Box className="flex-1 bg-background-50">
       {/* Welcome Header with Avatar, Tokens, Language Switcher */}
-      <WelcomeHeader />
+      {/* <WelcomeHeader /> */}
 
       {/* Scrollable Content */}
       <ScrollView
