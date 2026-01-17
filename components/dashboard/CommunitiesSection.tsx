@@ -134,10 +134,6 @@ export function CommunitiesSection() {
     router.push(`/communities/${communityId}` as any);
   };
 
-  const handleViewAllPress = () => {
-    router.push('/(main)/(tabs)/learn'); // Navigate to communities list
-  };
-
   if (isLoading) {
     return (
       <VStack space="md" className="py-4">
