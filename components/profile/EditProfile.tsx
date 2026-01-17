@@ -128,10 +128,10 @@ export default function EditProfileForm() {
         {isPending ? (
           <>
             <ButtonSpinner className="mr-2" />
-            <ButtonText>{t('auth.changePassword.submitting')}</ButtonText>
+            <ButtonText>{t('profile.form.submitting')}</ButtonText>
           </>
         ) : (
-          <ButtonText>{t('auth.changePassword.submit')}</ButtonText>
+          <ButtonText>{t('profile.form.submit')}</ButtonText>
         )}
       </Button>
     </Box>

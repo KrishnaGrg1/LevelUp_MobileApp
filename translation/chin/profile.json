@@ -1,0 +1,20 @@
+{
+  "editProfile": "编辑个人资料",
+  "settings": "设置",
+  "joined": "加入时间",
+  "accountInfo": "帐户信息",
+  "changePassword": "更改密码",
+  "form": {
+    "submit": "更新个人资料",
+    "submitting": "更新中..."
+  },
+  "deleteUser": {
+    "button": "删除我的帐户",
+    "deleting": "正在删除...",
+    "confirmTitle": "删除帐户",
+    "confirmMessage": "您确定要删除您的帐户吗？此操作无法撤消。",
+    "confirmButton": "删除",
+    "success": "帐户删除成功",
+    "error": "删除帐户失败"
+  }
+}

@@ -18,7 +18,7 @@ export const AccountInfoCard: React.FC<AccountInfoCardProps> = ({ email, joinedD
   return (
     <Card className="mt-6 border-0 bg-white p-4 shadow-sm dark:bg-background-900">
       <Text className="text-sm font-medium text-typography-500">
-        {t('profile.accountInfo', 'Account Information')}
+        {t('profile.accountInfo')}
       </Text>
       <VStack className="mt-3" space="sm">
         <HStack className="items-center" space="sm">
@@ -30,7 +30,7 @@ export const AccountInfoCard: React.FC<AccountInfoCardProps> = ({ email, joinedD
         <HStack className="items-center" space="sm">
           <Icon as={Calendar} size="sm" className="text-typography-500" />
           <Text className="text-sm text-typography-900">
-            {t('profile.joined', 'Joined')} {joinedDate}
+            {t('profile.joined')} {joinedDate}
           </Text>
         </HStack>
       </VStack>

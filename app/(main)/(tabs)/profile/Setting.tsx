@@ -53,7 +53,7 @@ export default function SettingPage() {
             router.replace('/(main)/(tabs)/profile/changePassword');
           }}
         >
-          <ButtonText>Change Password</ButtonText>
+          <ButtonText>{t('profile.changePassword')}</ButtonText>
         </Button>
         <DeleteUser />
         <Button
@@ -61,7 +61,7 @@ export default function SettingPage() {
             router.replace('/(main)/(tabs)/profile/editProfile');
           }}
         >
-          <ButtonText>Edit Profile</ButtonText>
+          <ButtonText>{t('profile.editProfile')}</ButtonText>
         </Button>
       </VStack>
     </Box>

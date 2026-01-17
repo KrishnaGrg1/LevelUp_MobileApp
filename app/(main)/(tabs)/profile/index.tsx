@@ -50,13 +50,13 @@ function ProfilePage() {
     {
       id: 1,
       icon: Edit,
-      label: t('profile.editProfile', 'Edit Profile'),
+      label: t('profile.editProfile'),
       onPress: () => router.push('/(main)/(tabs)/profile/editProfile'),
     },
     {
       id: 2,
       icon: Settings,
-      label: t('profile.settings', 'Settings'),
+      label: t('profile.settings'),
       onPress: () => router.push('/(main)/(tabs)/profile/Setting'),
     },
   ];

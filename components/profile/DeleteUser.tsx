@@ -16,15 +16,15 @@ export default function DeleteUser() {
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Delete Account',
-      'Are you sure you want to delete your account? This action cannot be undone.',
+      t('profile.deleteUser.confirmTitle'),
+      t('profile.deleteUser.confirmMessage'),
       [
         {
-          text: 'Cancel',
+          text: t('auth.cancel'),
           style: 'cancel',
         },
         {
-          text: 'Delete',
+          text: t('profile.deleteUser.confirmButton'),
           style: 'destructive',
           onPress: onConfirmDelete,
         },
@@ -40,7 +40,7 @@ export default function DeleteUser() {
         duration: 3000,
         render: () => (
           <Toast action="success" variant="solid">
-            <ToastTitle>{result.body.message}</ToastTitle>
+            <ToastTitle>{result.body.message || t('profile.deleteUser.success')}</ToastTitle>
           </Toast>
         ),
       });
@@ -51,7 +51,7 @@ export default function DeleteUser() {
         duration: 3000,
         render: () => (
           <Toast action="error" variant="solid">
-            <ToastTitle>{err?.message || 'Failed to delete account'}</ToastTitle>
+            <ToastTitle>{err?.message || t('profile.deleteUser.error')}</ToastTitle>
           </Toast>
         ),
       });
@@ -63,7 +63,7 @@ export default function DeleteUser() {
       {error && (
         <Box className="mb-4 rounded-lg border border-error-200 bg-error-50 p-3">
           <Text className="text-center text-sm text-error-700">
-            {error?.message || 'Failed to delete account'}
+            {error?.message || t('profile.deleteUser.error')}
           </Text>
         </Box>
       )}
@@ -72,10 +72,10 @@ export default function DeleteUser() {
         {isPending ? (
           <>
             <ButtonSpinner className="mr-2" />
-            <ButtonText>Deleting...</ButtonText>
+            <ButtonText>{t('profile.deleteUser.deleting')}</ButtonText>
           </>
         ) : (
-          <ButtonText>Delete My Account</ButtonText>
+          <ButtonText>{t('profile.deleteUser.button')}</ButtonText>
         )}
       </Button>
     </Box>
