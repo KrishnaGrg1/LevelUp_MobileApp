@@ -73,8 +73,9 @@ function TabLayoutInner() {
   return (
     <Tabs screenOptions={screenOptions}>
       <Tabs.Screen name="dashboard" options={dashboardOptions} />
-      <Tabs.Screen name="learn" options={learnOptions} />
-      <Tabs.Screen name="challenges" options={challengesOptions} />
+      <Tabs.Screen name="quests" options={learnOptions} />
+      <Tabs.Screen name="ai-chat" options={challengesOptions} />
+      <Tabs.Screen name="leaderboard" options={profileOptions} />
       <Tabs.Screen name="profile" options={profileOptions} />
     </Tabs>
   );

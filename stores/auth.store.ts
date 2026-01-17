@@ -14,7 +14,7 @@ interface AuthState {
   isAdmin: boolean;
   setUser: (user: User) => void;
   setAdminStatus: (isAdmin: boolean) => void;
-  setAuthSession: (authSession: string) => void;
+  setAuthSession: (authSession?: string | null) => void;
   logout: () => void;
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
@@ -35,8 +35,14 @@ const authStore = create<AuthState>()(
           isAdmin: user.isAdmin === true,
         });
       },
-      setAuthSession: (authSession: string) => {
-        set({ authSession, isAuthenticated: !!authSession });
+      setAuthSession: (authSession?: string | null) => {
+        set(state => ({
+          authSession: authSession ?? state.authSession,
+          // Never flip the user back to unauthenticated just because
+          // the session string is momentarily missing. Use existing
+          // auth flag unless we have a new, truthy session value.
+          isAuthenticated: state.isAuthenticated || !!authSession,
+        }));
       },
       setAdminStatus: (isAdmin: boolean) => set({ isAdmin }),
       logout: () => {
