@@ -1,6 +1,6 @@
 import { useTranslation } from '@/translation';
 import { Tabs } from 'expo-router';
-import { BookOpen, Home, Trophy, User } from 'lucide-react-native';
+import { BookOpen, Crown, Home, Trophy, User } from 'lucide-react-native';
 import React, { useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 
@@ -49,10 +49,18 @@ function TabLayoutInner() {
     }),
     [t],
   );
-
-  const challengesOptions = useMemo(
+  const leadershipOptions = useMemo(
     () => ({
-      title: t('tabs.challenges', 'Challenges'),
+      title: t('tabs.leadership', 'Leadership'),
+      tabBarIcon: ({ color, size }: { color: string; size: number }) => (
+        <Crown color={color} size={size} />
+      ),
+    }),
+    [t],
+  );
+  const aiChatOptions = useMemo(
+    () => ({
+      title: t('tabs.ai', 'Ai Chat'),
       tabBarIcon: ({ color, size }: { color: string; size: number }) => (
         <Trophy color={color} size={size} />
       ),
@@ -74,8 +82,8 @@ function TabLayoutInner() {
     <Tabs screenOptions={screenOptions}>
       <Tabs.Screen name="dashboard" options={dashboardOptions} />
       <Tabs.Screen name="quests" options={learnOptions} />
-      <Tabs.Screen name="ai-chat" options={challengesOptions} />
-      <Tabs.Screen name="leaderboard" options={profileOptions} />
+      <Tabs.Screen name="ai-chat" options={aiChatOptions} />
+      <Tabs.Screen name="leaderboard" options={leadershipOptions} />
       <Tabs.Screen name="profile" options={profileOptions} />
     </Tabs>
   );
